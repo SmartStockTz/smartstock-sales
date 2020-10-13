@@ -1,0 +1,167 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "sales": {
+      "projectType": "library",
+      "root": "projects/sales",
+      "sourceRoot": "projects/sales/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/sales/tsconfig.lib.json",
+            "project": "projects/sales/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/sales/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/sales/src/test.ts",
+            "tsConfig": "projects/sales/tsconfig.spec.json",
+            "karmaConfig": "projects/sales/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/sales/tsconfig.lib.json",
+              "projects/sales/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "sales-mock": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/sales-mock",
+      "sourceRoot": "projects/sales-mock/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/sales-mock",
+            "index": "projects/sales-mock/src/index.html",
+            "main": "projects/sales-mock/src/main.ts",
+            "polyfills": "projects/sales-mock/src/polyfills.ts",
+            "tsConfig": "projects/sales-mock/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/sales-mock/src/favicon.ico",
+              "projects/sales-mock/src/assets"
+            ],
+            "styles": [
+              "projects/sales-mock/src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/sales-mock/src/environments/environment.ts",
+                  "with": "projects/sales-mock/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "sales-mock:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "sales-mock:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "sales-mock:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/sales-mock/src/test.ts",
+            "polyfills": "projects/sales-mock/src/polyfills.ts",
+            "tsConfig": "projects/sales-mock/tsconfig.spec.json",
+            "karmaConfig": "projects/sales-mock/karma.conf.js",
+            "assets": [
+              "projects/sales-mock/src/favicon.ico",
+              "projects/sales-mock/src/assets"
+            ],
+            "styles": [
+              "projects/sales-mock/src/styles.css"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/sales-mock/tsconfig.app.json",
+              "projects/sales-mock/tsconfig.spec.json",
+              "projects/sales-mock/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/sales-mock/e2e/protractor.conf.js",
+            "devServerTarget": "sales-mock:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "sales-mock:serve:production"
+            }
+          }
+        }
+      }
+    }},
+  "cli": {
+    "analytics": false
+  },
+  "defaultProject": "sales"
+}
