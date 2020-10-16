@@ -2,10 +2,9 @@ import {Injectable} from '@angular/core';
 import {SalesModel} from '../models/sale.model';
 import {OrderModel} from '../models/order.model';
 import {BatchModel} from '../models/batch.model';
-import {StorageService} from '../../lib/services/storage.service';
 import {StockModel} from '../models/stock.model';
 import {BFast} from 'bfastjs';
-import {SecurityUtil} from '../../lib/utils/security.util';
+import { SecurityUtil, StorageService } from '@smartstock/core-libs';
 
 @Injectable({
   providedIn: 'any'

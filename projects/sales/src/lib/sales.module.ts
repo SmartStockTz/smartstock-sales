@@ -42,6 +42,7 @@ import {OrdersTableOptionsComponent} from './components/orders-table-options.com
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {OrdersTableShowItemsComponent} from './components/orders-table-show-items.component';
 import { ConfigsService } from './services/config.service';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 
 const routes: Routes = [
@@ -53,6 +54,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    MatExpansionModule,
     CommonModule,
     RouterModule.forChild(routes),
     LibModule,
@@ -101,9 +103,19 @@ const routes: Routes = [
   ],
 })
 export class SalesModule {
-  static start(config: { android: boolean } = {android: false}, 
-    smartstock : {databaseURL : string, functionsURL : string} = {databaseURL : '', functionsURL : ''}): void {
+  static start(config: { android: boolean, electron: boolean, browser: boolean, production: boolean } = {android: false, electron: false, browser: true, production: true}, 
+    smartstock : {databaseURL : string, functionsURL : string} = {databaseURL : '', functionsURL : ''},
+    printerUrl: string = ""): void {
     ConfigsService.android = config.android;
+    ConfigsService.electron = config.electron;
+    ConfigsService.browser = config.browser;
+    ConfigsService.production = config.browser;
+    
+    
     ConfigsService.smartstock = smartstock;
+   
+   
+   
+    ConfigsService.printerUrl = printerUrl;
   }
 }

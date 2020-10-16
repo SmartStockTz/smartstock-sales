@@ -115,7 +115,7 @@ import { LogService } from '@smartstock/core-libs';
       </div>
     </div>
   `,
-  styleUrls: ['../style/mobile-pay-details.style.css']
+  styleUrls: []
 })
 export class MobilePayDetailsComponent implements OnInit {
   confirmPaymentFlag = false;

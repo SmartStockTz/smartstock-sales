@@ -10,5 +10,9 @@ export class ConfigsService{
       databaseURL : '',
       functionsURL : ''
   }
+  static printerUrl = ''
+  static production = false
+  static electron = false
+  static browser = false 
   
 }

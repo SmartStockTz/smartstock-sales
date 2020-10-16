@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 /***** move to common ********/
-import {SettingsService} from '../../account/services/settings.service';
+import {SettingsService} from '../user-modules/settings.service';
 /***** move to common ********/
-import {environment} from '../../../../environments/environment';
 import {PrinterModel} from '../models/printer.model';
+import { ConfigsService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +21,7 @@ export class PrintService {
   }
 
   private async printInDesktop(printModel: PrinterModel) {
-    this.url = `${environment.printerUrl}/print`;
+    this.url = `${ConfigsService.printerUrl}/print`;
     return this.httpClient.post(this.url, {
       data: printModel.data,
       id: printModel.id
@@ -42,21 +42,21 @@ export class PrintService {
 
     printModel.data = data;
 
-    if (!environment.production) {
+    if (!ConfigsService.production) {
       console.warn('print services disabled in dev mode');
       return;
     }
 
     // console.log(cSettings.saleWithoutPrinter);
-    if (environment.android && !cSettings.saleWithoutPrinter) {
+    if (ConfigsService.android && !cSettings.saleWithoutPrinter) {
       return 'done printing';
     }
 
-    if (environment.electron && !cSettings.saleWithoutPrinter) {
+    if (ConfigsService.electron && !cSettings.saleWithoutPrinter) {
       return await this.printInDesktop(printModel);
     }
 
-    if (environment.browser && !cSettings.saleWithoutPrinter) {
+    if (ConfigsService.browser && !cSettings.saleWithoutPrinter) {
       return await this.printInDesktop(printModel);
     }
 
