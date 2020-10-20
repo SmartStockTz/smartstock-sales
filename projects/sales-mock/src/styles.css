@@ -1,1 +1,163 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+div.mat-list-text {
+  align-items: start;
+}
+
+table {
+  width: 100%;
+}
+
+button {
+  outline: none !important;
+}
+
+
+mat-sidenav {
+  border: none !important;
+}
+
+
+.highcharts-credits {
+  display: none !important;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.my-input {
+  width: 100%;
+}
+
+.match-parent {
+  height: 100vh;
+}
+
+.match-parent-side {
+  height: 100vh;
+  width: 250px;
+}
+
+/*.mytoolbar {*/
+/*position: fixed;*/
+/*top: 0;*/
+/*height: 60px;*/
+/*z-index: 1000;*/
+/*}*/
+
+button {
+  outline: none !important;
+}
+
+.ft-button {
+  height: 48px;
+  color: white;
+  font-size: 20px;
+}
+
+.table-data-row:hover {
+  background: rgba(0, 128, 0, 0.09);
+  cursor: pointer;
+}
+
+.editable:hover {
+  outline: #0b2e13 solid 1px;
+  cursor: pointer;
+}
+
+
+.pricing-input {
+  width: 80px;
+  border-radius: 4px;
+  border: none;
+  box-shadow: none;
+  background: rgba(191, 191, 191, 0.61);
+  color: #000000;
+  padding: 8px;
+  outline: none;
+}
+
+.pricing-input::placeholder {
+  color: #535353;
+}
+
+.pricing-input:focus {
+  outline: none;
+}
+
+.dashboard-refresh-button {
+  margin-top: 6px !important;
+  margin-left: 4px !important;
+}
+
+.bill-card-top {
+  height: 125px;
+  /*// background: #FFFFFF;*/
+  border-radius: 4px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+/* width */
+/*::-webkit-scrollbar {*/
+/*  width: 5px;*/
+/*}*/
+
+/*!* Track *!*/
+/*::-webkit-scrollbar-track {*/
+/*  background: rgba(0, 170, 7, 0.33);*/
+/*  border-radius: 5px;*/
+/*  margin: 5px;*/
+/*}*/
+
+/*!* Handle *!*/
+/*::-webkit-scrollbar-thumb {*/
+/*  background: #0d3b18;*/
+/*  border-radius: 5px;*/
+/*}*/
+
+/*!* Handle on hover *!*/
+/*::-webkit-scrollbar-thumb:hover {*/
+/*  background: #0b2e13;*/
+/*}*/
+
+
+.noSelect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+.cdk-virtual-scroll-content-wrapper {
+  text-align: center;
+  padding: 2px;
+  margin-top: 8px;
+}
+
+.my-drawer-container {
+  height: 100vh;
+}
+
+div.mat-tab-body-wrapper {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12)
+}
+
+mat-sidenav-content {
+  touch-action: pan-y !important;
+  background: white;
+}
+
+
+button {
+  outline: none !important;
+}
+
+div {
+  outline: none !important;
+}

@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
-import { IndexPage } from '@smartstock/core-sales/src/lib/pages/index.page';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-root',
   template: `
-    <!-- <smartstock-sales-index></smartstock-sales-index> -->
+    <router-outlet></router-outlet>
   `,
-  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'sales-mock';

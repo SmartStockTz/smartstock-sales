@@ -1,20 +1,21 @@
 {
-  "name": "@smartstock/core-sales",
-  "version": "0.0.5",
+  "name": "@smartstocktz/sales",
+  "version": "0.0.6",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "url": "git://github.com/smartstocktz/smartstock-sale.git"
+  },
   "peerDependencies": {
     "@angular/common": "^10.1.5",
     "@angular/core": "^10.1.5",
     "@angular/material": "^10.1.3",
-    "@smartstock/core-libs": "0.0.3",
-    "@angular/cdk": "~10.1.3"
+    "@smartstocktz/core-libs": "^0.0.2",
+    "@angular/cdk": "^10.1.3",
+    "bfastjs": "^4.0.0-beta.25"
   },
   "dependencies": {
-    "tslib": "^2.0.0",
-    "@angular/common": "^10.1.5",
-    "@angular/core": "^10.1.5",
-    "@angular/material": "^10.1.3",
-    "@smartstock/core-libs": "0.0.3",
-    "@angular/cdk": "~10.1.3",
-    "bfastjs": "^4.0.0-beta.23"
+    "tslib": "^2.0.0"
   }
 }
