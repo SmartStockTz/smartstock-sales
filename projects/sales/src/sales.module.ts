@@ -46,7 +46,6 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component';
 import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
 import {MatDialogModule} from '@angular/material/dialog';
-import {HttpClientModule} from '@angular/common/http';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 

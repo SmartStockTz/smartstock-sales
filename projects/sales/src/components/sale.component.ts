@@ -1,13 +1,14 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {MatSidenav} from '@angular/material/sidenav';
+import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
 import {Router} from '@angular/router';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
-import { DeviceInfoUtil, EventService, LogService, SsmEvents, StorageService } from '@smartstocktz/core-libs';
-import { ConfigsService } from '../services/config.service';
-import { UserService } from '../user-modules/user.service';
+import {DeviceInfoUtil, EventService, LogService, SsmEvents, StorageService} from '@smartstocktz/core-libs';
+import {ConfigsService} from '../services/config.service';
+import {UserService} from '../user-modules/user.service';
+import {CartState} from '../states/cart.state';
 
 @Component({
   selector: 'smartstock-sale',
@@ -48,10 +49,12 @@ import { UserService } from '../user-modules/user.service';
           </smartstock-product-card>
         </cdk-virtual-scroll-viewport>
 
-        <div style="position: fixed; width: 100%;display: flex; flex-direction: row; justify-content: center;
-           align-items: center; z-index: 3000; left: 16px; bottom: 20px;">
+        <div style="position: absolute; width: 100%;display: flex; flex-direction: row; justify-content: center;
+        flex-wrap: wrap;
+           align-items: center; z-index: 3000; left: 0; bottom: 0; right: 0;">
           <button mat-button color="primary"
-                  *ngIf="!fetchDataProgress && products &&showRefreshCart"
+                  style="margin: 16px"
+                  *ngIf="!fetchDataProgress && products && showRefreshCart"
                   (click)="getProductsFromServer()"
                   matTooltip="Refresh products from server"
                   class="mat-fab">
@@ -78,9 +81,9 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
   searchProgressFlag = false;
   @Input() isViewedInWholesale = true;
   isMobile = ConfigsService.android;
-  noOfProductsInCart = 1;
   searchInputControl = new FormControl('');
   showRefreshCart = false;
+  @ViewChild('cartdrawer') cartDrawer: MatDrawer;
 
   constructor(private readonly router: Router,
               private readonly userDatabase: UserService,
@@ -88,20 +91,19 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
               private readonly snack: MatSnackBar,
               private readonly logger: LogService,
               private readonly eventApi: EventService,
+              private readonly cartState: CartState,
               private readonly salesState: SalesState,
   ) {
     super();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getProducts();
     this._addToCartEventListener();
-    this.eventApi.listen(SsmEvents.NO_OF_CART, data => {
-      this.showRefreshCart = data.detail === 0;
-    });
+    this.showRefreshCart = this.cartState.carts.value.length === 0;
   }
 
-  getProductsFromServer() {
+  getProductsFromServer(): void {
     this.fetchDataProgress = true;
     this.salesState.getAllStock().then(products => {
       this.fetchDataProgress = false;
@@ -112,7 +114,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
     });
   }
 
-  getProducts() {
+  getProducts(): void {
     this.fetchDataProgress = true;
     this.products = undefined;
     this.storage.getStocks().then(products => {
@@ -126,10 +128,10 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
     });
   }
 
-  filterProduct(product: string) {
-    product = product.trim();
+  filterProduct(query: string): void {
+    query = query ? query.trim() : '';
     this.searchProgressFlag = true;
-    if (product === '') {
+    if (query === '') {
       this.getProducts();
       this.searchProgressFlag = false;
       return;
@@ -137,8 +139,31 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
     this.storage.getStocks().then(allStocks => {
       this.searchProgressFlag = false;
       if (allStocks) {
-        this.products = allStocks.filter(stock =>
-          stock.product.toLowerCase().trim().includes(product.trim().toLowerCase()) && stock.saleable === true);
+        // get index of product by barcode
+        const index = allStocks.findIndex((x: StockModel) => {
+          const barcode = x.barcode ? x.barcode : '';
+          return query.trim() === barcode.trim();
+        });
+        if (index >= 0) {
+          this.cartState.addToCart({
+            product: allStocks[index],
+            quantity: 1
+          });
+          this.searchInputControl.setValue('');
+          if (this.enoughWidth()) {
+            this.cartDrawer.open().catch();
+          }
+        } else {
+          // console.log(index, '**index found****');
+          this.products = allStocks.filter((stock: StockModel) => {
+              const barcode = stock.barcode ? stock.barcode : '';
+              const productName = stock.product ? stock.product : '';
+              const resembleProductName = productName.trim().toLowerCase().includes(query.trim().toLowerCase());
+              const equalToBarcode = query.trim() === barcode.trim();
+              return (resembleProductName || equalToBarcode) && stock.saleable === true;
+            }
+          );
+        }
       } else {
         this.snack.open('No products found, try again or refresh products', 'Ok', {
           duration: 3000
@@ -151,7 +176,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
     });
   }
 
-  private _addToCartEventListener() {
+  private _addToCartEventListener(): void {
     this.eventApi.listen(SsmEvents.ADD_CART, _ => {
       this.searchInputControl.setValue('');
     });

@@ -1,24 +1,17 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-/*********** moe to common ***********/
-
-/*********** moe to common ***********/
 import {UtilsService} from '../services/utils.service';
 import {MatSidenav} from '@angular/material/sidenav';
-import {Observable, of} from 'rxjs';
-/*********** moe to common ***********/
-/*********** moe to common ***********/
-import {StockModel} from '../models/stock.model';
 
-import { DeviceInfoUtil, EventService, SsmEvents } from '@smartstocktz/core-libs';
-import { ConfigsService } from '../services/config.service';
+import {DeviceInfoUtil} from '@smartstocktz/core-libs';
+import {CartState} from '../states/cart.state';
 
 @Component({
   selector: 'smartstock-cart-preview',
   template: `
     <div style="padding: 16px" [ngClass]="isMobile?'fixed-bottom':!enoughWidth()?'fixed-bottom-web-enough-width':'fixed-bottom-web'"
-         *ngIf="(totalItems | async)  > 0">
+         *ngIf="(cartState.carts | async).length  > 0">
       <button (click)="showMainCart()" mat-flat-button class="ft-button btn-block" color="primary">
-        {{totalItems | async | number}} Items = {{totalCost | currency: 'TZS '}}
+        {{totalItems | number}} Items = {{totalCost | currency: 'TZS '}}
       </button>
     </div>
   `,
@@ -29,46 +22,29 @@ import { ConfigsService } from '../services/config.service';
 })
 export class CartPreviewComponent extends DeviceInfoUtil implements OnInit {
   totalCost = 0;
-  totalItems: Observable<number> = of(0);
+  totalItems = 0;
   @Input() isWholeSale = false;
   @Input() cartSidenav: MatSidenav;
-  isMobile = ConfigsService.android;
+  isMobile = false;
 
-  constructor(private readonly eventApi: EventService,
+  constructor(public readonly cartState: CartState,
               private readonly changeDetectorRef: ChangeDetectorRef,
-              private readonly _saleUtils: UtilsService,
-              ) {
+              private readonly utilsService: UtilsService) {
     super();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._cartEventsListen();
-    this._clearCartListener();
   }
 
-  private _cartEventsListen() {
-    this.eventApi.listen(SsmEvents.CART_ITEMS, (data) => {
-      if (data && data.detail) {
-        const cartItems = data.detail;
-        this._findTotalCost(cartItems);
-      } else {
-        console.warn('unknown event');
-      }
+  private _cartEventsListen(): void {
+    this.cartState.carts.subscribe(value => {
+      this.totalCost = this.utilsService.findTotalCartCost(value, this.isWholeSale);
+      this.totalItems = value.map(x => x.quantity).reduce((a, b) => a + b, 0);
     });
   }
 
-  private _findTotalCost(cartItems: { quantity: number, product: StockModel }[]) {
-    this.totalCost = this._saleUtils.findTotalCartCost(cartItems, this.isWholeSale);
-  }
-
-  showMainCart() {
+  showMainCart(): void {
     this.cartSidenav.opened = true;
-  }
-
-  private _clearCartListener() {
-    this.eventApi.listen(SsmEvents.NO_OF_CART, data => {
-      this.totalItems = of(data.detail);
-      this.changeDetectorRef.detectChanges();
-    });
   }
 }

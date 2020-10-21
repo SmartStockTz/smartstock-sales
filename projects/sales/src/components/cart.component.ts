@@ -9,25 +9,23 @@ import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
 import {PrintService} from '../services/print.service';
 import {StockModel} from '../models/stock.model';
-import { EventService, SecurityUtil, SsmEvents, toSqlDate } from '@smartstocktz/core-libs';
-import { ConfigsService } from '../services/config.service';
-import { SettingsService } from '../user-modules/settings.service';
-import { UserService } from '../user-modules/user.service';
+import {SecurityUtil, SsmEvents, toSqlDate} from '@smartstocktz/core-libs';
+import {ConfigsService} from '../services/config.service';
+import {SettingsService} from '../user-modules/settings.service';
+import {UserService} from '../user-modules/user.service';
+import {CartState} from '../states/cart.state';
 
 @Component({
   selector: 'smartstock-cart',
   template: `
     <div id="cart_view" [ngClass]="isMobile?'cart-mobile':'cart'">
       <mat-toolbar class="mat-elevation-z3" style="z-index: 10000">
-
         <span [matBadge]="getTotalCartItem().toString()" matBadgeOverlap="false">Cart</span>
         <span style="flex-grow: 1;"></span>
         <button mat-icon-button (click)="cartdrawer.toggle()" style="float: right;">
           <mat-icon>close</mat-icon>
         </button>
-
       </mat-toolbar>
-
       <div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">
         <div style="width: 100%; padding: 6px">
           <input autocomplete="false"
@@ -35,7 +33,6 @@ import { UserService } from '../user-modules/user.service';
              padding: 4px; border-radius: 4px;width: 100%; height: 48px;"
                  [formControl]="customerFormControl" placeholder="Customer Name"
                  type="text" [matAutocomplete]="auto">
-
           <mat-autocomplete #auto="matAutocomplete">
             <mat-option *ngFor="let option of customers | async" [value]="option">
               {{option}}
@@ -43,10 +40,9 @@ import { UserService } from '../user-modules/user.service';
           </mat-autocomplete>
         </div>
       </div>
-
       <div style="margin-bottom: 300px">
         <mat-list>
-          <div *ngFor="let cart of cartProducts | async; let i=index">
+          <div *ngFor="let cart of cartState.carts | async; let i=index">
             <mat-list-item>
               <button (click)="removeCart(i)" matSuffix mat-icon-button>
                 <mat-icon color="warn">delete</mat-icon>
@@ -70,7 +66,6 @@ import { UserService } from '../user-modules/user.service';
           </div>
         </mat-list>
       </div>
-
       <div style="padding: 8px 8px 16px 8px;bottom: 0;width: 100%;position: absolute;background-color: white;z-index: 1000;">
         <mat-divider style="margin-bottom: 7px"></mat-divider>
         <div class="cart-total">
@@ -95,7 +90,6 @@ import { UserService } from '../user-modules/user.service';
           <span style="float: right;">{{totalCost | currency: 'TZS '}}</span>
         </button>
       </div>
-
     </div>
   `,
   styleUrls: ['../styles/cart.style.css'],
@@ -106,12 +100,12 @@ import { UserService } from '../user-modules/user.service';
 })
 export class CartComponent implements OnInit {
 
-  constructor(private readonly eventService: EventService,
-              private readonly saleDatabase: SalesState,
-              private readonly settings: SettingsService,
-              private readonly printer: PrintService,
-              private readonly userApi: UserService,
-              private readonly customerApi: CustomerState,
+  constructor(private readonly salesState: SalesState,
+              private readonly settingsService: SettingsService,
+              private readonly printService: PrintService,
+              private readonly userService: UserService,
+              private readonly customerState: CustomerState,
+              public readonly cartState: CartState,
               private readonly snack: MatSnackBar) {
   }
 
@@ -123,35 +117,32 @@ export class CartComponent implements OnInit {
   customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(3)]);
   customers: Observable<string[]>;
   customersArray: string[];
-  cartProductsArray: { quantity: number, product: StockModel }[] = [];
-  cartProducts: Observable<{ quantity: number, product: StockModel }[]> = of(this.cartProductsArray);
   checkoutProgress = false;
   private currentUser: any;
-  isMobile = ConfigsService.android;
+  isMobile = false;
 
   private static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
     return (data.totalDiscount / data.totalItems);
   }
 
-  private static getQuantity(isViewedInWholesale: boolean, cart: CartModel) {
+  private static getQuantity(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? (cart.quantity * cart.stock.wholesaleQuantity) : cart.quantity;
   }
 
-  private static getPrice(isViewedInWholesale: boolean, cart: CartModel) {
+  private static getPrice(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? cart.stock.wholesalePrice : cart.stock.retailPrice;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getUser();
     this._cartListener();
     this._discountListener();
-    this._hideCartListener();
     this._handleCustomerNameControl();
     this._getCustomers();
   }
 
-  private getUser() {
-    this.userApi.currentUser()
+  private getUser(): void {
+    this.userService.currentUser()
       .then(value => {
         this.currentUser = value;
       })
@@ -160,11 +151,11 @@ export class CartComponent implements OnInit {
       });
   }
 
-  private _handleCustomerNameControl() {
+  private _handleCustomerNameControl(): void {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
       if (enteredName) {
-        this.customerApi.getCustomers()
+        this.customerState.getCustomers()
           .then(customers => {
             if (!customers) {
               customers = [];
@@ -180,68 +171,42 @@ export class CartComponent implements OnInit {
     });
   }
 
-  private _cartListener() {
-    this.eventService.listen(SsmEvents.ADD_CART, (event) => {
-      const cart = event.detail;
-      const updateItem = this.cartProductsArray.find(x => x.product.id === cart.product.id);
-      if (updateItem != null) {
-        const index = this.cartProductsArray.indexOf(updateItem);
-        this.cartProductsArray[index].quantity = this.cartProductsArray[index].quantity + cart.quantity;
-      } else {
-        this.cartProductsArray.push(cart);
+  private _cartListener(): void {
+    this.cartState.carts.subscribe(_ => {
+      if (!_ || (_ && _.length === 0)) {
+        this.cartdrawer.opened = false;
       }
-      this.cartProducts = of(this.cartProductsArray);
-      this.eventService.broadcast(SsmEvents.CART_ITEMS, this.cartProductsArray);
-      this.eventService.broadcast(
-        SsmEvents.NO_OF_CART,
-        this.cartProductsArray.map(cartItem => cartItem.quantity).reduce((a, b) => a + b, 0)
-      );
-      this._getTotal(this.discountFormControl.value);
+      this._getTotal(this.discountFormControl.value ? this.discountFormControl.value : 0);
     });
   }
 
-  getTotalCartItem() {
-    const totalCart = this.cartProductsArray.map(cartItem => cartItem.quantity).reduce((a, b) => a + b, 0);
-    this.eventService.broadcast(SsmEvents.NO_OF_CART, totalCart);
-    return totalCart;
+  getTotalCartItem(): number {
+    return this.cartState.carts.value.map(cartItem => cartItem.quantity).reduce((a, b) => a + b, 0);
   }
 
-  private _getTotal(discount: number) {
-    if (discount != null) {
-      this.totalCost = this.cartProductsArray
-        .map<number>(value => {
-          return value.quantity * (this.isViewedInWholesale ? value.product.wholesalePrice : value.product.retailPrice) as number;
-        })
-        .reduce((a, b) => {
-          return a + b;
-        }, -discount);
-    }
-    this.eventService.broadcast(SsmEvents.NO_OF_CART, this.cartProductsArray.length);
+  private _getTotal(discount: number): void {
+    this.totalCost = this.cartState.carts.value
+      .map<number>(value => {
+        return value.quantity * (this.isViewedInWholesale ? value.product.wholesalePrice : value.product.retailPrice) as number;
+      })
+      .reduce((a, b) => {
+        return a + b;
+      }, (discount && typeof discount === 'number') ? -discount : 0);
   }
 
-  decrementQty(indexOfProductInCart: number) {
-    this.cartProducts.subscribe(cart => {
-      if (cart[indexOfProductInCart].quantity > 1) {
-        cart[indexOfProductInCart].quantity = cart[indexOfProductInCart].quantity - 1;
-      }
-    });
-    this._getTotal(this.discountFormControl.value ? this.discountFormControl.value : 0);
+  decrementQty(indexOfProductInCart: number): void {
+    this.cartState.decrementCartItemQuantity(indexOfProductInCart);
   }
 
-  incrementQty(indexOfProductInCart: number) {
-    this.cartProducts.subscribe(cart => {
-      cart[indexOfProductInCart].quantity = cart[indexOfProductInCart].quantity + 1;
-    });
-    this._getTotal(this.discountFormControl.value ? this.discountFormControl.value : 0);
+  incrementQty(indexOfProductInCart: number): void {
+    this.cartState.incrementCartItemQuantity(indexOfProductInCart);
   }
 
-  removeCart(indexOfProductInCart: number) {
-    this.cartProductsArray.splice(indexOfProductInCart, 1);
-    this.cartProducts = of(this.cartProductsArray);
-    this._getTotal(this.discountFormControl.value ? this.discountFormControl.value : 0);
+  removeCart(indexOfProductInCart: number): void {
+    this.cartState.removeItemFromCart(indexOfProductInCart);
   }
 
-  private _discountListener() {
+  private _discountListener(): void {
     this.discountFormControl.valueChanges.subscribe(value => {
       if (!value) {
         this._getTotal(0);
@@ -252,30 +217,16 @@ export class CartComponent implements OnInit {
     });
   }
 
-  private _hideCartListener() {
-    this.eventService.listen(SsmEvents.NO_OF_CART, (data) => {
-      if (!data && !data.detail) {
-        this.cartdrawer.opened = false;
-      }
-      if (!isNaN(data.detail) && data.detail === 0) {
-        this.cartdrawer.opened = false;
-      }
-    });
-  }
-
-  checkout() {
-
+  checkout(): void {
     if (this.isViewedInWholesale && !this.customerFormControl.valid) {
       this.snack.open('Please enter customer name, atleast three characters required', 'Ok', {
         duration: 3000
       });
       return;
     }
-
     this.checkoutProgress = true;
-
     if (this.customerFormControl.valid) {
-      this.customerApi.saveCustomer({
+      this.customerState.saveCustomer({
         displayName: this.customerFormControl.value,
       }).catch();
     }
@@ -289,23 +240,21 @@ export class CartComponent implements OnInit {
     return amount - CartComponent._getCartItemDiscount({totalDiscount: cart.totalDiscount, totalItems: cart.totalItems});
   }
 
-  async submitBill(cartId: string) {
+  async submitBill(cartId: string): Promise<void> {
     const sales: SalesModel[] = this._getSalesBatch();
-    await this.saleDatabase.saveSales(sales, cartId);
-    this.cartProductsArray = [];
-    this.cartProducts = of([]);
+    await this.salesState.saveSales(sales, cartId);
+    this.cartState.carts.next([]);
     this.customerFormControl.setValue(null);
     this._getTotal(0);
-    this.eventService.broadcast(SsmEvents.CART_ITEMS, []);
   }
 
-  printCart() {
+  printCart(): void {
     this.checkoutProgress = true;
     const cartId = SecurityUtil.generateUUID();
     const cartItems = this._getCartItems();
-    this.printer.print({
+    this.printService.print({
       data: this.cartItemsToPrinterData(cartItems, this.isViewedInWholesale ? this.customerFormControl.value : null),
-      printer: ConfigsService.android ? 'jzv3' : 'tm20',
+      printer: 'tm20',
       id: cartId,
       qr: cartId
     }).then(_ => {
@@ -334,7 +283,7 @@ export class CartComponent implements OnInit {
     }
     let totalBill = 0;
     carts.forEach((cart, index) => {
-      totalBill += <number>cart.amount;
+      totalBill += (cart.amount as number);
       data = data.concat(
         '\n-------------------------------\n' +
         (index + 1) + '.  ' + cart.product + '\n' +
@@ -352,10 +301,10 @@ export class CartComponent implements OnInit {
   }
 
   private _getCartItems(): CartModel[] {
-    return this.cartProductsArray.map<CartModel>(value => {
+    return this.cartState.carts.value.map<CartModel>(value => {
       return {
         amount: this._getCartItemSubAmount({
-          totalItems: this.cartProductsArray.length,
+          totalItems: this.cartState.carts.value.length,
           totalDiscount: this.discountFormControl.value,
           product: value.product,
           quantity: value.quantity
@@ -364,7 +313,7 @@ export class CartComponent implements OnInit {
         quantity: value.quantity,
         stock: value.product,
         discount: CartComponent._getCartItemDiscount({
-          totalItems: this.cartProductsArray.length,
+          totalItems: this.cartState.carts.value.length,
           totalDiscount: this.discountFormControl.value,
         })
       };
@@ -376,16 +325,16 @@ export class CartComponent implements OnInit {
     const idTra = 'n';
     const channel = this.isViewedInWholesale ? 'whole' : 'retail';
     const sales: SalesModel[] = [];
-    this.cartProductsArray.forEach(value => {
+    this.cartState.carts.value.forEach(value => {
       sales.push({
         amount: this._getCartItemSubAmount({
-          totalItems: this.cartProductsArray.length,
+          totalItems: this.cartState.carts.value.length,
           totalDiscount: this.discountFormControl.value,
           product: value.product,
           quantity: value.quantity
         }),
         discount: CartComponent._getCartItemDiscount({
-          totalItems: this.cartProductsArray.length,
+          totalItems: this.cartState.carts.value.length,
           totalDiscount: this.discountFormControl.value,
         }),
         quantity: this.isViewedInWholesale
@@ -394,9 +343,9 @@ export class CartComponent implements OnInit {
         product: value.product.product,
         category: value.product.category,
         unit: value.product.unit,
-        channel: channel,
+        channel,
         date: stringDate,
-        idTra: idTra,
+        idTra,
         customer: this.isViewedInWholesale
           ? this.customerFormControl.value
           : null,
@@ -408,11 +357,11 @@ export class CartComponent implements OnInit {
     return sales;
   }
 
-  private _getCustomers() {
+  private _getCustomers(): void {
     if (!this.isViewedInWholesale) {
       return;
     }
-    this.customerApi.getCustomers()
+    this.customerState.getCustomers()
       .then(customers => {
         if (!customers) {
           customers = [];

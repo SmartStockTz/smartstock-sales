@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-/***** move to common ********/
 import {SettingsService} from '../user-modules/settings.service';
-/***** move to common ********/
 import {PrinterModel} from '../models/printer.model';
 import { ConfigsService } from './config.service';
 
@@ -16,11 +14,11 @@ export class PrintService {
               private readonly httpClient: HttpClient) {
   }
 
-  private async printInMobile(printerModel: PrinterModel) {
+  private async printInMobile(printerModel: PrinterModel): Promise<string> {
     return 'done printing';
   }
 
-  private async printInDesktop(printModel: PrinterModel) {
+  private async printInDesktop(printModel: PrinterModel): Promise<any> {
     this.url = `${ConfigsService.printerUrl}/print`;
     return this.httpClient.post(this.url, {
       data: printModel.data,

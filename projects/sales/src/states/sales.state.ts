@@ -11,7 +11,7 @@ import { SecurityUtil, StorageService } from '@smartstocktz/core-libs';
 })
 export class SalesState {
 
-  constructor(private readonly _storage: StorageService) {
+  constructor(private readonly storageService: StorageService) {
   }
 
   async getSalesByUser(userId: string, channel: string): Promise<SalesModel[]> {
@@ -53,11 +53,11 @@ export class SalesState {
         path: '/classes/sales'
       });
     });
-    return await this._storage.saveSales(batchs);
+    return await this.storageService.saveSales(batchs);
   }
 
   async getAllStock(): Promise<StockModel[]> {
-    const shop = await this._storage.getActiveShop();
+    const shop = await this.storageService.getActiveShop();
     // const totalStock = await BFast.database(shop.projectId)
     //   .collection('stocks')
     //   .query()
@@ -68,7 +68,7 @@ export class SalesState {
         cacheEnable: false,
         dtl: 0
       });
-    await this._storage.saveStocks(stocks);
+    await this.storageService.saveStocks(stocks);
     // stocks.sort((a, b) => {
     //   return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     // });

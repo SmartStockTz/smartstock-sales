@@ -1,8 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {OrderModel} from '../models/order.model';
-import { OrderService } from '../services/order.service';
-import { OrderState } from '../states/order.state';
+import {OrderState} from '../states/order.state';
 import {OrdersTableShowItemsComponent} from './orders-table-show-items.component';
 
 @Component({
@@ -11,12 +10,13 @@ import {OrdersTableShowItemsComponent} from './orders-table-show-items.component
     <div style="padding: 16px 0 24px 0;">
       <mat-nav-list>
         <div *ngIf="data.order.status!=='COMPLETED'">
-        <mat-list-item *ngIf="(orderState.markAsCompleteFlag | async) === false" (click)="markAsComplete()" >
-          <mat-icon matListIcon>done_all</mat-icon>
-          <p matLine>Mark As Complete</p>
-          <mat-card-subtitle matLine>Mark order as complete</mat-card-subtitle>
-        </mat-list-item>
-        <mat-progress-spinner *ngIf="(orderState.markAsCompleteFlag | async) === true" diameter="30" mode="indeterminate"></mat-progress-spinner>
+          <mat-list-item *ngIf="(orderState.markAsCompleteFlag | async) === false" (click)="markAsComplete()">
+            <mat-icon matListIcon>done_all</mat-icon>
+            <p matLine>Mark As Complete</p>
+            <mat-card-subtitle matLine>Mark order as complete</mat-card-subtitle>
+          </mat-list-item>
+          <mat-progress-spinner *ngIf="(orderState.markAsCompleteFlag | async) === true" diameter="30"
+                                mode="indeterminate"></mat-progress-spinner>
         </div>
         <mat-list-item (click)="showItems()">
           <mat-icon matListIcon>receipt</mat-icon>

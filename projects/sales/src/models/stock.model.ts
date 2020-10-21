@@ -1,6 +1,7 @@
 export interface StockModel {
   createdAt?: any;
   updatedAt?: any;
+  barcode?: string;
   image?: any;
   id?: string;
   _id?: string;

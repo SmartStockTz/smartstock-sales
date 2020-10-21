@@ -26,7 +26,6 @@ export class OrderService {
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
-    // console.log(orderId);
     return BFast.database().collection('orders')
       .query()
       .byId(orderId)

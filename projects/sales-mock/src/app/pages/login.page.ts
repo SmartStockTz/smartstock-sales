@@ -48,7 +48,7 @@ export class LoginPageComponent implements OnInit {
       this.isLogin = true;
       BFast.auth().logIn(this.loginForm.value.username, this.loginForm.value.password)
         .then(async user => {
-          this.router.navigateByUrl('/stock').catch(console.log);
+          this.router.navigateByUrl('/sale').catch(console.log);
           BFast.init({
             applicationId: user.applicationId,
             projectId: user.projectId
