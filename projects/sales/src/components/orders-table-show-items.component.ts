@@ -1,9 +1,10 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 import {OrderModel} from '../models/order.model';
 
+// @dynamic
 @Component({
-  selector: 'smartstock-orders-show-items',
+  selector: 'smartstock-sale-orders-show-item',
   template: `
     <div style="padding: 16px 0 24px 0;">
       <div>
@@ -24,8 +25,7 @@ import {OrderModel} from '../models/order.model';
   `
 })
 export class OrdersTableShowItemsComponent implements OnInit {
-  constructor(private readonly bottomSheetRef: MatBottomSheetRef,
-              @Inject(MAT_BOTTOM_SHEET_DATA) readonly data: { order: OrderModel }) {
+  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) readonly data: { order: OrderModel }) {
   }
 
   ngOnInit(): void {

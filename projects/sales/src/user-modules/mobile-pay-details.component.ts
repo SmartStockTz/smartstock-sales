@@ -4,7 +4,7 @@ import {FormControl, Validators} from '@angular/forms';
 import {BillingApiService} from './billing-api.service';
 import {LogService} from '@smartstocktz/core-libs';
 
-
+// @dynamic
 @Component({
   selector: 'smartstock-mobile-pay-details',
   template: `

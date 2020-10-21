@@ -1,7 +1,6 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UtilsService} from '../services/utils.service';
 import {MatSidenav} from '@angular/material/sidenav';
-
 import {DeviceInfoUtil} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 

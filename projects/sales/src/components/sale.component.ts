@@ -1,11 +1,11 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
 import {Router} from '@angular/router';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
-import {DeviceInfoUtil, EventService, LogService, SsmEvents, StorageService} from '@smartstocktz/core-libs';
+import {DeviceInfoUtil, LogService, StorageService} from '@smartstocktz/core-libs';
 import {ConfigsService} from '../services/config.service';
 import {UserService} from '../user-modules/user.service';
 import {CartState} from '../states/cart.state';
@@ -43,6 +43,7 @@ import {CartState} from '../states/cart.state';
           <smartstock-product-card style="margin: 0 5px; display: inline-block"
                                    [cartdrawer]="cartdrawer"
                                    [product]="product"
+                                   (afterAddToCart)="afterAddToCart($event)"
                                    [productIndex]="idx"
                                    [isViewedInWholesale]="isViewedInWholesale"
                                    *cdkVirtualFor="let product of products; let idx = index">
@@ -73,7 +74,7 @@ import {CartState} from '../states/cart.state';
     UserService
   ]
 })
-export class SaleComponent extends DeviceInfoUtil implements OnInit {
+export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewInit {
   products: StockModel[] = undefined;
   fetchDataProgress = false;
   showProgress = false;
@@ -90,7 +91,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
               private readonly storage: StorageService,
               private readonly snack: MatSnackBar,
               private readonly logger: LogService,
-              private readonly eventApi: EventService,
+              private readonly changeDetect: ChangeDetectorRef,
               private readonly cartState: CartState,
               private readonly salesState: SalesState,
   ) {
@@ -99,7 +100,6 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
 
   ngOnInit(): void {
     this.getProducts();
-    this._addToCartEventListener();
     this.showRefreshCart = this.cartState.carts.value.length === 0;
   }
 
@@ -154,7 +154,6 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
             this.cartDrawer.open().catch();
           }
         } else {
-          // console.log(index, '**index found****');
           this.products = allStocks.filter((stock: StockModel) => {
               const barcode = stock.barcode ? stock.barcode : '';
               const productName = stock.product ? stock.product : '';
@@ -176,9 +175,14 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit {
     });
   }
 
-  private _addToCartEventListener(): void {
-    this.eventApi.listen(SsmEvents.ADD_CART, _ => {
-      this.searchInputControl.setValue('');
-    });
+  afterAddToCart($event: any): void {
+    this.searchInputControl.setValue('');
+  }
+
+  ngAfterViewInit(): void {
+    if (this.cartState.carts.value.length > 0) {
+      this.cartDrawer.opened = true; // ().catch();
+      this.changeDetect.detectChanges();
+    }
   }
 }

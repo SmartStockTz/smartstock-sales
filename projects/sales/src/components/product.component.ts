@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -61,6 +61,7 @@ export class ProductComponent extends DeviceInfoUtil implements OnInit {
   @Input() productIndex: number;
   @Input() isViewedInWholesale = false;
   @Input() cartdrawer: MatSidenav;
+  @Output() afterAddToCart = new EventEmitter();
 
   detailView = false;
   quantityFormControl = new FormControl(1, [Validators.nullValidator, Validators.min(1)]);
@@ -106,6 +107,7 @@ export class ProductComponent extends DeviceInfoUtil implements OnInit {
     if (this.enoughWidth()) {
       this.cartdrawer.opened = true;
     }
+    this.afterAddToCart.emit();
     this.quantityFormControl.reset(1);
     this.detailView = false;
     this.flipped = null;

@@ -9,10 +9,7 @@ import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
 import {PrintService} from '../services/print.service';
 import {StockModel} from '../models/stock.model';
-import {SecurityUtil, SsmEvents, toSqlDate} from '@smartstocktz/core-libs';
-import {ConfigsService} from '../services/config.service';
-import {SettingsService} from '../user-modules/settings.service';
-import {UserService} from '../user-modules/user.service';
+import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 
 @Component({

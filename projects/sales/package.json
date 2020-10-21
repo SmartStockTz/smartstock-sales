@@ -2,10 +2,10 @@
   "name": "@smartstocktz/sales",
   "version": "0.0.6",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://npm.pkg.github.com/smartstocktz"
   },
   "repository": {
-    "url": "git://github.com/smartstocktz/smartstock-sale.git"
+    "url": "git://github.com/SmartStockTz/smartstock-sales.git"
   },
   "peerDependencies": {
     "@angular/common": "^10.1.5",

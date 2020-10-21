@@ -4,6 +4,7 @@ import {OrderModel} from '../models/order.model';
 import {OrderState} from '../states/order.state';
 import {OrdersTableShowItemsComponent} from './orders-table-show-items.component';
 
+// @dynamic
 @Component({
   selector: 'smartstock-orders-table-options',
   template: `
@@ -42,7 +43,7 @@ export class OrdersTableOptionsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  showItems() {
+  showItems(): void {
     this.bottomSheetRef.dismiss(true);
     this.bottomSheet.open(OrdersTableShowItemsComponent, {
       data: {
@@ -52,7 +53,7 @@ export class OrdersTableOptionsComponent implements OnInit {
     });
   }
 
-  markAsComplete() {
+  markAsComplete(): void {
     this.orderState.markAsComplete(this.data.order);
   }
 }
