@@ -7,7 +7,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SalesModel} from '../models/sale.model';
 import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
-import {PrintService} from '../services/print.service';
+import {PrintService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
 import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';

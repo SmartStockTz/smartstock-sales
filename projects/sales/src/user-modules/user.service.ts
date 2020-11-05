@@ -61,10 +61,10 @@ export class UserService {
     const authUser = await BFast.auth().logIn<UserModel>(user.username, user.password);
     await this.storageService.removeActiveShop();
     if (authUser && authUser.role !== 'admin') {
-      await this.storageService.saveActiveUser(authUser);
+      await this.storageService.saveActiveUser(authUser as any);
       return authUser;
     } else if (authUser && authUser.verified === true) {
-      await this.storageService.saveActiveUser(authUser);
+      await this.storageService.saveActiveUser(authUser as any);
       return authUser;
     } else {
       await BFast.functions().request('/functions/users/reVerifyAccount/' + user.username).post();
@@ -227,7 +227,7 @@ export class UserService {
 
   async updateCurrentUser(user: UserModel): Promise<UserModel> {
     try {
-      return await this.storageService.saveActiveUser(user);
+      return await this.storageService.saveActiveUser(user as any);
     } catch (e) {
       throw e;
     }
