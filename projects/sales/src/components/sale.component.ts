@@ -33,7 +33,7 @@ import {CartState} from '../states/cart.state';
                             [searchInputControl]="searchInputControl"
                             [searchProgressFlag]="searchProgressFlag"
                             [heading]="isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
-                            [cartdrawer]="cartdrawer"
+                            [cartDrawer]="cartdrawer"
                             [showProgress]="showProgress"></smartstock-toolbar>
 
         <smartstock-on-fetch *ngIf="!products || fetchDataProgress" [isLoading]="fetchDataProgress"
