@@ -11,6 +11,8 @@ import {PrintService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
 import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateUserComponent } from './create-user.component';
 
 @Component({
   selector: 'smartstock-cart',
@@ -23,8 +25,8 @@ import {CartState} from '../states/cart.state';
           <mat-icon>close</mat-icon>
         </button>
       </mat-toolbar>
-      <div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">
-        <div style="width: 100%; padding: 6px">
+      <div class="row"style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale || isViewedInInvoice">
+        <div class="col-lg-10 col-10" style="width: 100%; padding: 6px">
           <input autocomplete="false"
                  style="border: none; background-color: rgba(0, 170, 7, 0.1);
              padding: 4px; border-radius: 4px;width: 100%; height: 48px;"
@@ -36,6 +38,13 @@ import {CartState} from '../states/cart.state';
             </mat-option>
           </mat-autocomplete>
         </div>
+
+        <div class="col-lg-2 col-2" style="padding-top:6px;">
+            <button color="primary" (click)='createCustomer()' mat-icon-button>
+                <mat-icon>add_circle</mat-icon>
+            </button>
+        </div>
+
       </div>
       <div style="margin-bottom: 300px">
         <mat-list>
@@ -104,7 +113,8 @@ export class CartComponent implements OnInit {
               private readonly userService: UserService,
               private readonly customerState: CustomerState,
               public readonly cartState: CartState,
-              private readonly snack: MatSnackBar) {
+              private readonly snack: MatSnackBar,
+              public dialog: MatDialog) {
   }
 
   @Input() isViewedInWholesale = false;
@@ -140,6 +150,17 @@ export class CartComponent implements OnInit {
     this._getCustomers();
   }
 
+  createCustomer(){
+    let dialogRef = this.dialog.open(CreateUserComponent, {
+      height: '400px',
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
   private getUser(): void {
     this.userService.currentUser()
       .then(value => {
@@ -159,6 +180,7 @@ export class CartComponent implements OnInit {
             if (!customers) {
               customers = [];
             }
+
             this.customers = of(
               customers
                 .map(customer => customer.displayName)
@@ -358,7 +380,7 @@ export class CartComponent implements OnInit {
   }
 
   private _getCustomers(): void {
-    if (!this.isViewedInWholesale) {
+    if (!this.isViewedInWholesale || !this.isViewedInInvoice) {
       return;
     }
     this.customerState.getCustomers()
@@ -366,6 +388,7 @@ export class CartComponent implements OnInit {
         if (!customers) {
           customers = [];
         }
+      
         this.customers = of(customers.map(value => value.displayName));
       })
       .catch();

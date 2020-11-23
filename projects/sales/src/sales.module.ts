@@ -49,6 +49,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { PayByCreditPageComponent } from './pages/pay_by_credit.page';
 import { PayByInvoicesComponent } from './pages/pay_by_invoices.page';
+import { CreateUserComponent } from './components/create-user.component';
 
 
 const routes: Routes = [
@@ -106,6 +107,7 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    CreateUserComponent,
     PayByInvoicesComponent,
     PayByCreditPageComponent,
     OrdersTableShowItemsComponent,
