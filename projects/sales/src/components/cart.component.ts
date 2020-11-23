@@ -46,7 +46,8 @@ import {CartState} from '../states/cart.state';
               </button>
               <h4 matLine>{{cart.product.product}}</h4>
               <mat-card-subtitle
-                matLine>{{isViewedInWholesale ? '(' + cart.product.wholesaleQuantity + ') ' : ''}}{{cart.quantity}} {{cart.product.unit}}
+                matLine>
+                {{isViewedInWholesale ? '(' + cart.product.wholesaleQuantity + ') ' : ''}}{{cart.quantity}} {{cart.product.unit}}
                 @{{isViewedInWholesale ? cart.product.wholesalePrice : cart.product.retailPrice}}
                 = {{cart.quantity * (isViewedInWholesale ? cart.product.wholesalePrice : cart.product.retailPrice) | number}}
               </mat-card-subtitle>
@@ -107,6 +108,7 @@ export class CartComponent implements OnInit {
   }
 
   @Input() isViewedInWholesale = false;
+  @Input() isViewedInInvoice = false;
   @Input() cartdrawer: MatSidenav;
 
   totalCost = 0;

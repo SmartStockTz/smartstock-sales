@@ -47,13 +47,17 @@ import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component
 import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { PayByCreditPageComponent } from './pages/pay_by_credit.page';
+import { PayByInvoicesComponent } from './pages/pay_by_invoices.page';
 
 
 const routes: Routes = [
   {path: '', component: IndexPage},
   {path: 'order', component: OrderPage},
   {path: 'whole', component: WholePageComponent},
-  {path: 'retail', component: RetailPageComponent}
+  {path: 'retail', component: RetailPageComponent},
+  {path: 'pay_by_credit', component: PayByCreditPageComponent},
+  {path: 'invoice', component: PayByInvoicesComponent}
 ];
 
 @NgModule({
@@ -102,6 +106,8 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    PayByInvoicesComponent,
+    PayByCreditPageComponent,
     OrdersTableShowItemsComponent,
     OrdersTableOptionsComponent,
     OrderPaymentStatusComponent,
