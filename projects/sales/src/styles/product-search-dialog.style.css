@@ -1,0 +1,25 @@
+.search-input {
+    background: #FAFAFA;
+    border: 1px solid #E0E0E0;
+    box-sizing: border-box;
+    border-radius: 6px;
+  
+    padding: 0 8px;
+  
+    outline: none !important;
+  
+    width: 535px;
+    height: 48px;
+  
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+    /* identical to box height */
+  
+  
+    color: #027206;
+  }
+  
+  

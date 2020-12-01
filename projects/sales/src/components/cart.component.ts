@@ -1,18 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
-import {Observable, of} from 'rxjs';
-import {MatSidenav} from '@angular/material/sidenav';
-import {SalesState} from '../states/sales.state';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {SalesModel} from '../models/sale.model';
-import {CartModel} from '../models/cart.model';
-import {CustomerState} from '../states/customer.state';
-import {PrintService} from '@smartstocktz/core-libs';
-import {StockModel} from '../models/stock.model';
-import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
-import {CartState} from '../states/cart.state';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { MatSidenav } from '@angular/material/sidenav';
+import { SalesState } from '../states/sales.state';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SalesModel } from '../models/sale.model';
+import { CartModel } from '../models/cart.model';
+import { CreditorState } from '../states/creditor.state';
+import { PrintService } from '@smartstocktz/core-libs';
+import { StockModel } from '../models/stock.model';
+import { SecurityUtil, SettingsService, toSqlDate, UserService } from '@smartstocktz/core-libs';
+import { CartState } from '../states/cart.state';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateUserComponent } from './create-user.component';
+import { CreateCreditorComponent } from './create-creditor.component';
 
 @Component({
   selector: 'smartstock-cart',
@@ -30,17 +30,18 @@ import { CreateUserComponent } from './create-user.component';
           <input autocomplete="false"
                  style="border: none; background-color: rgba(0, 170, 7, 0.1);
              padding: 4px; border-radius: 4px;width: 100%; height: 48px;"
-                 [formControl]="customerFormControl" placeholder="Customer Name"
+                 [formControl]="creditorFormControl" placeholder="Creditor Name"
                  type="text" [matAutocomplete]="auto">
           <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let option of customers | async" [value]="option">
-              {{option}}
+            <mat-option *ngFor="let option of customers | async" [value]="option.company">
+              <!-- {{option.firstName + " " + option.secondName}} -->
+              {{option.company}}
             </mat-option>
           </mat-autocomplete>
         </div>
 
         <div class="col-lg-2 col-2" style="padding-top:6px;">
-            <button color="primary" (click)='createCustomer()' mat-icon-button>
+            <button color="primary" (click)='createCreditor()' mat-icon-button>
                 <mat-icon>add_circle</mat-icon>
             </button>
         </div>
@@ -108,13 +109,13 @@ import { CreateUserComponent } from './create-user.component';
 export class CartComponent implements OnInit {
 
   constructor(private readonly salesState: SalesState,
-              private readonly settingsService: SettingsService,
-              private readonly printService: PrintService,
-              private readonly userService: UserService,
-              private readonly customerState: CustomerState,
-              public readonly cartState: CartState,
-              private readonly snack: MatSnackBar,
-              public dialog: MatDialog) {
+    private readonly settingsService: SettingsService,
+    private readonly printService: PrintService,
+    private readonly userService: UserService,
+    private readonly creditorState: CreditorState,
+    public readonly cartState: CartState,
+    private readonly snack: MatSnackBar,
+    public dialog: MatDialog) {
   }
 
   @Input() isViewedInWholesale = false;
@@ -123,8 +124,8 @@ export class CartComponent implements OnInit {
 
   totalCost = 0;
   discountFormControl = new FormControl(0, [Validators.nullValidator, Validators.min(0)]);
-  customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(3)]);
-  customers: Observable<string[]>;
+  creditorFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(3)]);
+  customers: Observable<any[]>;
   customersArray: string[];
   checkoutProgress = false;
   private currentUser: any;
@@ -146,12 +147,12 @@ export class CartComponent implements OnInit {
     this.getUser();
     this._cartListener();
     this._discountListener();
-    this._handleCustomerNameControl();
-    this._getCustomers();
+    this._handleCreditorNameControl();
+    this._getCreditors();
   }
 
-  createCustomer(){
-    let dialogRef = this.dialog.open(CreateUserComponent, {
+  createCreditor() {
+    let dialogRef = this.dialog.open(CreateCreditorComponent, {
       height: '400px',
       width: '600px',
     });
@@ -171,11 +172,11 @@ export class CartComponent implements OnInit {
       });
   }
 
-  private _handleCustomerNameControl(): void {
+  private _handleCreditorNameControl(): void {
     this.customersArray = [];
-    this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
+    this.creditorFormControl.valueChanges.subscribe((enteredName: string) => {
       if (enteredName) {
-        this.customerState.getCustomers()
+        this.creditorState.getCreditors()
           .then(customers => {
             if (!customers) {
               customers = [];
@@ -239,16 +240,16 @@ export class CartComponent implements OnInit {
   }
 
   checkout(): void {
-    if (this.isViewedInWholesale && !this.customerFormControl.valid) {
+    if (this.isViewedInWholesale && !this.creditorFormControl.valid) {
       this.snack.open('Please enter customer name, atleast three characters required', 'Ok', {
         duration: 3000
       });
       return;
     }
     this.checkoutProgress = true;
-    if (this.customerFormControl.valid) {
-      this.customerState.saveCustomer({
-        displayName: this.customerFormControl.value,
+    if (this.creditorFormControl.valid) {
+      this.creditorState.saveCreditor({
+        displayName: this.creditorFormControl.value,
       }).catch();
     }
     this.printCart();
@@ -258,14 +259,14 @@ export class CartComponent implements OnInit {
     const amount = this.isViewedInWholesale
       ? (cart.quantity * cart.product.wholesalePrice)
       : (cart.quantity * cart.product.retailPrice);
-    return amount - CartComponent._getCartItemDiscount({totalDiscount: cart.totalDiscount, totalItems: cart.totalItems});
+    return amount - CartComponent._getCartItemDiscount({ totalDiscount: cart.totalDiscount, totalItems: cart.totalItems });
   }
 
   async submitBill(cartId: string): Promise<void> {
     const sales: SalesModel[] = this._getSalesBatch();
     await this.salesState.saveSales(sales, cartId);
     this.cartState.carts.next([]);
-    this.customerFormControl.setValue(null);
+    this.creditorFormControl.setValue(null);
     this._getTotal(0);
   }
 
@@ -274,7 +275,7 @@ export class CartComponent implements OnInit {
     const cartId = SecurityUtil.generateUUID();
     const cartItems = this._getCartItems();
     this.printService.print({
-      data: this.cartItemsToPrinterData(cartItems, this.isViewedInWholesale ? this.customerFormControl.value : null),
+      data: this.cartItemsToPrinterData(cartItems, this.isViewedInWholesale ? this.creditorFormControl.value : null),
       printer: 'tm20',
       id: cartId,
       qr: cartId
@@ -282,13 +283,13 @@ export class CartComponent implements OnInit {
       return this.submitBill(cartId);
     }).then(_ => {
       this.checkoutProgress = false;
-      this.snack.open('Done save sales', 'Ok', {duration: 2000});
+      this.snack.open('Done save sales', 'Ok', { duration: 2000 });
     }).catch(reason => {
       this.checkoutProgress = false;
       this.snack.open(
         reason && reason.message ? reason.message : reason.toString(),
         'Ok',
-        {duration: 3000}
+        { duration: 3000 }
       );
     }).finally(() => {
       this.discountFormControl.setValue(0);
@@ -368,7 +369,7 @@ export class CartComponent implements OnInit {
         date: stringDate,
         idTra,
         customer: this.isViewedInWholesale
-          ? this.customerFormControl.value
+          ? this.creditorFormControl.value
           : null,
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
@@ -379,17 +380,19 @@ export class CartComponent implements OnInit {
     return sales;
   }
 
-  private _getCustomers(): void {
+  private _getCreditors(): void {
     if (!this.isViewedInWholesale || !this.isViewedInInvoice) {
       return;
     }
-    this.customerState.getCustomers()
+    this.creditorState.getCreditors()
       .then(customers => {
         if (!customers) {
           customers = [];
         }
-      
-        this.customers = of(customers.map(value => value.displayName));
+
+        this.customers = of(customers);
+
+        // this.customers = of(customers.map(value => value.displayName));
       })
       .catch();
   }

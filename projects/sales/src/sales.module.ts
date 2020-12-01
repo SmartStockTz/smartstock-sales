@@ -22,7 +22,7 @@ import {ProductComponent} from './components/product.component';
 import {RetailPageComponent} from './pages/retail.page';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatBadgeModule} from '@angular/material/badge';
-import {MatRippleModule} from '@angular/material/core';
+import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
 import {MatListModule} from '@angular/material/list';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {SaleComponent} from './components/sale.component';
@@ -49,7 +49,11 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { PayByCreditPageComponent } from './pages/pay_by_credit.page';
 import { PayByInvoicesComponent } from './pages/pay_by_invoices.page';
-import { CreateUserComponent } from './components/create-user.component';
+import { CreateCreditorComponent } from './components/create-creditor.component';
+import { SaleByCreditCreateFormComponent } from './components/create-sale-by-credit-form.component';
+import { ProductSearchDialogComponent } from './components/product-search.component';
+import { InfoDialogComponent } from './components/info-dialog.component';
+import { MatSelectModule } from '@angular/material/select';
 
 
 const routes: Routes = [
@@ -75,6 +79,8 @@ const routes: Routes = [
       ]
     },
     LibModule,
+    MatSelectModule,
+    MatNativeDateModule,
     MatSidenavModule,
     MatFormFieldModule,
     MatAutocompleteModule,
@@ -107,7 +113,10 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
-    CreateUserComponent,
+    InfoDialogComponent,
+    ProductSearchDialogComponent,
+    SaleByCreditCreateFormComponent,
+    CreateCreditorComponent,
     PayByInvoicesComponent,
     PayByCreditPageComponent,
     OrdersTableShowItemsComponent,

@@ -19,4 +19,5 @@ export interface SalesModel {
   stock?: StockModel;
   batch?: string; // for offline sync
   stockId: string;
+  creditor?: any;
 }
