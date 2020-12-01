@@ -54,6 +54,8 @@ import { SaleByCreditCreateFormComponent } from './components/create-sale-by-cre
 import { ProductSearchDialogComponent } from './components/product-search.component';
 import { InfoDialogComponent } from './components/info-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
+import { InvoicesPageComponent } from './pages/invoices.page';
+import { InvoicesListComponent } from './components/invoices-list.component';
 
 
 const routes: Routes = [
@@ -62,7 +64,8 @@ const routes: Routes = [
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
   {path: 'pay_by_credit', component: PayByCreditPageComponent},
-  {path: 'invoice', component: PayByInvoicesComponent}
+  {path: 'invoice', component: PayByInvoicesComponent},
+  {path: "list_invoices", component: InvoicesPageComponent}
 ];
 
 @NgModule({
@@ -113,6 +116,8 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    InvoicesPageComponent,
+    InvoicesListComponent,
     InfoDialogComponent,
     ProductSearchDialogComponent,
     SaleByCreditCreateFormComponent,

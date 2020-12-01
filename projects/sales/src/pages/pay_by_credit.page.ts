@@ -51,11 +51,11 @@ export class PayByCreditPageComponent extends DeviceInfoUtil implements OnInit {
             path: '/sale/list_invoices',
             icon: 'receipt'
         },
-        {
-            name: 'Price List',
-            path: '/sale/price_list',
-            icon: 'person'
-        },
+        // {
+        //     name: 'Price List',
+        //     path: '/sale/price_list',
+        //     icon: 'person'
+        // },
 
     ]
 }
