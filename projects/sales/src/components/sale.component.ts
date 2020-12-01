@@ -21,7 +21,7 @@ import {CartState} from '../states/cart.state';
 
       <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end" [mode]="enoughWidth()?'side':'over'"
                    [opened]="false">
-        <smartstock-cart [isViewedInInvoice]="isViewedInInvoice" [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></smartstock-cart>
+        <smartstock-cart  [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></smartstock-cart>
       </mat-sidenav>
 
       <mat-sidenav-content style="display:flex; flex-direction: column">
