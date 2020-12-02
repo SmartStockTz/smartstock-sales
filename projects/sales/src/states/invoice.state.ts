@@ -11,6 +11,16 @@ export class InvoiceState{
 
     }
 
+    async getTotalInvoice(): Promise<number> {
+      const shop = await this.storageService.getActiveShop();
+      return await BFast.database(shop.projectId)
+        .collection('sales')
+        .query()
+        .count(true)
+        .equalTo('channel', 'invoice')
+        .find();
+    }
+
     async getInvoices(pagination: { size: number, skip: number }): Promise<any[]> {
         const shop = await this.storageService.getActiveShop();
         return await BFast.database(shop.projectId)
@@ -27,5 +37,5 @@ export class InvoiceState{
         // console.log(invoices);
         // invoices = invoices.filter(val => val.channel === 'invoice')
         // return invoices;
-      }
+    }
 }

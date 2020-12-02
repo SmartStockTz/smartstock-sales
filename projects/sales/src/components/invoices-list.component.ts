@@ -70,7 +70,7 @@ import { MatSort } from '@angular/material/sort';
           <mat-progress-spinner matTooltip="fetch invoices" [diameter]="30" mode="indeterminate"
                                 color="primary"></mat-progress-spinner>
         </div>
-        <mat-paginator #paginator (page)="pageChanged()" [pageSize]="10" [pageSizeOptions]="[5,10,50]" showFirstLastButtons></mat-paginator>
+        <mat-paginator [pageIndex]="0" #paginator (page)="pageChanged()" [pageSize]="10" [pageSizeOptions]="[5,10,50]" showFirstLastButtons></mat-paginator>
       </mat-card-content>
     </mat-card>
   `,
@@ -107,22 +107,24 @@ export class InvoicesListComponent implements OnInit, AfterViewInit {
 
     getInvoices(): void {
         this.fetchinvoicesFlag = true;
+        this.invoicesDatasource.paginator = this.matPaginator;
         this.changeDector.detectChanges();
-       
-        this.invoiceState.getInvoices({size:  this.matPaginator.pageSize, skip: this.matPaginator.pageSize * this.matPaginator.pageIndex}).then(
-            data => {
+        this.invoiceState.getTotalInvoice().then(total=>{
+          this.invoicesDatasource.paginator.length = total;
+          this.invoicesDatasource.paginator.pageIndex = this.invoicesDatasource.data.length/this.matPaginator.pageSize;
+          return this.invoiceState.getInvoices({
+            size:  this.matPaginator.pageSize,
+            skip: this.matPaginator.pageSize * this.matPaginator.pageIndex
+          });
+        }).then(data => {
                 this.invoicesArray = data;
-                this.invoicesDatasource = new MatTableDataSource<any>(this.invoicesArray);
-                this.invoicesDatasource.paginator = this.matPaginator;
+                this.invoicesDatasource.data = this.invoicesArray;
                 this.invoicesDatasource.sort = this.sort;
                 this.fetchinvoicesFlag = false;
                 this.changeDector.detectChanges();
-            }
-        ).catch(reason => {
+        }).catch(reason => {
             console.log(reason);
             this.fetchinvoicesFlag = false;
-        }).finally(() => {
-            
         });
 
     }
