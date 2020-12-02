@@ -56,6 +56,7 @@ import { InfoDialogComponent } from './components/info-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
 import { InvoicesPageComponent } from './pages/invoices.page';
 import { InvoicesListComponent } from './components/invoices-list.component';
+import { CreateCustomerComponent } from './components/create-customer-form.component';
 
 
 const routes: Routes = [
@@ -116,6 +117,7 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    CreateCustomerComponent,
     InvoicesPageComponent,
     InvoicesListComponent,
     InfoDialogComponent,

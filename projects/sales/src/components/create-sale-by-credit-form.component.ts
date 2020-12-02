@@ -5,7 +5,6 @@ import { MessageService, SecurityUtil, toSqlDate, UserService } from '@smartstoc
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { StockModel } from '../models/stock.model';
-import { InfoDialogComponent } from './info-dialog.component';
 import { ProductSearchDialogComponent } from './product-search.component';
 import { CreateCreditorComponent } from './create-creditor.component';
 import { Observable } from 'rxjs';
@@ -13,7 +12,8 @@ import { CreditorState } from '../states/creditor.state';
 import { of } from 'rxjs/internal/observable/of';
 import { SalesModel } from '../models/sale.model';
 import { SalesState } from '../states/sales.state';
-import { UserModel } from 'bfastjs/dist/models/UserModel';
+import { CustomerState } from '../states/customer.state';
+import { CreateCustomerComponent } from './create-customer-form.component';
 
 @Component({
   selector: 'smartstock-sales-create-sale-by-credit-form',
@@ -35,6 +35,24 @@ import { UserModel } from 'bfastjs/dist/models/UserModel';
             </div>
             <div class="col-lg-6 col-6" style="padding-top:6px;">
               <button color="primary" (click)='createCreditor()' mat-icon-button>
+                  <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+           </div>
+
+           <mat-label>Choose Customer</mat-label>
+            <div class="row" style="padding: 0px 0 0 0">
+              <div class="col-lg-6 col-6" style="width: 100%; padding: 10 10 10 10; margin-left: 0px">
+                    <mat-form-field   appearance="fill">
+                    <mat-select formControlName="customer">
+                       <mat-option  *ngFor="let option of customers | async" [value]="option.displayName">
+                         {{option.displayName}}
+                       </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+            </div>
+            <div class="col-lg-6 col-6" style="padding-top:6px;">
+              <button color="primary" (click)='createCustomer()' mat-icon-button>
                   <mat-icon>add_circle</mat-icon>
               </button>
             </div>
@@ -122,6 +140,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   showProgress = false;
   private currentUser: any;
   creditors: Observable<any[]>;
+  customers: Observable<any[]>;
   transferFormGroup: FormGroup;
   transfersDatasource: MatTableDataSource<{ quantity: number, product: StockModel, amount: number }> = new MatTableDataSource([]);
   transfersTableColumn = ['product', 'quantity', 'amount', 'subAmount', 'action'];
@@ -131,6 +150,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   constructor(private readonly formBuilder: FormBuilder,
     private readonly message: MessageService,
     private readonly userService: UserService,
+    private readonly customerState: CustomerState,
     private readonly salesState: SalesState,
     private readonly dialog: MatDialog,
     public readonly transferState: TransferState,
@@ -140,14 +160,28 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   ngOnInit(): void {
     this.transferFormGroup = this.formBuilder.group({
       date: [new Date(), [Validators.required, Validators.nullValidator]],
-      note: ['stock transfer', [Validators.required, Validators.nullValidator]],
+      note: ['Invoice note', [Validators.nullValidator]],
       creditor: [null, [Validators.required, Validators.nullValidator]],
+      customer: [null, [Validators.required, Validators.nullValidator]],
       amount: [null, [Validators.required, Validators.nullValidator]],
     });
 
     this._handleCreditorNameControl();
     this._getCreditors();
     this._getCurrentUser();
+    this._handleCustomerNameControl();
+    this._getCustomers();
+  }
+
+  createCustomer() {
+    let dialogRef = this.dialog.open(CreateCustomerComponent, {
+      height: '400px',
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 
   private _getCurrentUser() {
@@ -160,6 +194,33 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       });
   }
 
+  private _handleCustomerNameControl(): void {
+    this.transferFormGroup.get('customer').valueChanges.subscribe((enteredName: string) => {
+      if (enteredName) {
+        this.customerState.getCustomers()
+          .then(customers => {
+            if (!customers) {
+              customers = [];
+            }
+            this.customers = of(
+              customers
+            );
+          })
+          .catch();
+      }
+    });
+  }
+
+  private _getCustomers(): void {
+    this.customerState.getCustomers()
+      .then(customers => {
+        if (!customers) {
+          customers = [];
+        }
+        this.customers = of(customers);
+      })
+      .catch();
+  }
 
   private _handleCreditorNameControl(): void {
 
@@ -200,11 +261,16 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     this.showProgress = true;
     var sales = [];
     var creditor;
+    var customer;
 
     if (this.creditors != null) {
       this.creditors.subscribe(value => {
         creditor = value.find(val => val.company == this.transferFormGroup.get('creditor').value);
       });
+
+      this.customers.subscribe(value => {
+        customer = value.find(val => val.displayName == this.transferFormGroup.get('customer').value);
+      })
 
       this.transfersDatasource.data.forEach(element => {
         var sale: SalesModel = {
@@ -216,7 +282,8 @@ export class SaleByCreditCreateFormComponent implements OnInit {
           date: toSqlDate(this.transferFormGroup.value.date),
           user: this.currentUser?.id,
           sellerObject: this.currentUser,
-          creditor: creditor
+          creditor: creditor,
+          customer: customer
         };
         sales.push(sale)
       });

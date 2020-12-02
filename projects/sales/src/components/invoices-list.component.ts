@@ -10,5 +10,4 @@ export class InvoicesListComponent implements OnInit{
     ngOnInit(): void {
        
     }
-
 }
