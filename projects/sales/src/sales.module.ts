@@ -57,6 +57,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { InvoicesPageComponent } from './pages/invoices.page';
 import { InvoicesListComponent } from './components/invoices-list.component';
 import { CreateCustomerComponent } from './components/create-customer-form.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 
 const routes: Routes = [
@@ -83,6 +84,7 @@ const routes: Routes = [
       ]
     },
     LibModule,
+    MatMenuModule,
     MatSelectModule,
     MatNativeDateModule,
     MatSidenavModule,

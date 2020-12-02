@@ -25,8 +25,8 @@ import { CreateCustomerComponent } from './create-customer-form.component';
             <mat-label>Choose Creditor</mat-label>
             <div class="row" style="padding: 0px 0 0 0">
               <div class="col-lg-6 col-6" style="width: 100%; padding: 10 10 10 10; margin-left: 0px">
-                    <mat-form-field   appearance="fill">
-                    <mat-select formControlName="creditor">
+                    <mat-form-field style="width:100%" appearance="fill">
+                    <mat-select style="width:100%" formControlName="creditor">
                        <mat-option  *ngFor="let option of creditors | async" [value]="option.company">
                          {{option.company}}
                        </mat-option>
@@ -34,6 +34,9 @@ import { CreateCustomerComponent } from './create-customer-form.component';
                   </mat-form-field>
             </div>
             <div class="col-lg-6 col-6" style="padding-top:6px;">
+              <button color="primary" (click)='_getCreditors()' mat-icon-button>
+                  <mat-icon>refresh</mat-icon>
+              </button>
               <button color="primary" (click)='createCreditor()' mat-icon-button>
                   <mat-icon>add_circle</mat-icon>
               </button>
@@ -43,18 +46,22 @@ import { CreateCustomerComponent } from './create-customer-form.component';
            <mat-label>Choose Customer</mat-label>
             <div class="row" style="padding: 0px 0 0 0">
               <div class="col-lg-6 col-6" style="width: 100%; padding: 10 10 10 10; margin-left: 0px">
-                    <mat-form-field   appearance="fill">
-                    <mat-select formControlName="customer">
+                    <mat-form-field style="width:100%" appearance="fill">
+                    <mat-select style="width:100%" formControlName="customer">
                        <mat-option  *ngFor="let option of customers | async" [value]="option.displayName">
                          {{option.displayName}}
                        </mat-option>
                     </mat-select>
                   </mat-form-field>
             </div>
-            <div class="col-lg-6 col-6" style="padding-top:6px;">
+            <div class="col-lg-2 col-2" style="padding-top:6px;">
+              <button color="primary" (click)='_getCustomers()' mat-icon-button>
+                  <mat-icon>refresh</mat-icon>
+              </button>
               <button color="primary" (click)='createCustomer()' mat-icon-button>
                   <mat-icon>add_circle</mat-icon>
               </button>
+              
             </div>
            </div>
 
@@ -211,7 +218,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     });
   }
 
-  private _getCustomers(): void {
+  _getCustomers(): void {
     this.customerState.getCustomers()
       .then(customers => {
         if (!customers) {
@@ -240,7 +247,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     });
   }
 
-  private _getCreditors(): void {
+  _getCreditors(): void {
     this.creditorState.getCreditors()
       .then(customers => {
         if (!customers) {
@@ -283,7 +290,8 @@ export class SaleByCreditCreateFormComponent implements OnInit {
           user: this.currentUser?.id,
           sellerObject: this.currentUser,
           creditor: creditor,
-          customer: customer
+          customer: customer,
+          paid: false
         };
         sales.push(sale)
       });
