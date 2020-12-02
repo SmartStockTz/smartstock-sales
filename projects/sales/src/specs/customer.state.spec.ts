@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CustomerState } from '../states/customer.state';
+import { CreditorState } from '../states/creditor.state';
 
 describe('CustomerApiService', () => {
-  let service: CustomerState;
+  let service: CreditorState;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CustomerState);
+    service = TestBed.inject(CreditorState);
   });
 
   it('should be created', () => {

@@ -21,7 +21,7 @@ import {CartState} from '../states/cart.state';
 
       <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end" [mode]="enoughWidth()?'side':'over'"
                    [opened]="false">
-        <smartstock-cart [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></smartstock-cart>
+        <smartstock-cart  [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></smartstock-cart>
       </mat-sidenav>
 
       <mat-sidenav-content style="display:flex; flex-direction: column">
@@ -32,7 +32,7 @@ import {CartState} from '../states/cart.state';
                             searchPlaceholder="Filter product"
                             [searchInputControl]="searchInputControl"
                             [searchProgressFlag]="searchProgressFlag"
-                            [heading]="isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
+                            [heading]="isViewedInInvoice ? 'Invoice' :isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
                             [cartDrawer]="cartdrawer"
                             [showProgress]="showProgress"></smartstock-toolbar>
 
@@ -81,6 +81,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
   @ViewChild('sidenav') sidenav: MatSidenav;
   searchProgressFlag = false;
   @Input() isViewedInWholesale = true;
+  @Input() isViewedInInvoice = false;
   isMobile = ConfigsService.android;
   searchInputControl = new FormControl('');
   showRefreshCart = false;

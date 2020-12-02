@@ -1,0 +1,12 @@
+.quantity-input{
+    height: 38px;
+    background: #FAFAFA;
+    border: 1px solid #E0E0E0;
+    box-sizing: border-box;
+    border-radius: 6px;
+  
+    padding: 0 8px;
+  
+    outline: none !important;
+  }
+  

@@ -22,7 +22,7 @@ import {ProductComponent} from './components/product.component';
 import {RetailPageComponent} from './pages/retail.page';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatBadgeModule} from '@angular/material/badge';
-import {MatRippleModule} from '@angular/material/core';
+import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
 import {MatListModule} from '@angular/material/list';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {SaleComponent} from './components/sale.component';
@@ -47,13 +47,27 @@ import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component
 import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { PayByCreditPageComponent } from './pages/pay_by_credit.page';
+import { PayByInvoicesComponent } from './pages/pay_by_invoices.page';
+import { CreateCreditorComponent } from './components/create-creditor.component';
+import { SaleByCreditCreateFormComponent } from './components/create-sale-by-credit-form.component';
+import { ProductSearchDialogComponent } from './components/product-search.component';
+import { InfoDialogComponent } from './components/info-dialog.component';
+import { MatSelectModule } from '@angular/material/select';
+import { InvoicesPageComponent } from './pages/invoices.page';
+import { InvoicesListComponent } from './components/invoices-list.component';
+import { CreateCustomerComponent } from './components/create-customer-form.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 
 const routes: Routes = [
   {path: '', component: IndexPage},
   {path: 'order', component: OrderPage},
   {path: 'whole', component: WholePageComponent},
-  {path: 'retail', component: RetailPageComponent}
+  {path: 'retail', component: RetailPageComponent},
+  {path: 'pay_by_credit', component: PayByCreditPageComponent},
+  {path: 'invoice', component: PayByInvoicesComponent},
+  {path: "list_invoices", component: InvoicesPageComponent}
 ];
 
 @NgModule({
@@ -70,6 +84,9 @@ const routes: Routes = [
       ]
     },
     LibModule,
+    MatMenuModule,
+    MatSelectModule,
+    MatNativeDateModule,
     MatSidenavModule,
     MatFormFieldModule,
     MatAutocompleteModule,
@@ -102,6 +119,15 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    CreateCustomerComponent,
+    InvoicesPageComponent,
+    InvoicesListComponent,
+    InfoDialogComponent,
+    ProductSearchDialogComponent,
+    SaleByCreditCreateFormComponent,
+    CreateCreditorComponent,
+    PayByInvoicesComponent,
+    PayByCreditPageComponent,
     OrdersTableShowItemsComponent,
     OrdersTableOptionsComponent,
     OrderPaymentStatusComponent,
