@@ -21,6 +21,16 @@ export class InvoiceState{
         .find();
     }
 
+    async recordPayment(invoice){
+      const shop = await this.storageService.getActiveShop();
+      return await BFast.database(shop.projectId)
+       .collection('sales')
+       .query()
+       .byId(invoice.id)
+       .updateBuilder()
+       .set('paid', true).update();
+    }
+
     async getInvoices(pagination: { size: number, skip: number }): Promise<any[]> {
         const shop = await this.storageService.getActiveShop();
         return await BFast.database(shop.projectId)

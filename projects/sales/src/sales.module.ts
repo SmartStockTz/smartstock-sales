@@ -84,6 +84,7 @@ const routes: Routes = [
       ]
     },
     LibModule,
+    MatSortModule,
     MatMenuModule,
     MatSelectModule,
     MatNativeDateModule,
