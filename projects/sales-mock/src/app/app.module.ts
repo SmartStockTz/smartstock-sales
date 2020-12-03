@@ -15,6 +15,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { SalesWorkerService } from 'projects/sales/src/public-api';
 
 
 @NgModule({
@@ -40,11 +41,35 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor() {
+  constructor(private salesWorkerService: SalesWorkerService) {
     BFast.init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
       appPassword: 'ZMUGVn72o3yd8kSbMGhfWpI80N9nA2IHjxWKlAhG'
     });
+    this.startSalesSync();
   }
+
+  shouldRun = true;
+  
+ async startSalesSync(){
+    console.log('sales worker started');
+    this.salesWorkerService.initiateSmartStock();
+    setInterval(_ => {
+      if (this.shouldRun === true) {
+        this.shouldRun = false;
+        this.salesWorkerService.run()
+          .then(_1 => {
+          })
+          .catch(_2 => {
+          })
+          .finally(() => {
+            this.shouldRun = true;
+          });
+      } else {
+        console.log('another save sales routine runs');
+      }
+    }, 5000);
+  }
+
 }

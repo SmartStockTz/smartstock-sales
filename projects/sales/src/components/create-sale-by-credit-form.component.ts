@@ -135,7 +135,6 @@ import { CreateCustomerComponent } from './create-customer-form.component';
             </ng-container>
             <tr mat-header-row *cdkHeaderRowDef="transfersTableColumn"></tr>
             <tr mat-row *matRowDef="let row; columns transfersTableColumn"></tr>
-            <tr mat-footer-row *cdkFooterRowDef="transfersTableColumn"></tr>
           </table>
         </mat-card>
       </form>
