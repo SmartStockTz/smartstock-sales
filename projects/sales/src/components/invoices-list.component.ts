@@ -25,7 +25,8 @@ import { MatSort } from '@angular/material/sort';
     </mat-card-title>
     <mat-card class="mat-elevation-z3">
       <mat-card-content>
-        <table mat-table #invoiceSort [dataSource]="invoicesDatasource" matSortDirection="desc" class="mat-elevation-z0" style="margin-top:0px; padding: 10%" matSort>
+      <smartstock-data-not-ready *ngIf="noDataRetrieved  && !fetchinvoicesFlag"></smartstock-data-not-ready>
+        <table mat-table *ngIf="!noDataRetrieved  && !fetchinvoicesFlag"  #invoiceSort [dataSource]="invoicesDatasource" matSortDirection="desc" class="mat-elevation-z0" style="margin-top:0px; padding: 10%" matSort>
             <ng-container matColumnDef="Creditor">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Creditor </th>
             <td mat-cell *matCellDef="let element"> {{ element.creditor != null ? element.creditor.company : ""}} </td>
@@ -85,7 +86,7 @@ import { MatSort } from '@angular/material/sort';
           <mat-progress-spinner matTooltip="fetch invoices" [diameter]="30" mode="indeterminate"
                                 color="primary"></mat-progress-spinner>
         </div>
-        <mat-paginator #paginator (page)="pageChanged()" [pageSize]="10" [pageSizeOptions]="[5,10,50]" showFirstLastButtons></mat-paginator>
+        <mat-paginator #paginator (page)="pageChanged()" [pageSize]="1" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
       </mat-card-content>
     </mat-card>
   `,
@@ -94,7 +95,7 @@ import { MatSort } from '@angular/material/sort';
 export class InvoicesListComponent implements OnInit, AfterViewInit {
   @ViewChild('paginator') matPaginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  
+
   invoicesDatasource: MatTableDataSource<any> = new MatTableDataSource<any>([]);
   invoicesTableColums = ['Creditor', 'Customer', 'Amount', 'Product', 'Quantity', 'Status', 'Date', 'Actions'];
   invoicesArray: any[] = [];
@@ -105,6 +106,7 @@ export class InvoicesListComponent implements OnInit, AfterViewInit {
   itemsLength = 0;
   selectedId = 0;
   recordingPayment = false;
+  noDataRetrieved = false;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -112,19 +114,20 @@ export class InvoicesListComponent implements OnInit, AfterViewInit {
     private readonly snack: MatSnackBar,
     private readonly changeDector: ChangeDetectorRef,
     private readonly invoiceState: InvoiceState) {
+    this.getInvoices();
   }
+
   ngAfterViewInit(): void {
     this.invoicesDatasource.paginator = this.matPaginator;
     this.invoicesDatasource.sort = this.sort
-    this.getInvoices();
   }
 
   ngOnInit(): void {
+
   }
 
   pageChanged() {
-    this.pageIndex = this.matPaginator.pageIndex;
-    this.getInvoices();
+    // this.loadMore(this.matPaginator.pageIndex, this.matPaginator.pageSize);
   }
 
   async recordPayment(invoice) {
@@ -136,32 +139,62 @@ export class InvoicesListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  async loadMore(pageIndex, pageSize) {
+    console.log(this.invoicesDatasource.data.length)
+    console.log(pageIndex * pageSize)
+
+    if (pageIndex * pageSize >= this.invoicesDatasource.data.length) {
+      await this.invoiceState.getTotalInvoice().then(async total => {
+        this.itemsLength = total;
+      }).catch(err => {
+        this.noDataRetrieved = true;
+        console.log(err);
+        this.fetchinvoicesFlag = false;
+      }
+      );
+
+      await this.invoiceState.getInvoices({ size: pageSize, skip: (pageIndex * pageSize)}).then(data => {
+        this.invoicesDatasource.data = this.invoicesDatasource.data.concat(data);
+      });
+
+      this.matPaginator.length = this.itemsLength;
+    }
+  }
+
+
   async getInvoices() {
     this.fetchinvoicesFlag = true;
     this.invoicesDatasource.paginator = this.matPaginator;
-    this.changeDector.detectChanges();
 
     await this.invoiceState.getTotalInvoice().then(async total => {
       this.itemsLength = total;
-      if (this.invoicesDatasource.data.length <= this.matPaginator.pageSize * this.pageIndex) {
-        await this.invoiceState.getInvoices({
-          size: this.matPaginator.pageSize,
-          skip: this.matPaginator.pageSize * this.pageIndex
-        }).then(data => {
-          this.invoicesArray = this.invoicesArray.concat(data);
-          this.invoicesDatasource.data = this.invoicesDatasource.data.concat(this.invoicesArray);
-          this.invoicesDatasource.sort = this.sort;
+    }).catch(err => {
+      this.noDataRetrieved = true;
+      console.log(err);
+      this.fetchinvoicesFlag = false;
+    }
+    );
 
-          this.fetchinvoicesFlag = false;
-          this.changeDector.detectChanges();
-        }).catch(reason => {
-          console.log(reason);
-          this.fetchinvoicesFlag = false;
-        });
-      }
+    await this.invoiceState.getInvoices({
+      size: this.matPaginator.pageSize,
+      skip: 0
+    }).then(data => {
+      this.invoicesArray = data;
+      this.invoicesDatasource.data = this.invoicesArray;
+      this.invoicesDatasource.sort = this.sort;
+      this.noDataRetrieved = false;
+      this.fetchinvoicesFlag = false;
+
+    }).catch(reason => {
+      this.noDataRetrieved = true;
+      console.log(reason);
+      this.fetchinvoicesFlag = false;
     });
+
+    this.matPaginator.pageIndex = this.pageIndex;
     this.fetchinvoicesFlag = false;
     this.matPaginator.length = this.itemsLength;
+    this.changeDector.detectChanges();
 
 
   }

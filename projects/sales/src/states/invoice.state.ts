@@ -36,8 +36,8 @@ export class InvoiceState{
         return await BFast.database(shop.projectId)
           .collection('sales')
           .query()
-          .size(pagination.size)
-          .skip(pagination.skip)
+          // .size(pagination.size)
+          // .skip(pagination.skip)
           .equalTo('channel', 'invoice')
           .find();
         // var invoices: any[] = await BFast.database(shop.projectId)
