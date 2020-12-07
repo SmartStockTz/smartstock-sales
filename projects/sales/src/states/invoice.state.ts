@@ -1,51 +1,46 @@
 import { Injectable } from '@angular/core';
-import { StorageService } from '@smartstocktz/core-libs';
+import { MessageService, StorageService } from '@smartstocktz/core-libs';
 import { BFast } from 'bfastjs';
+import { BehaviorSubject } from 'rxjs';
 import { InvoiceModel } from '../models/invoice.model';
+import { InvoiceService } from '../services/invoice.services';
 
 @Injectable({
-    'providedIn': 'root'
+  'providedIn': 'root'
 })
-export class InvoiceState{
-    constructor(private readonly storageService: StorageService){
+export class InvoiceState {
+  isFetchingInvoices: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  totalInvoiceItems: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  invoices: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
-    }
+  constructor(private readonly invoiceService: InvoiceService, private readonly messageService: MessageService) {
 
-    async getTotalInvoice(): Promise<number> {
-      const shop = await this.storageService.getActiveShop();
-      return await BFast.database(shop.projectId)
-        .collection('sales')
-        .query()
-        .count(true)
-        .equalTo('channel', 'invoice')
-        .find();
-    }
+  }
 
-    async recordPayment(invoice){
-      const shop = await this.storageService.getActiveShop();
-      return await BFast.database(shop.projectId)
-       .collection('sales')
-       .query()
-       .byId(invoice.id)
-       .updateBuilder()
-       .set('paid', true).update();
-    }
+  countAll(): void {
+    this.invoiceService.getTotalInvoice().then(value => {
+      this.totalInvoiceItems.next(value);
+    }).catch(_ => {
 
-    async getInvoices(pagination: { size: number, skip: number }): Promise<any[]> {
-        const shop = await this.storageService.getActiveShop();
-        return await BFast.database(shop.projectId)
-          .collection('sales')
-          .query()
-          // .size(pagination.size)
-          // .skip(pagination.skip)
-          .equalTo('channel', 'invoice')
-          .find();
-        // var invoices: any[] = await BFast.database(shop.projectId)
-        //   .collection('sales')
-        //   .getAll();
+    });
+  }
 
-        // console.log(invoices);
-        // invoices = invoices.filter(val => val.channel === 'invoice')
-        // return invoices;
-    }
+  fetch(size = 20, skip = 0): void {
+    this.isFetchingInvoices.next(true);
+    this.invoiceService.getInvoices({
+      skip,
+      size
+    }).then(value => {
+      this.invoices.next(value ? value : []);
+    }).catch(reason => {
+      this.messageService.showMobileInfoMessage(reason && reason.message ? reason.message : reason.toString(), 2000, 'bottom');
+    }).finally(() => {
+      this.isFetchingInvoices.next(false);
+    });
+  }
+
+  async recordPayment(invoice){
+    return this.invoiceService.recordPayment(invoice);
+  }
+
 }
