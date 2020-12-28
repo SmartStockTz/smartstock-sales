@@ -81,10 +81,10 @@ import {CartState} from '../states/cart.state';
         <button [disabled]="checkoutProgress" (click)="checkout()"
                 style="width: 100%;text-align:left;height: 54px;font-size: 20px" color="primary"
                 mat-raised-button>
-          <span style="float: right;">{{totalCost | currency: 'TZS '}}</span>
+          <span style="float: left;">{{totalCost | currency: 'TZS '}}</span>
           <mat-progress-spinner color="primary" *ngIf="checkoutProgress" mode="indeterminate" diameter="25"
                                 style="display: inline-block"></mat-progress-spinner>
-          <span *ngIf="!checkoutProgress">Checkout</span>
+          <span style="float: right" *ngIf="!checkoutProgress">Checkout</span>
         </button>
       </div>
     </div>
