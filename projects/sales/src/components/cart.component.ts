@@ -347,6 +347,7 @@ export class CartComponent implements OnInit {
           ? this.customerFormControl.value
           : null,
         user: this.currentUser?.id,
+        sellerObject: this.currentUser,
         stock: value.product,
         stockId: value.product.id
       });

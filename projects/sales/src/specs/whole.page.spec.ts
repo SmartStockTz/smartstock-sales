@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { WholePageComponent } from '../pages/whole.page';
 
@@ -6,7 +6,7 @@ describe('WholeSaleComponent', () => {
   let component: WholePageComponent;
   let fixture: ComponentFixture<WholePageComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ WholePageComponent ]
     })

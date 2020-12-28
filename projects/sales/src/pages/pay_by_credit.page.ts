@@ -1,16 +1,18 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DeviceInfoUtil } from '@smartstocktz/core-libs';
 
 @Component({
-  selector: 'smartstock-sales-index',
-  template: `
-      <mat-sidenav-container>
+    template: `
+         <mat-sidenav-container>
           <mat-sidenav class="match-parent-side" #sidenav [mode]="enoughWidth()?'side': 'over'" [opened]="enoughWidth()">
               <smartstock-drawer></smartstock-drawer>
           </mat-sidenav>
           <mat-sidenav-content style="min-height: 100vh">
-              <smartstock-toolbar searchPlaceholder="Filter product" [heading]="'Sales'" [sidenav]="sidenav"></smartstock-toolbar>
-              <div class="container col-xl-10 col-lg-10 col-sm-9 col-md-9 col-sm-12 col-10" style="padding: 16px 0">
+              <smartstock-toolbar searchPlaceholder="Filter orders" [showSearch]="false"
+                                  (searchCallback)="onSearch($event)" [heading]="'Pay by Invoice'"
+                                  [sidenav]="sidenav"></smartstock-toolbar>
+                                  
+                                  <div class="container col-xl-10 col-lg-10 col-sm-9 col-md-9 col-sm-12 col-10" style="padding: 16px 0">
                   <h1>Go To</h1>
                   <div class="row">
                       <div *ngFor="let page of pages" routerLink="{{page.path}}" style="margin: 5px; cursor: pointer">
@@ -26,38 +28,34 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
               </div>
           </mat-sidenav-content>
       </mat-sidenav-container>
-  `
+    `,
+    selector: 'smartstock-pay-by-credit'
 })
+export class PayByCreditPageComponent extends DeviceInfoUtil implements OnInit {
+    ngOnInit() {
 
-export class IndexPage extends DeviceInfoUtil implements OnInit {
-  pages = [
-    {
-      name: 'Retail',
-      path: '/sale/retail',
-      icon: 'receipt'
-    },
-    {
-      name: 'Wholesale',
-      path: '/sale/whole',
-      icon: 'widgets'
-    },
-    {
-      name: 'Orders',
-      path: '/sale/order',
-      icon: 'local_shipping'
-    },
-    {
-      name: 'Sale by Credit',
-      path: '/sale/pay_by_credit',
-      icon: 'payments'
     }
-  ];
 
-  constructor() {
-    super();
-  }
+    onSearch($event: string): void {
 
-  ngOnInit(): void {
-  }
+    }
 
+    pages = [
+        {
+            name: 'Sell',
+            path: '/sale/invoice',
+            icon: 'shop'
+        },
+        {
+            name: 'Invoices',
+            path: '/sale/list_invoices',
+            icon: 'receipt'
+        },
+        // {
+        //     name: 'Price List',
+        //     path: '/sale/price_list',
+        //     icon: 'person'
+        // },
+
+    ]
 }

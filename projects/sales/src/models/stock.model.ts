@@ -24,4 +24,5 @@ export interface StockModel {
   wholesalePrice: any;
   supplier: string;
   expire: string;
+  
 }

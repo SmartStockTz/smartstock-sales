@@ -158,11 +158,11 @@ export class UserService {
     }
   }
 
-  async getCurrentShop(): Promise<ShopModel> {
+  async getCurrentShop(): Promise<any> {
     try {
       const activeShop = await this.storageService.getActiveShop();
       if (activeShop && activeShop.projectId && activeShop.applicationId && activeShop.projectUrlId) {
-        return activeShop;
+        return activeShop as any;
       } else {
         throw new Error('No active shop in records');
       }
@@ -174,7 +174,7 @@ export class UserService {
   async saveCurrentShop(shop: ShopModel): Promise<ShopModel> {
     try {
       await this.storageService.saveCurrentProjectId(shop.projectId);
-      return await this.storageService.saveActiveShop(shop);
+      return await this.storageService.saveActiveShop(shop as any);
     } catch (e) {
       throw e;
     }
