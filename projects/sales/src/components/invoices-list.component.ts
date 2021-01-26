@@ -77,7 +77,7 @@ import { Subject } from 'rxjs';
               <!-- <mat-progress-spinner *ngIf="recordingPayment && element.id ==  selectedId" matTooltip="fetch invoices" [diameter]="30" mode="indeterminate"
                                   color="primary" style="margin: 5px"></mat-progress-spinner> -->
            </div>
-           
+
             </td>
             </ng-container>
 
@@ -88,8 +88,8 @@ import { Subject } from 'rxjs';
           <mat-progress-spinner matTooltip="fetch invoices" [diameter]="30" mode="indeterminate"
                                 color="primary"></mat-progress-spinner>
         </div>
-        <mat-paginator 
-            #paginator 
+        <mat-paginator
+            #paginator
             (page)="loadPage($event)"
             [length]="invoiceState.totalInvoiceItems | async"
             [pageSizeOptions]="[5, 10, 20]"
@@ -127,11 +127,11 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy)
       ).subscribe(value => {
         this.invoicesDatasource.data = value;
-      });  
-      
+      });
+
       invoiceState.isFetchingInvoices.subscribe(value => {
         this.fetchinvoicesFlag = value;
-      })
+      });
     }
 
   ngOnDestroy(): void {
@@ -159,6 +159,11 @@ export class InvoicesListComponent implements OnInit, OnDestroy {
     });
   }
 
-  
+  async saveInvoice(invoice){
+    await this.invoiceState.saveInvoice(invoice).then( val => {
+        console.log(val);
+    });
+  }
+
 }
 

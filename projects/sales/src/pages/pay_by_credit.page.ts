@@ -11,7 +11,7 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
               <smartstock-toolbar searchPlaceholder="Filter orders" [showSearch]="false"
                                   (searchCallback)="onSearch($event)" [heading]="'Pay by Invoice'"
                                   [sidenav]="sidenav"></smartstock-toolbar>
-                                  
+
                                   <div class="container col-xl-10 col-lg-10 col-sm-9 col-md-9 col-sm-12 col-10" style="padding: 16px 0">
                   <h1>Go To</h1>
                   <div class="row">

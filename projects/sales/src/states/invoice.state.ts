@@ -6,7 +6,7 @@ import { InvoiceModel } from '../models/invoice.model';
 import { InvoiceService } from '../services/invoice.services';
 
 @Injectable({
-  'providedIn': 'root'
+  providedIn: 'root'
 })
 export class InvoiceState {
   isFetchingInvoices: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -43,4 +43,7 @@ export class InvoiceState {
     return this.invoiceService.recordPayment(invoice);
   }
 
+  async saveInvoice(invoice){
+    return this.invoiceService.saveInvoice(invoice);
+  }
 }

@@ -25,8 +25,6 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
     selector: 'smartstock-pay-by-invoices'
 })
 export class InvoicesPageComponent extends DeviceInfoUtil implements OnInit {
-   
     ngOnInit(){
-
     }
 }

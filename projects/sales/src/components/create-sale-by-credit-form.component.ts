@@ -14,6 +14,9 @@ import { SalesModel } from '../models/sale.model';
 import { SalesState } from '../states/sales.state';
 import { CustomerState } from '../states/customer.state';
 import { CreateCustomerComponent } from './create-customer-form.component';
+import {InvoiceModel} from '../models/invoice.model';
+import {InvoiceState} from '../states/invoice.state';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'smartstock-sales-create-sale-by-credit-form',
@@ -22,30 +25,30 @@ import { CreateCustomerComponent } from './create-customer-form.component';
       <form *ngIf="transferFormGroup" [formGroup]="transferFormGroup">
         <h1>Details</h1>
         <mat-card>
-            <mat-label>Choose Creditor</mat-label>
-            <div class="row" style="padding: 0px 0 0 0">
-              <div class="col-lg-6 col-6" style="width: 100%; padding: 10 10 10 10; margin-left: 0px">
-                    <mat-form-field style="width:100%" appearance="fill">
-                    <mat-select style="width:100%" formControlName="creditor">
-                       <mat-option  *ngFor="let option of creditors | async" [value]="option.company">
-                         {{option.company}}
-                       </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-            </div>
-            <div class="col-lg-6 col-6" style="padding-top:6px;">
-              <button color="primary" (click)='_getCreditors()' mat-icon-button>
-                  <mat-icon>refresh</mat-icon>
-              </button>
-              <button color="primary" (click)='createCreditor()' mat-icon-button>
-                  <mat-icon>add_circle</mat-icon>
-              </button>
-            </div>
-           </div>
+            <!--<mat-label>Choose Creditor</mat-label>-->
+            <!--<div class="row" style="padding: 0px 0 0 0">-->
+              <!--<div class="col-lg-6 col-6" style="width: 100%; padding: 10; margin-left: 0px">-->
+                    <!--<mat-form-field style="width:100%" appearance="fill">-->
+                    <!--<mat-select style="width:100%" formControlName="creditor">-->
+                       <!--<mat-option  *ngFor="let option of creditors | async" [value]="option.company">-->
+                         <!--{{option.company}}-->
+                       <!--</mat-option>-->
+                    <!--</mat-select>-->
+                  <!--</mat-form-field>-->
+            <!--</div>-->
+            <!--<div class="col-lg-6 col-6" style="padding-top:6px;">-->
+              <!--<button color="primary" (click)='_getCreditors()' mat-icon-button>-->
+                  <!--<mat-icon>refresh</mat-icon>-->
+              <!--</button>-->
+              <!--<button color="primary" (click)='createCreditor()' mat-icon-button>-->
+                  <!--<mat-icon>add_circle</mat-icon>-->
+              <!--</button>-->
+            <!--</div>-->
+           <!--</div>-->
 
            <mat-label>Choose Customer</mat-label>
             <div class="row" style="padding: 0px 0 0 0">
-              <div class="col-lg-6 col-6" style="width: 100%; padding: 10 10 10 10; margin-left: 0px">
+              <div class="col-lg-6 col-6" style="width: 100%; padding: 10px; margin-left: 0px">
                     <mat-form-field style="width:100%" appearance="fill">
                     <mat-select style="width:100%" formControlName="customer">
                        <mat-option  *ngFor="let option of customers | async" [value]="option.displayName">
@@ -54,6 +57,7 @@ import { CreateCustomerComponent } from './create-customer-form.component';
                     </mat-select>
                   </mat-form-field>
             </div>
+
             <div class="col-lg-2 col-2" style="padding-top:6px;">
               <button color="primary" (click)='_getCustomers()' mat-icon-button>
                   <mat-icon>refresh</mat-icon>
@@ -61,8 +65,16 @@ import { CreateCustomerComponent } from './create-customer-form.component';
               <button color="primary" (click)='createCustomer()' mat-icon-button>
                   <mat-icon>add_circle</mat-icon>
               </button>
-              
+
             </div>
+              <div class="row" style="width: 100%; padding: 10px; margin-left: 0px">
+                <mat-form-field appearance="fill">
+                  <mat-label>Due date</mat-label>
+                  <input matInput formControlName="dueDate" [matDatepicker]="picker">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
            </div>
 
           <mat-form-field appearance="outline" style="width: 100%; margin-top: 20px">
@@ -80,14 +92,16 @@ import { CreateCustomerComponent } from './create-customer-form.component';
             Add Product
           </button>
           <div style="width: 16px; height: 16px"></div>
-          <button (click)="saveCreditSale()" [disabled]="(transferState.isSaveTransfers | async) === true" mat-flat-button color="primary">
+          <button (click)="saveCreditSale()" [disabled]="showProgress" mat-flat-button color="primary">
             <mat-icon matSuffix>done_all</mat-icon>
             Submit
             <mat-progress-spinner mode="indeterminate" diameter="20" style="display: inline-block"
-                                  *ngIf="(showProgress) === true"
+                                  *ngIf="showProgress"
                                   color="primary"></mat-progress-spinner>
           </button>
-   
+          <!--<div *ngIf="showSpinner" style="padding-left: 50px ">-->
+            <!--<mat-spinner diameter="50"></mat-spinner>-->
+          <!--</div>-->
         </div>
         <mat-card>
           <table mat-table [dataSource]="transfersDatasource">
@@ -140,7 +154,7 @@ import { CreateCustomerComponent } from './create-customer-form.component';
       </form>
     </div>
   `,
-  styleUrls: ["../styles/create-sale-by-credit.style.css"]
+  styleUrls: ['../styles/create-sale-by-credit.style.css']
 })
 export class SaleByCreditCreateFormComponent implements OnInit {
   showProgress = false;
@@ -154,33 +168,36 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   totalCost = 0;
 
   constructor(private readonly formBuilder: FormBuilder,
-    private readonly message: MessageService,
-    private readonly userService: UserService,
-    private readonly customerState: CustomerState,
-    private readonly salesState: SalesState,
-    private readonly dialog: MatDialog,
-    public readonly transferState: TransferState,
-    public readonly creditorState: CreditorState) {
+              private readonly message: MessageService,
+              private readonly userService: UserService,
+              private readonly customerState: CustomerState,
+              private readonly salesState: SalesState,
+              private readonly dialog: MatDialog,
+              public readonly transferState: TransferState,
+              public readonly creditorState: CreditorState,
+              public readonly invoiceState: InvoiceState,
+              private readonly snack: MatSnackBar) {
   }
 
   ngOnInit(): void {
     this.transferFormGroup = this.formBuilder.group({
       date: [new Date(), [Validators.required, Validators.nullValidator]],
+      dueDate: [new Date(), [Validators.nullValidator]],
       note: ['Invoice note', [Validators.nullValidator]],
       creditor: [null, [Validators.required, Validators.nullValidator]],
       customer: [null, [Validators.required, Validators.nullValidator]],
       amount: [null, [Validators.required, Validators.nullValidator]],
     });
 
-    this._handleCreditorNameControl();
-    this._getCreditors();
+    // this._handleCreditorNameControl();
+    // this._getCreditors();
     this._getCurrentUser();
     this._handleCustomerNameControl();
     this._getCustomers();
   }
 
   createCustomer() {
-    let dialogRef = this.dialog.open(CreateCustomerComponent, {
+    const dialogRef = this.dialog.open(CreateCustomerComponent, {
       height: '400px',
       width: '600px',
     });
@@ -264,55 +281,68 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   }
 
   async saveCreditSale(): Promise<void> {
-    this.showProgress = true;
-    var sales = [];
-    var creditor;
-    var customer;
+    if (this.transfersDatasource.data.length === 0){
+      this.snack.open('Select Products to add before submitting', 'Ok', {
+        duration: 3000
+      });
+      return;
+    }
 
-    if (this.creditors != null) {
-      this.creditors.subscribe(value => {
-        creditor = value.find(val => val.company == this.transferFormGroup.get('creditor').value);
+    this.showProgress = true;
+
+    const items = [];
+    let customer;
+
+    // if (this.customers != null) {
+      // this.creditors.subscribe(value => {
+      //   creditor = value.find(val => val.company == this.transferFormGroup.get('creditor').value);
+      // });
+
+    this.customers.subscribe(value => {
+        customer = value.find(val => val.displayName === this.transferFormGroup.get('customer').value);
       });
 
-      this.customers.subscribe(value => {
-        customer = value.find(val => val.displayName == this.transferFormGroup.get('customer').value);
-      })
+    let totalAmount = 0;
 
-      this.transfersDatasource.data.forEach(element => {
-        var sale: SalesModel = {
-          stockId: element.product.id,
+    this.transfersDatasource.data.forEach(element => {
+        const sale = {
           stock: element.product,
           amount: element.amount,
           quantity: element.quantity,
-          channel: "invoice",
-          date: toSqlDate(this.transferFormGroup.value.date),
-          user: this.currentUser?.id,
-          sellerObject: this.currentUser,
-          creditor: creditor,
-          customer: customer,
-          paid: false
         };
-        sales.push(sale)
+        totalAmount += element.amount;
+        items.push(sale);
       });
 
-      const cartId = SecurityUtil.generateUUID();
-      this.salesState.saveSales(sales, cartId).then(val => {
-        this.transfersDatasource = new MatTableDataSource<any>();
-        this.selectedProducts = [];
-        this.totalCost = 0;
-        this.showProgress = false;
-      })
-    }
-    else {
-      this.message.showMobileInfoMessage(
-        'Please fix all errors, and make sure you add at least one product then submit again',
-        5000,
-        'bottom');
-    }
+    const invoice: InvoiceModel = {
+        date: toSqlDate(this.transferFormGroup.value.date),
+        dueDate: toSqlDate(this.transferFormGroup.value.dueDate),
+        items,
+        sellerObject: this.currentUser,
+        customer,
+        amount: totalAmount,
+        quantity: items.length,
+        batchId: SecurityUtil.generateUUID()
+      };
+
+    await this.invoiceState.saveInvoice(invoice).then( val => {
+          console.log(val);
+          this.transfersDatasource.data = [];
+    });
+    this.showProgress = false;
+    // }
+    // else {
+    //   this.message.showMobileInfoMessage(
+    //     'Please fix all errors, and make sure you add at least one product then submit again',
+    //     5000,
+    //     'bottom');
+    //   this.showProgress = false;
+    //
+    // }
   }
 
   createCreditor() {
-    let dialogRef = this.dialog.open(CreateCreditorComponent, {
+    const dialogRef = this.dialog.open(CreateCreditorComponent, {
       height: '400px',
       width: '600px',
     });
