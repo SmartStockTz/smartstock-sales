@@ -14,48 +14,56 @@ export class InvoiceService {
 
   }
 
-  async getTotalInvoice(): Promise<number> {
+  async getInvoices(pagination: { size: number, skip: number }): Promise<InvoiceModel[]> {
     const shop = await this.storageService.getActiveShop();
     return await BFast.database(shop.projectId)
-      .collection('sales')
-      .query()
-      .count(true)
-      .equalTo('channel', 'invoice')
-      .find();
-  }
-
-  async recordPayment(invoice) {
-    const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId)
-      .collection('sales')
-      .query()
-      .byId(invoice.id)
-      .updateBuilder()
-      .set('paid', true).update();
-  }
-
-  async getInvoices(pagination: { size: number, skip: number }): Promise<any[]> {
-    const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId)
-      .collection('sales')
+      .collection('invoices')
       .query()
       .size(pagination.size)
       .skip(pagination.skip)
-      .equalTo('channel', 'invoice')
+      .find();
+  }
+
+  async invoicesCount(): Promise<number>{
+    const shop = await this.storageService.getActiveShop();
+    return await BFast.database(shop.projectId)
+      .collection('invoices')
+      .query()
+      .count(true)
       .find();
   }
 
   async saveInvoice(invoice: InvoiceModel){
     const shop = await this.storageService.getActiveShop();
     return await BFast.database(shop.projectId)
-      .collection('sales')
+      .collection('invoices')
       .save(invoice);
-    // return await BFast.functions().request('http://localhost:3000/functions/invoices').post(invoice, {
-    //   headers: this.settingsService.ssmFunctionsHeader
-    // });
   }
 
-  async saveInvoiceLocally(invoice){
+  async addReturn(id: string, value: any) {
+    const shop = await this.storageService.getActiveShop();
+    const invoice: InvoiceModel = await BFast.database(shop.projectId)
+      .collection('invoices')
+      .query()
+      .byId( id)
+      .find();
 
+    const returns = [];
+
+    if (invoice && invoice.returns && Array.isArray(invoice.returns)){
+      invoice.returns.push(value);
+    } else {
+      invoice.returns = [value];
+    }
+
+    delete invoice.updatedAt;
+
+    return await BFast.database(shop.projectId)
+      .collection('invoices')
+      .query()
+      .byId(id)
+      .updateBuilder()
+      .doc(invoice)
+      .update();
   }
 }

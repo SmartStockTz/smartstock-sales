@@ -8,7 +8,7 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
                                [leftDrawer]="leftDrawer"
                                [leftDrawerMode]="enoughWidth()?'side': 'over'"
                                [leftDrawerOpened]="enoughWidth()"
-                               [heading]="'Sell by Credit'">
+                               [heading]="'Invoices'">
       <ng-template #leftDrawer>
         <smartstock-drawer></smartstock-drawer>
       </ng-template>
@@ -16,7 +16,8 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
         <div class="container col-xl-10 col-lg-10 col-sm-9 col-md-9 col-sm-12 col-10"
              style="padding: 16px 0; z-index: -1">
           <div style="margin-top: 24px">
-            <smartstock-invoices-list></smartstock-invoices-list>
+            <!--<smartstock-invoices-list></smartstock-invoices-list>-->
+            <smartstock-incomplete-invoices></smartstock-incomplete-invoices>
           </div>
         </div>
       </ng-template>

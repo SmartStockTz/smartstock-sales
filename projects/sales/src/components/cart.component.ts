@@ -159,7 +159,7 @@ export class CartComponent implements OnInit {
             }
             this.customers = of(
               customers
-                .map(customer => customer.displayName)
+                .map(customer => customer.firstName ? customer.firstName : customer.displayName)
                 .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()))
             );
           })

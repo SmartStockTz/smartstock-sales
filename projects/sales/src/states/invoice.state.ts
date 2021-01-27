@@ -17,12 +17,8 @@ export class InvoiceState {
 
   }
 
-  countAll(): void {
-    this.invoiceService.getTotalInvoice().then(value => {
-      this.totalInvoiceItems.next(value);
-    }).catch(_ => {
-
-    });
+  async countAll(): Promise<any> {
+      return this.invoiceService.invoicesCount();
   }
 
   fetch(size = 20, skip = 0): void {
@@ -39,8 +35,11 @@ export class InvoiceState {
     });
   }
 
-  async recordPayment(invoice){
-    return this.invoiceService.recordPayment(invoice);
+  async fetchSync(size= 20, skip = 0): Promise<InvoiceModel[]>{
+    return await this.invoiceService.getInvoices({
+      skip,
+      size
+    });
   }
 
   async saveInvoice(invoice){

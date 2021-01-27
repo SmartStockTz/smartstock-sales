@@ -7,9 +7,9 @@ export interface InvoiceModel{
   quantity?: number;
   amount?: number;
   customer?: string;
-  discount?: number;
   sellerObject?: any;
-  returns?: [number];
+  returns?: [any];
   dueDate?: any;
   batchId?: string;
+  updatedAt?: string;
 }

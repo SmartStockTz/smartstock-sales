@@ -51,8 +51,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
               <div class="col-lg-6 col-6" style="width: 100%; padding: 10px; margin-left: 0px">
                     <mat-form-field style="width:100%" appearance="fill">
                     <mat-select style="width:100%" formControlName="customer">
-                       <mat-option  *ngFor="let option of customers | async" [value]="option.displayName">
-                         {{option.displayName}}
+                       <mat-option  *ngFor="let option of customers | async" [value]='option.firstName'>
+                         {{option.secondName ?( option.firstName + " " + option.secondName) : option.firstName}}
                        </mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -240,6 +240,8 @@ export class SaleByCreditCreateFormComponent implements OnInit {
         if (!customers) {
           customers = [];
         }
+
+        customers = customers.filter( customer => customer.firstName);
         this.customers = of(customers);
       })
       .catch();
@@ -293,14 +295,9 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     const items = [];
     let customer;
 
-    // if (this.customers != null) {
-      // this.creditors.subscribe(value => {
-      //   creditor = value.find(val => val.company == this.transferFormGroup.get('creditor').value);
-      // });
-
     this.customers.subscribe(value => {
-        customer = value.find(val => val.displayName === this.transferFormGroup.get('customer').value);
-      });
+        customer = value.find(val => val.firstName === this.transferFormGroup.get('customer').value);
+    });
 
     let totalAmount = 0;
 
@@ -310,7 +307,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
           amount: element.amount,
           quantity: element.quantity,
         };
-        totalAmount += element.amount;
+        totalAmount += element.amount * element.quantity;
         items.push(sale);
       });
 
@@ -326,19 +323,17 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       };
 
     await this.invoiceState.saveInvoice(invoice).then( val => {
-          console.log(val);
           this.transfersDatasource.data = [];
+          this.selectedProducts = [];
+          this.snack.open('Your invoice has been recorded.', 'Ok', {
+        duration: 3000
+      });
+    }).catch( err => {
+      this.snack.open('Please fix all errors, and make sure you add at least one product then submit again', 'Ok', {
+        duration: 3000
+      });
     });
     this.showProgress = false;
-    // }
-    // else {
-    //   this.message.showMobileInfoMessage(
-    //     'Please fix all errors, and make sure you add at least one product then submit again',
-    //     5000,
-    //     'bottom');
-    //   this.showProgress = false;
-    //
-    // }
   }
 
   createCreditor() {
