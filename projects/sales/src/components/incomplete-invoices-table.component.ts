@@ -198,6 +198,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
         id: invoice.id,
         date:  invoice.date,
         amount: invoice.amount,
+        amountDue: invoice.amountDue,
         businessName:  invoice.sellerObject.businessName,
         sellerFirstName:  invoice.sellerObject.firstname,
         sellerLastName:  invoice.sellerObject.lastname,

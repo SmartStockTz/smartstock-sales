@@ -96,7 +96,6 @@ import {InvoiceModel} from '../models/invoice.model';
     </div>
   `,
   styleUrls: ['../styles/invoice-details.style.css'],
-
 })
 export class InvoiceDetailsComponent implements OnInit{
   returnsData: MatTableDataSource<any>;

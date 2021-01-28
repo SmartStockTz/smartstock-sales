@@ -31,8 +31,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
          <p>{{data.sellerFirstName | titlecase }} {{data.sellerLastName | titlecase}}</p>
        </div>
         <div>
-          <p class="mb-0">Amount</p>
-          <p>{{data.amount | currency: ' '}}</p>
+          <p class="mb-0">Amount Due</p>
+          <p>{{data.amountDue | currency: ' '}}</p>
         </div>
       </div>
       <hr class="my-0">
@@ -77,7 +77,7 @@ export class AddReturnSheetComponent implements OnInit{
               private readonly snack: MatSnackBar) {
     this.addReturnsFormControl = this.formBuilder.group({
       date: [ new Date(), [Validators.nullValidator, Validators.required]],
-      amount: [new Date(), [Validators.nullValidator, Validators.required]]
+      amount: [0, [Validators.nullValidator, Validators.required]]
       }
     );
   }
@@ -86,7 +86,14 @@ export class AddReturnSheetComponent implements OnInit{
   }
 
   addReturn() {
-    if (this.addReturnsFormControl.value) {
+    if (this.addReturnsFormControl.value && this.addReturnsFormControl.value.amount !== 0) {
+      if (this.addReturnsFormControl.value.amount > this.data.amountDue){
+        console.log(this.addReturnsFormControl.value.amount)
+        this.snack.open('Amount entered is higher than the debt', 'Ok', {
+          duration: 3000
+        });
+        return;
+      }
       // this.returnsData.data.push(this.addReturnsFormControl.value);
       this.invoiceService.addReturn(this.data.id, this.addReturnsFormControl.value);
       this.returnsDetailsSheetRef.dismiss({
