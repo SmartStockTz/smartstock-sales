@@ -61,7 +61,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
                                   *ngIf="loading"
                                   color="primary"
             style="margin-top: 5px"></mat-progress-spinner>
-            <button mat-raised-button color="warn" (click)="addReturn()">Add Return</button>
+            <button mat-raised-button color="warn" [disabled]="loading" (click)="addReturn()">Add Return</button>
           </div>
         </form>
       </div>
