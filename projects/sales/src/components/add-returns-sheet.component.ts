@@ -57,6 +57,10 @@ import {MatSnackBar} from '@angular/material/snack-bar';
         </mat-form-field>
         </div>
           <div class="row justify-content-end pr-4" >
+            <mat-progress-spinner mode="indeterminate" diameter="30" style="display: inline-block"
+                                  *ngIf="loading"
+                                  color="primary"
+            style="margin-top: 5px"></mat-progress-spinner>
             <button mat-raised-button color="warn" (click)="addReturn()">Add Return</button>
           </div>
         </form>
@@ -69,6 +73,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 })
 export class AddReturnSheetComponent implements OnInit{
   addReturnsFormControl: FormGroup;
+  loading = false
 
   constructor(private returnsDetailsSheetRef: MatBottomSheetRef<AddReturnSheetComponent>,
               @Inject(MAT_BOTTOM_SHEET_DATA) public data,
@@ -85,7 +90,7 @@ export class AddReturnSheetComponent implements OnInit{
   ngOnInit(): void {
   }
 
-  addReturn() {
+  async addReturn() {
     if (this.addReturnsFormControl.value && this.addReturnsFormControl.value.amount !== 0) {
       if (this.addReturnsFormControl.value.amount > this.data.amountDue){
         console.log(this.addReturnsFormControl.value.amount)
@@ -95,8 +100,10 @@ export class AddReturnSheetComponent implements OnInit{
         return;
       }
       // this.returnsData.data.push(this.addReturnsFormControl.value);
-      this.invoiceService.addReturn(this.data.id, this.addReturnsFormControl.value);
-      this.returnsDetailsSheetRef.dismiss({
+      this.loading = true;
+      await this.invoiceService.addReturn(this.data.id, this.addReturnsFormControl.value);
+      this.loading = false;
+      await this.returnsDetailsSheetRef.dismiss({
         id: this.data.id,
         returns: this.addReturnsFormControl.value
       });
