@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {SettingsService, StorageService} from '@smartstocktz/core-libs';
 import {BFast} from 'bfastjs';
 import {InvoiceModel} from '../models/invoice.model';
+import {QueryOrder} from 'bfastjs/dist/controllers/QueryController';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class InvoiceService {
     return await BFast.database(shop.projectId)
       .collection('invoices')
       .query()
+      .orderBy('date', -1)
       .size(pagination.size)
       .skip(pagination.skip)
       .find();

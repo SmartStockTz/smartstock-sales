@@ -21,6 +21,16 @@ export class InvoiceState {
       return this.invoiceService.invoicesCount();
   }
 
+  calculateTotalReturns(returns: [any]){
+    if (returns && Array.isArray(returns)){
+      return returns.map(a => a.amount).reduce((a, b, i) => {
+        return a + b;
+      });
+    } else {
+      return 0.0;
+    }
+  }
+
   fetch(size = 20, skip = 0): void {
     this.isFetchingInvoices.next(true);
     this.invoiceService.getInvoices({

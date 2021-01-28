@@ -6,7 +6,7 @@ export interface InvoiceModel{
   items?: any[];
   quantity?: number;
   amount?: number;
-  customer?: string;
+  customer?: any;
   sellerObject?: any;
   returns?: [any];
   dueDate?: any;

@@ -8,12 +8,24 @@ import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceDetailsComponent} from './invoice-details.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {AddReturnSheetComponent} from './add-returns-sheet.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   template: `
     <mat-card-title>Invoices</mat-card-title>
+    <div class="row justify-content-end">
+      <div class="col-2" style="margin-right: 9em">
+        <mat-form-field>
+          <mat-label>Filter</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Ex. John" #input>
+        </mat-form-field>
+      </div>
+    </div>
+
     <div class="mat-elevation-z8">
-      <table mat-table [dataSource]="dataSource" matSort>
+      <mat-progress-bar *ngIf="fetchingInvoices" mode="indeterminate" color="primary"></mat-progress-bar>
+      <smartstock-data-not-ready *ngIf="noData"></smartstock-data-not-ready>
+      <table mat-table *ngIf="!noData" [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="Invoice Id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Invoice Id</th>
           <td mat-cell *matCellDef="let row"> {{row.id}} </td>
@@ -21,17 +33,17 @@ import {AddReturnSheetComponent} from './add-returns-sheet.component';
 
         <ng-container matColumnDef="Customer">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Customer</th>
-          <td mat-cell *matCellDef="let row"> {{row.customer.firstName + " " + row.customer.secondName}} </td>
+          <td mat-cell *matCellDef="let row"> {{row.fullCustomerName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Amount Due">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount Due</th>
-          <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+          <td mat-cell *matCellDef="let row"> {{row.amountDue}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Amount Paid">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount Paid</th>
-          <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+          <td mat-cell *matCellDef="let row"> {{row.amountPaid}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Due Date">
@@ -46,13 +58,13 @@ import {AddReturnSheetComponent} from './add-returns-sheet.component';
 
         <ng-container matColumnDef="Seller">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Seller</th>
-          <td mat-cell *matCellDef="let row"> {{row.sellerObject.firstname + " " + row.sellerObject.lastname}} </td>
+          <td mat-cell *matCellDef="let row"> {{row.fullSellerName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Actions">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Actions</th>
           <td mat-cell *matCellDef="let row">
-            <button mat-raised-button color="warn" (click)="clickRow(row, 'button', $event)">Add Returns</button>
+            <button mat-raised-button [disabled]="row.paid" color="warn" (click)="clickRow(row, 'button', $event)">Add Returns</button>
           </td>
         </ng-container>
 
@@ -61,9 +73,7 @@ import {AddReturnSheetComponent} from './add-returns-sheet.component';
             *matRowDef="let row; columns: displayedColumns;"></tr>
 
       </table>
-
-      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
-
+      <mat-paginator *ngIf="!noData" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
     </div>
   `,
   selector: 'smartstock-incomplete-invoices',
@@ -78,6 +88,8 @@ import {AddReturnSheetComponent} from './add-returns-sheet.component';
 })
 export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<InvoiceModel>;
+  fetchingInvoices = false;
+  noData = false;
   displayedColumns = ['Invoice Id', 'Customer', 'Amount Due', 'Amount Paid', 'Due Date', 'Date of Sale', 'Seller', 'Actions'];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -85,18 +97,49 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
 
   constructor(private invoiceState: InvoiceState,
               private invoiceDetails: MatBottomSheet,
-              private addReturnsSheet: MatBottomSheet) {
-
-  }
+              private addReturnsSheet: MatBottomSheet,
+              private snack: MatSnackBar) {}
 
   ngOnInit(): void {
     this.fetchInvoices();
-
   }
 
   async fetchInvoices() {
-    this.dataSource = new MatTableDataSource(await this.invoiceState.fetchSync((await this.invoiceState.countAll()), 0));
-    this.dataSource.sort = this.sort;
+    this.fetchingInvoices = true;
+    try{
+      let invoices = await this.invoiceState.fetchSync(await this.invoiceState.countAll(), 0);
+      invoices = invoices.map(((value: InvoiceModel, index) => {
+        return {
+          ...value,
+          fullCustomerName: value.customer.firstName + ' ' + value.customer.secondName,
+          amountDue: value.amount - this.invoiceState.calculateTotalReturns(value.returns),
+          amountPaid: this.invoiceState.calculateTotalReturns(value.returns),
+          fullSellerName: value.sellerObject.firstname + ' ' + value.sellerObject.lastname,
+          paid: value.amount <= this.invoiceState.calculateTotalReturns(value.returns),
+          customerCompany: value.customer.company
+        };
+      }));
+      this.dataSource = new MatTableDataSource(invoices);
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    } catch (e) {
+      this.noData = true;
+      this.snack.open('An Error occurred fetching the invoices please reload.', 'OK', {
+        duration: 3000
+      });
+    }
+
+    this.fetchingInvoices = false;
+
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -124,13 +167,16 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
         sellerFirstName: invoiceDetailsData.sellerObject.firstname,
         sellerLastName: invoiceDetailsData.sellerObject.lastname,
         region: invoiceDetailsData.sellerObject.region,
-        items: invoiceDetailsData.items
+        items: invoiceDetailsData.items,
+        returns: invoiceDetailsData.returns,
+        fullCustomerName: invoiceDetailsData.fullCustomerName,
+        customerCompany: invoiceDetailsData.customerCompany
       }
     });
   }
 
   recordPayment(invoice) {
-    this.addReturnsSheet.open(AddReturnSheetComponent, {
+    const addReturnSheetRef = this.addReturnsSheet.open(AddReturnSheetComponent, {
       data: {
         id: invoice.id,
         date:  invoice.date,
@@ -142,6 +188,27 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
         items:  invoice.returns
       }
     });
+
+    addReturnSheetRef.afterDismissed().subscribe( result => {
+      if (result){
+        this.dataSource.data = this.dataSource.data.map( value => {
+          if (value.id === result.id){
+            value.returns.push(result.returns);
+          }
+          return {
+            ...value,
+            fullCustomerName: value.customer.firstName + ' ' + value.customer.secondName,
+            amountDue: value.amount - this.invoiceState.calculateTotalReturns(value.returns),
+            amountPaid: this.invoiceState.calculateTotalReturns(value.returns),
+            fullSellerName: value.sellerObject.firstname + ' ' + value.sellerObject.lastname,
+            paid: value.amount <= this.invoiceState.calculateTotalReturns(value.returns),
+            customerCompany: value.customer.company
+          };
+        });
+      }
+    });
   }
+
+
 }
 

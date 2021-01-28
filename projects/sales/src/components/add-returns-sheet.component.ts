@@ -61,29 +61,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
           </div>
         </form>
       </div>
-      <div class="py-3">
-        <h3><b>Returns</b></h3>
-        <table mat-table [dataSource]="returnsData">
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let element">{{element.date | date}}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="amount">
-            <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let element">{{element.amount}}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="returnsDataColumns"></tr>
-          <tr class="table-data-row"  mat-row
-              *matRowDef="let row; columns: returnsDataColumns;"></tr>
-
-        </table>
-        <div class="d-flex pt-4 align-items-center justify-content-between">
-          <h3 class="text-center col-4 ">Total</h3>
-          <h2 class="text-white py-3 col-7 col-md-5 col-lg-6 text-center" style="background: #1b5e20;">{{totalAmount | currency: ' '}} /=</h2>
-        </div>
-      </div>
       <p class="text-center" style="color: #1b5e20">smartstock.co.tz</p>
     </div>
   `,
@@ -91,10 +68,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 
 })
 export class AddReturnSheetComponent implements OnInit{
-  returnsData: MatTableDataSource<any>;
-  returnsDataColumns = ['date', 'amount'];
-  totalAmount = 0;
-
   addReturnsFormControl: FormGroup;
 
   constructor(private returnsDetailsSheetRef: MatBottomSheetRef<AddReturnSheetComponent>,
@@ -110,23 +83,16 @@ export class AddReturnSheetComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.returnsData = new MatTableDataSource(this.data.items);
-
-    this.totalAmount = this.data.items.map(a => a.amount).reduce((a, b, i) => {
-      return a +  b;
-    });
-  }
-
-  openLink(event: MouseEvent): void {
-    this.returnsDetailsSheetRef.dismiss();
-    event.preventDefault();
   }
 
   addReturn() {
     if (this.addReturnsFormControl.value) {
-      this.returnsData.data.push(this.addReturnsFormControl.value);
+      // this.returnsData.data.push(this.addReturnsFormControl.value);
       this.invoiceService.addReturn(this.data.id, this.addReturnsFormControl.value);
-      this.returnsDetailsSheetRef.dismiss();
+      this.returnsDetailsSheetRef.dismiss({
+        id: this.data.id,
+        returns: this.addReturnsFormControl.value
+      });
     } else {
       this.snack.open('Fill Amount before submitting', 'Ok', {
         duration: 3000
