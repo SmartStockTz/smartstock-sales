@@ -91,6 +91,16 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
   fetchingInvoices = false;
   noData = false;
   displayedColumns = ['Invoice Id', 'Customer', 'Amount Due', 'Amount Paid', 'Due Date', 'Date of Sale', 'Seller', 'Actions'];
+  keysMap = {
+    'Invoice Id': 'id',
+    Customer: 'fullCustomerName',
+    'Amount Due': 'amountDue',
+    'Amount Paid': 'amountPaid',
+    'Due Date': 'dueDate',
+    'Date of Sale': 'date',
+    Seller: 'fullSellerName',
+    Actions: 'paid'
+  };
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -119,9 +129,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
           customerCompany: value.customer.company
         };
       }));
-      this.dataSource = new MatTableDataSource(invoices);
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      this.configureDataSource(invoices);
     } catch (e) {
       this.noData = true;
       this.snack.open('An Error occurred fetching the invoices please reload.', 'OK', {
@@ -131,6 +139,15 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
 
     this.fetchingInvoices = false;
 
+  }
+
+  configureDataSource(invoices) {
+    this.dataSource = new MatTableDataSource(invoices);
+    this.dataSource.sort = this.sort;
+    this.dataSource.sortingDataAccessor = ( invoice: InvoiceModel, sortHeaderId: string) => {
+      return invoice[this.keysMap[sortHeaderId]];
+    };
+    this.dataSource.paginator = this.paginator;
   }
 
   applyFilter(event: Event) {
@@ -208,7 +225,5 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
       }
     });
   }
-
-
 }
 
