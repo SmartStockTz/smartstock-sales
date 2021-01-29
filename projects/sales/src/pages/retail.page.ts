@@ -26,7 +26,7 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
 
   constructor(private readonly router: Router,
               private readonly userDatabase: UserService,
-              private readonly _storage: StorageService,
+              private readonly storage: StorageService,
               private readonly snack: MatSnackBar,
               private readonly logger: LogService,
               private readonly salesState: SalesState,
@@ -53,7 +53,7 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
   getProducts() {
     this.fetchDataProgress = true;
     this.productsObservable = undefined;
-    this._storage.getStocks().then(products => {
+    this.storage.getStocks().then(products => {
       this.fetchDataProgress = false;
       this.productsObservable = of(products);
     }).catch(reason => {
@@ -63,19 +63,13 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
   }
 
   filterProduct(product: string) {
-    // this.productsObservable.subscribe((data) => {
-    //
-    // }, (error) => {
-    //
-    // });
-    //
     this.searchProgressFlag = true;
     if (product === '') {
       this.getProducts();
       this.searchProgressFlag = false;
       return;
     }
-    this._storage.getStocks().then(value => {
+    this.storage.getStocks().then(value => {
       this.searchProgressFlag = false;
       if (value) {
         const result = value.filter(value1 =>

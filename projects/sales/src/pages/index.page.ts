@@ -47,7 +47,7 @@ export class IndexPage extends DeviceInfoUtil implements OnInit {
       icon: 'local_shipping'
     },
     {
-      name: 'Sale by Credit',
+      name: 'Invoices',
       path: '/sale/pay_by_credit',
       icon: 'payments'
     }

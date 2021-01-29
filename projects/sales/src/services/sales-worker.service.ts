@@ -4,17 +4,17 @@ import { ShopModel } from '@smartstocktz/core-libs/models/shop.model';
 import { BFast } from 'bfastjs';
 
 @Injectable({
-    'providedIn': 'any'
+    providedIn: 'any'
 })
 export class SalesWorkerService {
     async run(): Promise<any> {
       return this.saveSalesAndRemove();
     }
-  
+
     initiateSmartStock(): void {
       BFast.init({applicationId: 'smartstock_lb', projectId: 'smartstock'});
     }
-  
+
     async getShops(): Promise<ShopModel[]> {
       try {
         const user = await BFast.auth().currentUser();
@@ -40,7 +40,7 @@ export class SalesWorkerService {
         return [];
       }
     }
-  
+
     async saveSalesAndRemove(): Promise<string> {
       const shops = await this.getShops();
       for (const shop of shops) {
@@ -59,7 +59,7 @@ export class SalesWorkerService {
         }
       }
     }
-  
+
     async saveSaleAndUpdateStock(sales: {
                                    method: string,
                                    path: string,
@@ -92,13 +92,13 @@ export class SalesWorkerService {
           })
           ).commit({
               before: async transactionRequests => {
-                for (let i=0; i<transactionRequests.length; i++) {
+                for (let i = 0; i < transactionRequests.length; i++) {
                   if (transactionRequests[i].action === 'create') {
                     const value: {data: any[]} = transactionRequests[i] as any;
-                    transactionRequests[i].data = value.data.filter(async x=> {
+                    transactionRequests[i].data = value.data.filter(async x => {
                       const results = await BFast.database(shop.projectId).collection('sales')
                         .query()
-                        .equalTo('batch', x['batch'])
+                        .equalTo('batch', x.batch)
                         .find();
                       if (results && Array.isArray(results) && results.length > 0) {
                         console.log('exists');
@@ -117,7 +117,7 @@ export class SalesWorkerService {
         return 'Done';
       }
     }
-  
+
   }
 
 

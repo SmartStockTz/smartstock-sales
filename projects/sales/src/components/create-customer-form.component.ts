@@ -8,14 +8,14 @@ import { CustomerState } from '../states/customer.state';
   template: `
        <div class="row" mat-dialog-content>
            <mat-card-title>Create Customer</mat-card-title>
-         
+
       <form [formGroup]="createCustomerForm" (ngSubmit)="createCustomer()" class="create-shop-form-container" style="margin-top: 10px">
         <mat-form-field appearance="" style="width:100%">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" placeholder="First Name">
           <mat-error>First Name is required</mat-error>
         </mat-form-field>
-       
+
         <mat-form-field appearance="" style="width:100%">
           <mat-label>Second Name</mat-label>
           <input matInput formControlName="secondName" placeholder="Second Name">
@@ -40,13 +40,6 @@ import { CustomerState } from '../states/customer.state';
           <mat-error>Company name required</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="" style="width:100%">
-          <mat-label>Display Name</mat-label>
-          <input matInput formControlName="displayName" placeholder="Display Name">
-          <mat-error>Display name is required</mat-error>
-        </mat-form-field>
-
-
         <div class="row">
           <button style="width: 100%" [disabled]="createShopProgress" class="ft-button btn-block" color="primary" mat-raised-button>
             Create Customer
@@ -69,9 +62,10 @@ export class CreateCustomerComponent implements OnInit {
   createShopProgress = false;
 
   constructor(public dialogRef: MatDialogRef<CreateCustomerComponent>,
-    private readonly formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: any, private readonly snack: MatSnackBar,
-    private readonly customerState: CustomerState,) {
+              private readonly formBuilder: FormBuilder,
+              @Inject(MAT_DIALOG_DATA) public data: any,
+              private readonly snack: MatSnackBar,
+              private readonly customerState: CustomerState) {
 
   }
 
@@ -80,9 +74,9 @@ export class CreateCustomerComponent implements OnInit {
       firstName: ['', [Validators.nullValidator, Validators.required]],
       secondName: ['', [Validators.nullValidator, Validators.required]],
       phone: ['', [Validators.nullValidator, Validators.required]],
-      email: ['', [Validators.nullValidator, Validators.required]],
+      email: ['', [Validators.nullValidator]],
       company: ['', [Validators.nullValidator, Validators.required]],
-      displayName: ['', [Validators.nullValidator, Validators.required]]
+      returns: [[]],
     });
   }
 
@@ -90,9 +84,17 @@ export class CreateCustomerComponent implements OnInit {
     if (this.createCustomerForm.valid) {
       this.createShopProgress = true;
 
+      this.createCustomerForm.value.displayName = this.createCustomerForm.value.firstName;
       this.customerState.saveCustomer(this.createCustomerForm.value).then((val) => {
         this.createShopProgress = false;
+        this.snack.open('Customer Created Successfully', 'Ok', {
+          duration: 3000
+        });
         this.dialogRef.close(null);
+      }).catch( err => {
+        this.snack.open('Failed to create Customer', 'Cancel', {
+          duration: 3000
+        });
       });
 
     } else {

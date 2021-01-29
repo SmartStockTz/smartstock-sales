@@ -55,9 +55,12 @@ import { ProductSearchDialogComponent } from './components/product-search.compon
 import { InfoDialogComponent } from './components/info-dialog.component';
 import { MatSelectModule } from '@angular/material/select';
 import { InvoicesPageComponent } from './pages/invoices.page';
-import { InvoicesListComponent } from './components/invoices-list.component';
+// import { InvoicesListComponent } from './components/invoices-list.component';
 import { CreateCustomerComponent } from './components/create-customer-form.component';
 import { MatMenuModule } from '@angular/material/menu';
+import {IncompleteInvoicesTableComponent} from './components/incomplete-invoices-table.component';
+import {InvoiceDetailsComponent} from './components/invoice-details.component';
+import {AddReturnSheetComponent} from './components/add-returns-sheet.component';
 
 
 const routes: Routes = [
@@ -67,7 +70,7 @@ const routes: Routes = [
   {path: 'retail', component: RetailPageComponent},
   {path: 'pay_by_credit', component: PayByCreditPageComponent},
   {path: 'invoice', component: PayByInvoicesComponent},
-  {path: "list_invoices", component: InvoicesPageComponent}
+  {path: 'list_invoices', component: InvoicesPageComponent}
 ];
 
 @NgModule({
@@ -120,9 +123,11 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    AddReturnSheetComponent,
+    IncompleteInvoicesTableComponent,
     CreateCustomerComponent,
     InvoicesPageComponent,
-    InvoicesListComponent,
+    InvoiceDetailsComponent,
     InfoDialogComponent,
     ProductSearchDialogComponent,
     SaleByCreditCreateFormComponent,
@@ -144,7 +149,9 @@ const routes: Routes = [
     CartPreviewComponent,
     VerifyEMailDialogComponent,
     MobilePayDetailsComponent
-  ],
+  ], entryComponents: [
+    InvoiceDetailsComponent
+  ]
 })
 export class SalesModule {
   static start(config: { android: boolean, electron: boolean, browser: boolean, production: boolean } = {

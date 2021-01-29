@@ -6,7 +6,7 @@ import { InvoiceModel } from '../models/invoice.model';
 import { InvoiceService } from '../services/invoice.services';
 
 @Injectable({
-  'providedIn': 'root'
+  providedIn: 'root'
 })
 export class InvoiceState {
   isFetchingInvoices: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -17,12 +17,18 @@ export class InvoiceState {
 
   }
 
-  countAll(): void {
-    this.invoiceService.getTotalInvoice().then(value => {
-      this.totalInvoiceItems.next(value);
-    }).catch(_ => {
+  async countAll(): Promise<any> {
+      return this.invoiceService.invoicesCount();
+  }
 
-    });
+  calculateTotalReturns(returns: [any]){
+    if (returns && Array.isArray(returns)){
+      return returns.map(a => a.amount).reduce((a, b, i) => {
+        return a + b;
+      });
+    } else {
+      return 0.0;
+    }
   }
 
   fetch(size = 20, skip = 0): void {
@@ -39,8 +45,14 @@ export class InvoiceState {
     });
   }
 
-  async recordPayment(invoice){
-    return this.invoiceService.recordPayment(invoice);
+  async fetchSync(size= 20, skip = 0): Promise<InvoiceModel[]>{
+    return await this.invoiceService.getInvoices({
+      skip,
+      size
+    });
   }
 
+  async saveInvoice(invoice){
+    return this.invoiceService.saveInvoice(invoice);
+  }
 }
