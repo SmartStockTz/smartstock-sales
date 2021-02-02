@@ -10,7 +10,7 @@ import {OrdersTableShowItemsComponent} from './orders-table-show-items.component
   template: `
     <div style="padding: 16px 0 24px 0;">
       <mat-nav-list>
-        <div *ngIf="data.order.status!=='COMPLETED'">
+        <div *ngIf="data.order.status ==='PROCESSED' ">
           <mat-list-item *ngIf="(orderState.markAsCompleteFlag | async) === false" (click)="markAsComplete()">
             <mat-icon matListIcon>done_all</mat-icon>
             <p matLine>Mark As Complete</p>
@@ -30,8 +30,7 @@ import {OrdersTableShowItemsComponent} from './orders-table-show-items.component
           <mat-card-subtitle matLine>Get order in PDF</mat-card-subtitle>
         </mat-list-item>
       </mat-nav-list>
-    </div>
-  `
+    </div>    `
 })
 export class OrdersTableOptionsComponent implements OnInit {
   constructor(private readonly bottomSheetRef: MatBottomSheetRef<OrdersTableOptionsComponent>,
