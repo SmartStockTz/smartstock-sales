@@ -11,7 +11,7 @@ export class InvoiceService {
 
   constructor(private readonly storageService: StorageService,
               private settingsService: SettingsService,
-             ) {
+  ) {
 
   }
 
@@ -26,7 +26,7 @@ export class InvoiceService {
       .find();
   }
 
-  async invoicesCount(): Promise<number>{
+  async invoicesCount(): Promise<number> {
     const shop = await this.storageService.getActiveShop();
     return await BFast.database(shop.projectId)
       .collection('invoices')
@@ -35,11 +35,33 @@ export class InvoiceService {
       .find();
   }
 
-  async saveInvoice(invoice: InvoiceModel){
+  async saveInvoice(invoice: InvoiceModel) {
     const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId)
-      .collection('invoices')
-      .save(invoice);
+    let result;
+    try {
+      result = await BFast.database(shop.projectId)
+        .collection('invoices')
+        .save(invoice);
+
+      await BFast.database(shop.projectId)
+        .transaction()
+        .update('stocks', invoice.items.map(item => {
+          return {
+            update: {
+              $inc: {
+                quantity: -Number(item.quantity)
+              }
+            },
+            query: {
+              id: item.stock.id
+            },
+          };
+        })).commit();
+    } catch (e) {
+      console.warn(e);
+    }
+
+    return result;
   }
 
   async addReturn(id: string, value: any) {
@@ -47,12 +69,12 @@ export class InvoiceService {
     const invoice: InvoiceModel = await BFast.database(shop.projectId)
       .collection('invoices')
       .query()
-      .byId( id)
+      .byId(id)
       .find();
 
     const returns = [];
 
-    if (invoice && invoice.returns && Array.isArray(invoice.returns)){
+    if (invoice && invoice.returns && Array.isArray(invoice.returns)) {
       invoice.returns.push(value);
     } else {
       invoice.returns = [value];

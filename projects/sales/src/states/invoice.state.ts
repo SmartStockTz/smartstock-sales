@@ -53,6 +53,6 @@ export class InvoiceState {
   }
 
   async saveInvoice(invoice){
-    return this.invoiceService.saveInvoice(invoice);
+    return await this.invoiceService.saveInvoice(invoice);
   }
 }
