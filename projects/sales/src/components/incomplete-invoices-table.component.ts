@@ -9,6 +9,7 @@ import {InvoiceDetailsComponent} from './invoice-details.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {AddReturnSheetComponent} from './add-returns-sheet.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import * as moment from 'moment';
 
 @Component({
   template: `
@@ -112,6 +113,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.fetchInvoices();
+
   }
 
   async fetchInvoices() {
@@ -121,6 +123,8 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
       invoices = invoices.map(((value: InvoiceModel, index) => {
         return {
           ...value,
+          date: moment(value.date).format('YYYY-MM-DD'),
+          dueDate: moment(value.dueDate).format('YYYY-MM-DD'),
           fullCustomerName: value.customer.firstName + ' ' + value.customer.secondName,
           amountDue: value.amount - this.invoiceState.calculateTotalReturns(value.returns),
           amountPaid: this.invoiceState.calculateTotalReturns(value.returns),
@@ -211,7 +215,11 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
       if (result){
         this.dataSource.data = this.dataSource.data.map( value => {
           if (value.id === result.id){
-            value.returns.push(result.returns);
+            if (value.returns && Array.isArray(value.returns)){
+              value.returns.push(result.returns);
+            } else {
+              value.returns = [result.returns];
+            }
           }
           return {
             ...value,

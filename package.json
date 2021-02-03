@@ -25,7 +25,8 @@
     "bfastjs": "^4.0.8",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.3",

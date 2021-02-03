@@ -312,8 +312,8 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       });
 
     const invoice: InvoiceModel = {
-        date: toSqlDate(this.transferFormGroup.value.date),
-        dueDate: toSqlDate(this.transferFormGroup.value.dueDate),
+        date: this.transferFormGroup.value.date,
+        dueDate: this.transferFormGroup.value.dueDate,
         items,
         sellerObject: this.currentUser,
         customer,
