@@ -98,11 +98,22 @@ export class OrdersTableComponent implements OnInit {
   }
 
   showOptions(order: OrderModel) {
-    this.bottomSheet.open(OrdersTableOptionsComponent, {
+    const ref = this.bottomSheet.open(OrdersTableOptionsComponent, {
       data: {
         order
       },
       closeOnNavigation: true
+    });
+
+    ref.afterDismissed().subscribe(value => {
+      if (value && value.id){
+        this.ordersDataTable.data = this.ordersDataTable.data.map(val => {
+          if (val.id === value.id){
+              val.status = value.status;
+          }
+          return val;
+        });
+      }
     });
   }
 }

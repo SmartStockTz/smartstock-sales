@@ -7,6 +7,6 @@ export interface OrderModel {
   date?: string;
   carts?: {quantity: number, product: any}[];
   user?: any;
-  status?: 'PROCESSED' | 'DELIVERED' | "COMPLETED" | "CANCELLED" ;
+  status?: 'PROCESSED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED' ;
   complete?: boolean;
 }
