@@ -37,31 +37,20 @@ export class InvoiceService {
 
   async saveInvoice(invoice: InvoiceModel) {
     const shop = await this.storageService.getActiveShop();
-    let result;
-    try {
-      result = await BFast.database(shop.projectId)
-        .collection('invoices')
-        .save(invoice);
-
-      await BFast.database(shop.projectId)
-        .transaction()
-        .update('stocks', invoice.items.map(item => {
-          return {
-            update: {
-              $inc: {
-                quantity: -Number(item.quantity)
-              }
-            },
-            query: {
-              id: item.stock.id
-            },
-          };
-        })).commit();
-    } catch (e) {
-      console.warn(e);
-    }
-
-    return result;
+    return await BFast.database(shop.projectId).transaction()
+      .create('invoices', invoice)
+      .update('stocks', invoice.items.map(item => {
+        return {
+          update: {
+            $inc: {
+              quantity: -Number(item.quantity)
+            }
+          },
+          query: {
+            id: item.stock.id
+          },
+        };
+      })).commit();
   }
 
   async addReturn(id: string, value: any) {
