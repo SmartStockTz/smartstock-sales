@@ -20,7 +20,7 @@ export class InvoiceService {
     return await BFast.database(shop.projectId)
       .collection('invoices')
       .query()
-      .orderBy('date', -1)
+      .orderBy('_created_at', -1)
       .size(pagination.size)
       .skip(pagination.skip)
       .find();
