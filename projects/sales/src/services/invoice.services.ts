@@ -57,18 +57,13 @@ export class InvoiceService {
     const shop = await this.storageService.getActiveShop();
     const invoice: InvoiceModel = await BFast.database(shop.projectId)
       .collection('invoices')
-      .query()
-      .byId(id)
-      .find();
+      .get(id);
 
-    const returns = [];
-
-    if (invoice && invoice.returns && Array.isArray(invoice.returns)) {
+    if (invoice && invoice.returns && Array.isArray(invoice.returns) ) {
       invoice.returns.push(value);
     } else {
       invoice.returns = [value];
     }
-
     delete invoice.updatedAt;
 
     return await BFast.database(shop.projectId)
