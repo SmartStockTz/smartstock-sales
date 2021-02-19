@@ -112,9 +112,11 @@ export class InvoiceDetailsComponent implements OnInit{
     this.invoiceData = new MatTableDataSource(this.data.items);
     this.returnsData = new MatTableDataSource(this.data.returns);
 
-    this.totalAmount = this.data.returns.map(a => a.amount).reduce((a, b, i) => {
-      return a +  b;
-    });
+    if (this.data.returns && Array.isArray(this.data.returns)) {
+      this.totalAmount = this.data.returns.map(a => a.amount).reduce((a, b, i) => {
+        return a + b;
+      });
+    }
 
   }
 

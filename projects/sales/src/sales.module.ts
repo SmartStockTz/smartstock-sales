@@ -68,9 +68,9 @@ const routes: Routes = [
   {path: 'order', component: OrderPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  {path: 'pay_by_credit', component: PayByCreditPageComponent},
-  {path: 'invoice', component: PayByInvoicesComponent},
-  {path: 'list_invoices', component: InvoicesPageComponent}
+  {path: 'invoices', component: PayByCreditPageComponent},
+  {path: 'invoices/create', component: PayByInvoicesComponent},
+  {path: 'invoices/list', component: InvoicesPageComponent}
 ];
 
 @NgModule({

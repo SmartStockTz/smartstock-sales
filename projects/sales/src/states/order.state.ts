@@ -50,4 +50,13 @@ export class OrderState {
       this.markAsCompleteFlag.next(false);
     });
   }
+
+  async markOrderAsCancelled(order: OrderModel): Promise<any> {
+    return this.orderService.markOrderAsCancelled(order);
+  }
+
+  async markAsProcessed(order: OrderModel): Promise<any> {
+    return this.orderService.markAsProcessed(order);
+  }
+
 }

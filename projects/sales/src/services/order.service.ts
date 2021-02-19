@@ -87,4 +87,26 @@ export class OrderService {
       .get<any[]>();
     return payments.map(x => Math.round(Number(x.amount))).reduce((a, b) => a + b, 0);
   }
+
+  async markOrderAsCancelled(order: OrderModel): Promise<any> {
+    const shop = await this.storageService.getActiveShop();
+
+    return BFast.database(shop.projectId).collection('orders')
+      .query()
+      .byId(order.id)
+      .updateBuilder()
+      .set('status', 'CANCELLED')
+      .update();
+  }
+
+  async markAsProcessed(order: OrderModel): Promise<any> {
+    const shop = await this.storageService.getActiveShop();
+
+    return BFast.database(shop.projectId).collection('orders')
+      .query()
+      .byId(order.id)
+      .updateBuilder()
+      .set('status', 'PROCESSED')
+      .update();
+  }
 }

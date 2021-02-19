@@ -43,12 +43,12 @@ export class PayByCreditPageComponent extends DeviceInfoUtil implements OnInit {
     pages = [
         {
             name: 'Sell',
-            path: '/sale/invoice',
+            path: '/sale/invoices/create',
             icon: 'shop'
         },
         {
             name: 'Invoices Summary',
-            path: '/sale/list_invoices',
+            path: '/sale/invoices/list',
             icon: 'receipt'
         },
         // {

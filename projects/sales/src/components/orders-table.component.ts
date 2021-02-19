@@ -46,6 +46,7 @@ import {OrdersTableOptionsComponent} from './orders-table-options.component';
           <td mat-cell *cdkCellDef="let order">
             <span *ngIf="order.status === 'COMPLETED'">COMPLETED</span>
             <span *ngIf="order.status === 'PROCESSED'">NEW</span>
+            <span *ngIf="order.status === 'CANCELLED'">CANCELLED</span>
           </td>
         </ng-container>
         <ng-container matColumnDef="action">
@@ -97,11 +98,22 @@ export class OrdersTableComponent implements OnInit {
   }
 
   showOptions(order: OrderModel) {
-    this.bottomSheet.open(OrdersTableOptionsComponent, {
+    const ref = this.bottomSheet.open(OrdersTableOptionsComponent, {
       data: {
-        order: order
+        order
       },
       closeOnNavigation: true
+    });
+
+    ref.afterDismissed().subscribe(value => {
+      if (value && value.id){
+        this.ordersDataTable.data = this.ordersDataTable.data.map(val => {
+          if (val.id === value.id){
+              val.status = value.status;
+          }
+          return val;
+        });
+      }
     });
   }
 }

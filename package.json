@@ -1,6 +1,6 @@
 {
   "name": "smartstock-sales",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "scripts": {
     "ng": "ng",
     "start": "ng serve sales-mock",
@@ -21,11 +21,12 @@
     "@angular/platform-browser": "~11.0.5",
     "@angular/platform-browser-dynamic": "~11.0.5",
     "@angular/router": "~11.0.5",
-    "@smartstocktz/core-libs": "^0.0.24",
+    "@smartstocktz/core-libs": "^0.0.26",
     "bfastjs": "^4.0.5",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1100.5",

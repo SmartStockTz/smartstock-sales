@@ -1,22 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TransferState } from '../states/transfer.state';
-import { MessageService, SecurityUtil, toSqlDate, UserService } from '@smartstocktz/core-libs';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
-import { StockModel } from '../models/stock.model';
-import { ProductSearchDialogComponent } from './product-search.component';
-import { CreateCreditorComponent } from './create-creditor.component';
-import { Observable } from 'rxjs';
-import { CreditorState } from '../states/creditor.state';
-import { of } from 'rxjs/internal/observable/of';
-import { SalesModel } from '../models/sale.model';
-import { SalesState } from '../states/sales.state';
-import { CustomerState } from '../states/customer.state';
-import { CreateCustomerComponent } from './create-customer-form.component';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {TransferState} from '../states/transfer.state';
+import {MessageService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {MatDialog} from '@angular/material/dialog';
+import {MatTableDataSource} from '@angular/material/table';
+import {StockModel} from '../models/stock.model';
+import {ProductSearchDialogComponent} from './product-search.component';
+import {CreateCreditorComponent} from './create-creditor.component';
+import {Observable} from 'rxjs';
+import {CreditorState} from '../states/creditor.state';
+import {of} from 'rxjs/internal/observable/of';
+import {SalesModel} from '../models/sale.model';
+import {SalesState} from '../states/sales.state';
+import {CustomerState} from '../states/customer.state';
+import {CreateCustomerComponent} from './create-customer-form.component';
 import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceState} from '../states/invoice.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'smartstock-sales-create-sale-by-credit-form',
@@ -25,57 +26,57 @@ import {MatSnackBar} from '@angular/material/snack-bar';
       <form *ngIf="transferFormGroup" [formGroup]="transferFormGroup">
         <h1>Details</h1>
         <mat-card>
-            <!--<mat-label>Choose Creditor</mat-label>-->
-            <!--<div class="row" style="padding: 0px 0 0 0">-->
-              <!--<div class="col-lg-6 col-6" style="width: 100%; padding: 10; margin-left: 0px">-->
-                    <!--<mat-form-field style="width:100%" appearance="fill">-->
-                    <!--<mat-select style="width:100%" formControlName="creditor">-->
-                       <!--<mat-option  *ngFor="let option of creditors | async" [value]="option.company">-->
-                         <!--{{option.company}}-->
-                       <!--</mat-option>-->
-                    <!--</mat-select>-->
-                  <!--</mat-form-field>-->
-            <!--</div>-->
-            <!--<div class="col-lg-6 col-6" style="padding-top:6px;">-->
-              <!--<button color="primary" (click)='_getCreditors()' mat-icon-button>-->
-                  <!--<mat-icon>refresh</mat-icon>-->
-              <!--</button>-->
-              <!--<button color="primary" (click)='createCreditor()' mat-icon-button>-->
-                  <!--<mat-icon>add_circle</mat-icon>-->
-              <!--</button>-->
-            <!--</div>-->
-           <!--</div>-->
+          <!--<mat-label>Choose Creditor</mat-label>-->
+          <!--<div class="row" style="padding: 0px 0 0 0">-->
+          <!--<div class="col-lg-6 col-6" style="width: 100%; padding: 10; margin-left: 0px">-->
+          <!--<mat-form-field style="width:100%" appearance="fill">-->
+          <!--<mat-select style="width:100%" formControlName="creditor">-->
+          <!--<mat-option  *ngFor="let option of creditors | async" [value]="option.company">-->
+          <!--{{option.company}}-->
+          <!--</mat-option>-->
+          <!--</mat-select>-->
+          <!--</mat-form-field>-->
+          <!--</div>-->
+          <!--<div class="col-lg-6 col-6" style="padding-top:6px;">-->
+          <!--<button color="primary" (click)='_getCreditors()' mat-icon-button>-->
+          <!--<mat-icon>refresh</mat-icon>-->
+          <!--</button>-->
+          <!--<button color="primary" (click)='createCreditor()' mat-icon-button>-->
+          <!--<mat-icon>add_circle</mat-icon>-->
+          <!--</button>-->
+          <!--</div>-->
+          <!--</div>-->
 
-           <mat-label>Choose Customer</mat-label>
-            <div class="row" style="padding: 0px 0 0 0">
-              <div class="col-lg-6 col-6" style="width: 100%; padding: 10px; margin-left: 0px">
-                    <mat-form-field style="width:100%" appearance="fill">
-                    <mat-select style="width:100%" formControlName="customer">
-                       <mat-option  *ngFor="let option of customers | async" [value]='option.firstName'>
-                         {{option.secondName ?( option.firstName + " " + option.secondName) : option.firstName}}
-                       </mat-option>
-                    </mat-select>
-                  </mat-form-field>
+          <mat-label>Choose Customer</mat-label>
+          <div class="row" style="padding: 0px 0 0 0">
+            <div class="col-lg-6 col-6" style="width: 100%; padding: 10px; margin-left: 0px">
+              <mat-form-field style="width:100%" appearance="fill">
+                <mat-select style="width:100%" formControlName="customer">
+                  <mat-option *ngFor="let option of customers | async" [value]='option.firstName'>
+                    {{option.secondName ? (option.firstName + " " + option.secondName) : option.firstName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
 
             <div class="col-lg-2 col-2" style="padding-top:6px;">
               <button color="primary" (click)='_getCustomers()' mat-icon-button>
-                  <mat-icon>refresh</mat-icon>
+                <mat-icon>refresh</mat-icon>
               </button>
               <button color="primary" (click)='createCustomer()' mat-icon-button>
-                  <mat-icon>add_circle</mat-icon>
+                <mat-icon>add_circle</mat-icon>
               </button>
 
             </div>
-              <div class="row" style="width: 100%; padding: 10px; margin-left: 0px">
-                <mat-form-field appearance="fill">
-                  <mat-label>Due date</mat-label>
-                  <input matInput formControlName="dueDate" [matDatepicker]="picker">
-                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
-              </div>
-           </div>
+            <div class="row" style="width: 100%; padding: 10px; margin-left: 0px">
+              <mat-form-field appearance="fill">
+                <mat-label>Due date</mat-label>
+                <input matInput formControlName="dueDate" [matDatepicker]="picker">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
 
           <mat-form-field appearance="outline" style="width: 100%; margin-top: 20px">
             <mat-label>Notes</mat-label>
@@ -100,7 +101,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
                                   color="primary"></mat-progress-spinner>
           </button>
           <!--<div *ngIf="showSpinner" style="padding-left: 50px ">-->
-            <!--<mat-spinner diameter="50"></mat-spinner>-->
+          <!--<mat-spinner diameter="50"></mat-spinner>-->
           <!--</div>-->
         </div>
         <mat-card>
@@ -173,6 +174,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
               private readonly customerState: CustomerState,
               private readonly salesState: SalesState,
               private readonly dialog: MatDialog,
+              private router: Router,
               public readonly transferState: TransferState,
               public readonly creditorState: CreditorState,
               public readonly invoiceState: InvoiceState,
@@ -241,7 +243,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
           customers = [];
         }
 
-        customers = customers.filter( customer => customer.firstName);
+        customers = customers.filter(customer => customer.firstName);
         this.customers = of(customers);
       })
       .catch();
@@ -283,7 +285,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   }
 
   async saveCreditSale(): Promise<void> {
-    if (this.transfersDatasource.data.length === 0){
+    if (this.transfersDatasource.data.length === 0) {
       this.snack.open('Select Products to add before submitting', 'Ok', {
         duration: 3000
       });
@@ -296,39 +298,40 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     let customer;
 
     this.customers.subscribe(value => {
-        customer = value.find(val => val.firstName === this.transferFormGroup.get('customer').value);
+      customer = value.find(val => val.firstName === this.transferFormGroup.get('customer').value);
     });
 
     let totalAmount = 0;
 
     this.transfersDatasource.data.forEach(element => {
-        const sale = {
-          stock: element.product,
-          amount: element.amount,
-          quantity: element.quantity,
-        };
-        totalAmount += element.amount * element.quantity;
-        items.push(sale);
-      });
+      const sale = {
+        stock: element.product,
+        amount: element.amount,
+        quantity: element.quantity,
+      };
+      totalAmount += element.amount * element.quantity;
+      items.push(sale);
+    });
 
     const invoice: InvoiceModel = {
-        date: toSqlDate(this.transferFormGroup.value.date),
-        dueDate: toSqlDate(this.transferFormGroup.value.dueDate),
-        items,
-        sellerObject: this.currentUser,
-        customer,
-        amount: totalAmount,
-        quantity: items.length,
-        batchId: SecurityUtil.generateUUID()
-      };
+      date: this.transferFormGroup.value.date,
+      dueDate: this.transferFormGroup.value.dueDate,
+      items,
+      sellerObject: this.currentUser,
+      customer,
+      amount: totalAmount,
+      quantity: items.length,
+      batchId: SecurityUtil.generateUUID()
+    };
 
-    await this.invoiceState.saveInvoice(invoice).then( val => {
-          this.transfersDatasource.data = [];
-          this.selectedProducts = [];
-          this.snack.open('Your invoice has been recorded.', 'Ok', {
+    await this.invoiceState.saveInvoice(invoice).then(val => {
+      this.transfersDatasource.data = [];
+      this.selectedProducts = [];
+      this.snack.open('Your invoice has been recorded.', 'Ok', {
         duration: 3000
       });
-    }).catch( err => {
+      this.router.navigateByUrl('/sale/invoices/list').catch(console.log);
+    }).catch(err => {
       this.snack.open('Please fix all errors, and make sure you add at least one product then submit again', 'Ok', {
         duration: 3000
       });
