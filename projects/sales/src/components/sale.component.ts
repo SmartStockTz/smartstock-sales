@@ -158,7 +158,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
           this.products = allStocks.filter((stock: StockModel) => {
               const barcode = stock.barcode ? stock.barcode : '';
               const productName = stock.product ? stock.product : '';
-              const resembleProductName = productName.trim().toLowerCase().includes(query.trim().toLowerCase());
+              const resembleProductName = productName.toString().trim().toLowerCase().includes(query.trim().toLowerCase());
               const equalToBarcode = query.trim() === barcode.trim();
               return (resembleProductName || equalToBarcode) && stock.saleable === true;
             }
