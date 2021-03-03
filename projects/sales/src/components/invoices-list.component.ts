@@ -10,7 +10,7 @@
 // import { Subject } from 'rxjs';
 //
 // @Component({
-//   selector: 'smartstock-invoices-list',
+//   selector: 'app-invoices-list',
 //   template: `
 //     <mat-card-title class="d-flex flex-row">
 //         <mat-label>Invoices</mat-label>
@@ -25,7 +25,7 @@
 //     </mat-card-title>
 //     <mat-card class="mat-elevation-z3">
 //       <mat-card-content>
-//       <smartstock-data-not-ready *ngIf="noDataRetrieved  && !fetchinvoicesFlag"></smartstock-data-not-ready>
+//       <app-data-not-ready *ngIf="noDataRetrieved  && !fetchinvoicesFlag"></app-data-not-ready>
 //         <table mat-table *ngIf="!noDataRetrieved  && !fetchinvoicesFlag"  #invoiceSort [dataSource]="invoicesDatasource" matSortDirection="desc" class="mat-elevation-z0" style="margin-top:0px; padding: 10%" matSort>
 //             <ng-container matColumnDef="Invoice Id">
 //               <th mat-header-cell *matHeaderCellDef mat-sort-header> Invoice Id </th>

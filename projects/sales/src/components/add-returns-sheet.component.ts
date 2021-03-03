@@ -7,7 +7,7 @@ import {InvoiceService} from '../services/invoice.services';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'smartstock-invoice-details',
+  selector: 'app-invoice-details',
   template: `
     <div class="w-100 m-0 p-0">
       <div class="row header text-white align-items-center p-3">

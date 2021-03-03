@@ -4,7 +4,7 @@ import {OrderModel} from '../models/order.model';
 
 // @dynamic
 @Component({
-  selector: 'smartstock-sale-orders-show-item',
+  selector: 'app-sale-orders-show-item',
   template: `
     <div style="padding: 16px 0 24px 0;">
       <div>

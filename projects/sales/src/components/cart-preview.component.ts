@@ -5,7 +5,7 @@ import {DeviceInfoUtil} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 
 @Component({
-  selector: 'smartstock-cart-preview',
+  selector: 'app-cart-preview',
   template: `
     <div style="padding: 16px" [ngClass]="isMobile?'fixed-bottom':!enoughWidth()?'fixed-bottom-web-enough-width':'fixed-bottom-web'"
          *ngIf="(cartState.carts | async).length  > 0">

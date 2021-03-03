@@ -14,7 +14,7 @@ import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'smartstock-cart',
+  selector: 'app-cart',
   template: `
     <div id="cart_view" [ngClass]="isMobile?'cart-mobile':'cart'">
       <mat-toolbar class="mat-elevation-z3" style="z-index: 10000">

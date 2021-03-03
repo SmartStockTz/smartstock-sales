@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {OrderState} from '../states/order.state';
 
 @Component({
-  selector: 'smartstock-orders-table-actions',
+  selector: 'app-orders-table-actions',
   template: `
     <div class="row">
       <button [disabled]="(orderState.getOrderFlag | async) === true" (click)="loadMore()" color="primary" mat-flat-button

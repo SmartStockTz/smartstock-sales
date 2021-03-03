@@ -6,7 +6,7 @@ import { LogService } from '@smartstocktz/core-libs';
 import { MobilePayDetailsComponent } from '../user-modules/mobile-pay-details.component';
 
 @Component({
-  selector: 'smartstock-oder-paid-status',
+  selector: 'app-oder-paid-status',
   template: `
     <button (click)="makePayment()" mat-button color="primary" *ngIf="!isPaid && !getPaidProgress">
       PAY NOW

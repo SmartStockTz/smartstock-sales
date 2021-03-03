@@ -20,7 +20,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'smartstock-sales-create-sale-by-credit-form',
+  selector: 'app-sales-create-sale-by-credit-form',
   template: `
     <div class="">
       <form *ngIf="transferFormGroup" [formGroup]="transferFormGroup">

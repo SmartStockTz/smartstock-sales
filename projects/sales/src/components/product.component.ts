@@ -7,7 +7,7 @@ import {StockModel} from '../models/stock.model';
 import {CartState} from '../states/cart.state';
 
 @Component({
-  selector: 'smartstock-product-card',
+  selector: 'app-product-card',
   template: `
     <div>
       <div class='card-container' [ngClass]="{'flipped':productIndex == flipped}">

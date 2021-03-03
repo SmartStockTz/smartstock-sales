@@ -8,14 +8,14 @@ import { CreditorState } from '../states/creditor.state';
   template: `
        <div class="row" mat-dialog-content>
            <mat-card-title>Create Creditor</mat-card-title>
-         
+
       <form [formGroup]="createCreditorForm" (ngSubmit)="createCreditor()" class="create-shop-form-container" style="margin-top: 10px">
         <mat-form-field appearance="" style="width:100%">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" placeholder="First Name">
           <mat-error>First Name is required</mat-error>
         </mat-form-field>
-       
+
         <mat-form-field appearance="" style="width:100%">
           <mat-label>Second Name</mat-label>
           <input matInput formControlName="secondName" placeholder="Second Name">
@@ -56,7 +56,7 @@ import { CreditorState } from '../states/creditor.state';
       </button>
     </div>
     `,
-  selector: 'smartstock-create-customer'
+  selector: 'app-create-customer'
 })
 export class CreateCreditorComponent implements OnInit {
   createCreditorForm: FormGroup;

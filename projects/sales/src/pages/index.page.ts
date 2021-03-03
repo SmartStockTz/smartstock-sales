@@ -2,14 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import { DeviceInfoUtil } from '@smartstocktz/core-libs';
 
 @Component({
-  selector: 'smartstock-sales-index',
+  selector: 'app-sales-index',
   template: `
       <mat-sidenav-container>
           <mat-sidenav class="match-parent-side" #sidenav [mode]="enoughWidth()?'side': 'over'" [opened]="enoughWidth()">
-              <smartstock-drawer></smartstock-drawer>
+              <app-drawer></app-drawer>
           </mat-sidenav>
           <mat-sidenav-content style="min-height: 100vh">
-              <smartstock-toolbar searchPlaceholder="Filter product" [heading]="'Sales'" [sidenav]="sidenav"></smartstock-toolbar>
+              <app-toolbar searchPlaceholder="Filter product" [heading]="'Sales'" [sidenav]="sidenav"></app-toolbar>
               <div class="container col-xl-10 col-lg-10 col-sm-9 col-md-9 col-sm-12 col-10" style="padding: 16px 0">
                   <h1>Go To</h1>
                   <div class="row">
