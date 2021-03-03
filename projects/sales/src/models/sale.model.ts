@@ -14,7 +14,8 @@ export interface SalesModel {
   cartId?: string; // for retrieve sold items per cart/order
   discount?: number;
   user?: string;
-  sellerObject? : any;
+  sellerObject?: any;
+  timer: string;
   channel?: string;
   stock?: StockModel;
   batch?: string; // for offline sync
