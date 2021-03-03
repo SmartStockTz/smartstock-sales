@@ -11,6 +11,7 @@ import {PrintService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
 import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
+import * as moment from 'moment';
 
 @Component({
   selector: 'smartstock-cart',
@@ -346,6 +347,7 @@ export class CartComponent implements OnInit {
         customer: this.isViewedInWholesale
           ? this.customerFormControl.value
           : null,
+        timer: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
         stock: value.product,
