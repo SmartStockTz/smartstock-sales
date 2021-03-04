@@ -9,9 +9,9 @@ import { DeviceInfoUtil, LogService, StorageService } from '@smartstocktz/core-l
 import { UserService } from '../user-modules/user.service';
 
 @Component({
-  selector: 'smartstock-retail-sale',
+  selector: 'app-retail-sale',
   template: `
-    <smartstock-sale [isViewedInWholesale]="false"></smartstock-sale>
+    <app-sale [isViewedInWholesale]="false"></app-sale>
   `,
   styleUrls: ['../styles/retail.style.css']
 })

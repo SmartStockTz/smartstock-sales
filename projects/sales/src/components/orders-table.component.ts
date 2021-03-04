@@ -7,12 +7,12 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {OrdersTableOptionsComponent} from './orders-table-options.component';
 
 @Component({
-  selector: 'smartstock-orders-table',
+  selector: 'app-orders-table',
   template: `
     <mat-progress-bar mode="indeterminate" color="primary" *ngIf="(orderState.getOrderFlag | async)===true"></mat-progress-bar>
     <mat-card>
       <mat-card-header>
-        <smartstock-orders-table-actions></smartstock-orders-table-actions>
+        <app-orders-table-actions></app-orders-table-actions>
       </mat-card-header>
       <table *ngIf="orderState.orders.value.length > 0" mat-table [dataSource]="ordersDataTable">
         <ng-container matColumnDef="date">
@@ -30,7 +30,7 @@ import {OrdersTableOptionsComponent} from './orders-table-options.component';
         <!-- <ng-container matColumnDef="paid">
           <th mat-header-cell *cdkHeaderCellDef>Payment</th>
           <td mat-cell *cdkCellDef="let order">
-            <smartstock-oder-paid-status [order]="order"></smartstock-oder-paid-status>
+            <app-oder-paid-status [order]="order"></app-oder-paid-status>
           </td>
         </ng-container> -->
         <ng-container matColumnDef="mobile">
@@ -62,7 +62,7 @@ import {OrdersTableOptionsComponent} from './orders-table-options.component';
         <tr mat-row *matRowDef="let row; columns: ordersColumns;"></tr>
       </table>
       <div *ngIf="orderState.orders.value.length === 0" class="d-flex justify-content-center align-items-center" style="padding: 16px">
-        <smartstock-data-not-ready></smartstock-data-not-ready>
+        <app-data-not-ready></app-data-not-ready>
       </div>
       <mat-paginator #paginator [pageSize]="10" [showFirstLastButtons]="true" [pageSizeOptions]="[10,20,50]"></mat-paginator>
     </mat-card>

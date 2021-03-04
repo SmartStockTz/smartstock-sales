@@ -25,7 +25,7 @@ import * as moment from 'moment';
 
     <div class="mat-elevation-z8">
       <mat-progress-bar *ngIf="fetchingInvoices" mode="indeterminate" color="primary"></mat-progress-bar>
-      <smartstock-data-not-ready *ngIf="noData"></smartstock-data-not-ready>
+      <app-data-not-ready *ngIf="noData"></app-data-not-ready>
       <table mat-table *ngIf="!noData" [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="Invoice Id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Invoice Id</th>
@@ -77,7 +77,7 @@ import * as moment from 'moment';
       <mat-paginator *ngIf="!noData" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
     </div>
   `,
-  selector: 'smartstock-incomplete-invoices',
+  selector: 'app-incomplete-invoices',
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),

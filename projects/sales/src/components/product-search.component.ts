@@ -6,7 +6,7 @@ import {StockModel} from "../models/stock.model";
 import {debounceTime} from "rxjs/operators";
 
 @Component({
-  selector: 'smartstock-stock-products-search-dialog',
+  selector: 'app-stock-products-search-dialog',
   template: `
     <div>
       <div mat-dialog-title>

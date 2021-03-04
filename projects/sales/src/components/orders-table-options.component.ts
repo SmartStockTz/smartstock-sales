@@ -7,7 +7,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 
 // @dynamic
 @Component({
-  selector: 'smartstock-orders-table-options',
+  selector: 'app-orders-table-options',
   template: `
     <div style="padding: 16px 0 24px 0;">
       <mat-nav-list>

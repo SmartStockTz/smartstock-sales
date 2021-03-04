@@ -6,7 +6,7 @@ import {LogService} from '@smartstocktz/core-libs';
 
 // @dynamic
 @Component({
-  selector: 'smartstock-mobile-pay-details',
+  selector: 'app-mobile-pay-details',
   template: `
     <div>
       <div style="display: flex;justify-content: center; align-items: center">

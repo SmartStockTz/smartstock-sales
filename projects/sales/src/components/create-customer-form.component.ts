@@ -55,7 +55,7 @@ import { CustomerState } from '../states/customer.state';
       </button>
     </div>
     `,
-  selector: 'smartstock-create-customer'
+  selector: 'app-create-customer'
 })
 export class CreateCustomerComponent implements OnInit {
   createCustomerForm: FormGroup;

@@ -11,22 +11,22 @@ import {UserService} from '../user-modules/user.service';
 import {CartState} from '../states/cart.state';
 
 @Component({
-  selector: 'smartstock-sale',
+  selector: 'app-sale',
   template: `
     <mat-sidenav-container class="match-parent">
 
       <mat-sidenav class="match-parent-side" #sidenav [mode]="enoughWidth()?'side':'over'" [opened]="enoughWidth()">
-        <smartstock-drawer></smartstock-drawer>
+        <app-drawer></app-drawer>
       </mat-sidenav>
 
       <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end" [mode]="enoughWidth()?'side':'over'"
                    [opened]="false">
-        <smartstock-cart  [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></smartstock-cart>
+        <app-cart  [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></app-cart>
       </mat-sidenav>
 
       <mat-sidenav-content style="display:flex; flex-direction: column">
 
-        <smartstock-toolbar (searchCallback)="filterProduct($event)"
+        <app-toolbar (searchCallback)="filterProduct($event)"
                             [showSearch]="true"
                             [hasBackRoute]="true" [backLink]="'/sale/'"
                             searchPlaceholder="Filter product"
@@ -34,20 +34,20 @@ import {CartState} from '../states/cart.state';
                             [searchProgressFlag]="searchProgressFlag"
                             [heading]="isViewedInInvoice ? 'Invoice' :isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
                             [cartDrawer]="cartdrawer"
-                            [showProgress]="showProgress"></smartstock-toolbar>
+                            [showProgress]="showProgress"></app-toolbar>
 
-        <smartstock-on-fetch *ngIf="!products || fetchDataProgress" [isLoading]="fetchDataProgress"
-                             (refreshCallback)="getProductsFromServer()"></smartstock-on-fetch>
+        <app-on-fetch *ngIf="!products || fetchDataProgress" [isLoading]="fetchDataProgress"
+                             (refreshCallback)="getProductsFromServer()"></app-on-fetch>
 
         <cdk-virtual-scroll-viewport style="flex-grow: 1" itemSize="25" *ngIf="products && !fetchDataProgress">
-          <smartstock-product-card style="margin: 0 5px; display: inline-block"
+          <app-product-card style="margin: 0 5px; display: inline-block"
                                    [cartdrawer]="cartdrawer"
                                    [product]="product"
                                    (afterAddToCart)="afterAddToCart($event)"
                                    [productIndex]="idx"
                                    [isViewedInWholesale]="isViewedInWholesale"
                                    *cdkVirtualFor="let product of products; let idx = index">
-          </smartstock-product-card>
+          </app-product-card>
         </cdk-virtual-scroll-viewport>
 
         <div style="position: absolute; width: 100%;display: flex; flex-direction: row; justify-content: center;
@@ -62,7 +62,7 @@ import {CartState} from '../states/cart.state';
             <mat-icon>refresh</mat-icon>
           </button>
           <span [ngStyle]="showRefreshCart?{flex: '1 1 auto'}:{}"></span>
-          <smartstock-cart-preview [cartSidenav]="cartdrawer" [isWholeSale]="isViewedInWholesale"></smartstock-cart-preview>
+          <app-cart-preview [cartSidenav]="cartdrawer" [isWholeSale]="isViewedInWholesale"></app-cart-preview>
         </div>
       </mat-sidenav-content>
 

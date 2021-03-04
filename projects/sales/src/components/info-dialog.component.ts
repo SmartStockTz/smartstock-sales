@@ -2,7 +2,7 @@ import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 // @dynamic
 @Component({
-  selector: 'smartstock-stock-info-dialog',
+  selector: 'app-stock-info-dialog',
   template: `
     <div>
       <h1 mat-dialog-title>Info</h1>
