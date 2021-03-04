@@ -119,15 +119,15 @@ export class CartComponent implements OnInit {
   private currentUser: any;
   isMobile = false;
 
-  private static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
+  static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
     return (data.totalDiscount / data.totalItems);
   }
 
-  private static getQuantity(isViewedInWholesale: boolean, cart: CartModel): number {
+  static getQuantity(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? (cart.quantity * cart.stock.wholesaleQuantity) : cart.quantity;
   }
 
-  private static getPrice(isViewedInWholesale: boolean, cart: CartModel): number {
+  static getPrice(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? cart.stock.wholesalePrice : cart.stock.retailPrice;
   }
 

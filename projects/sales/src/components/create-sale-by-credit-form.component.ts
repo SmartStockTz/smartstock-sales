@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TransferState} from '../states/transfer.state';
-import {MessageService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {MessageService, PrintService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {MatDialog} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {StockModel} from '../models/stock.model';
@@ -19,6 +19,7 @@ import {InvoiceState} from '../states/invoice.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {CartModel} from '../models/cart.model';
+import {CartComponent} from './cart.component';
 
 @Component({
   selector: 'app-sales-create-sale-by-credit-form',
@@ -173,6 +174,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
               private readonly message: MessageService,
               private readonly userService: UserService,
               private readonly customerState: CustomerState,
+              private readonly printService: PrintService,
               private readonly salesState: SalesState,
               private readonly dialog: MatDialog,
               private router: Router,
@@ -331,7 +333,15 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       this.snack.open('Your invoice has been recorded.', 'Ok', {
         duration: 3000
       });
-      this.router.navigateByUrl('/sale/invoices/list').catch(console.log);
+      return this.printService.print({
+        data: this.invoiceToPrinterData(invoice, customer),
+        printer: 'tm20',
+        id: invoice.batchId,
+        qr: invoice.batchId
+      });
+
+    }).then(val => {
+      return this.router.navigateByUrl('/sale/invoices/list').catch(console.log);
     }).catch(err => {
       this.snack.open('Please fix all errors, and make sure you add at least one product then submit again', 'Ok', {
         duration: 3000
@@ -340,55 +350,31 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     this.showProgress = false;
   }
 
-  printCart(): void {
-    this.checkoutProgress = true;
-    const cartId = SecurityUtil.generateUUID();
-    const cartItems = this._getCartItems();
-    this.printService.print({
-      data: this.cartItemsToPrinterData(cartItems, this.isViewedInWholesale ? this.customerFormControl.value : null),
-      printer: 'tm20',
-      id: cartId,
-      qr: cartId
-    }).then(_ => {
-      return this.submitBill(cartId);
-    }).then(_ => {
-      this.checkoutProgress = false;
-      this.snack.open('Done save sales', 'Ok', {duration: 2000});
-    }).catch(reason => {
-      this.checkoutProgress = false;
-      this.snack.open(
-        reason && reason.message ? reason.message : reason.toString(),
-        'Ok',
-        {duration: 3000}
-      );
-    }).finally(() => {
-      this.discountFormControl.setValue(0);
-    });
-  }
-
-  private cartItemsToPrinterData(carts: CartModel[], customer: string): string {
+  private invoiceToPrinterData(invoice: InvoiceModel, customer): string {
     let data = '';
     data = data.concat('-------------------------------\n');
     data = data.concat(new Date().toDateString() + '\n');
     if (customer) {
-      data = data.concat('-------------------------------\nTo ---> ' + customer);
+      data = data.concat('-------------------------------\nInvoice To ---> ' +
+        (customer.firstName ? customer.firstName + ' ' + customer.secondName : customer.displayName));
     }
-    let totalBill = 0;
-    carts.forEach((cart, index) => {
-      totalBill += (cart.amount as number);
+    data = data.concat('\nInvoice Id ---> ' + invoice.batchId)
+    invoice.items.forEach((sale, index) => {
       data = data.concat(
         '\n-------------------------------\n' +
-        (index + 1) + '.  ' + cart.product + '\n' +
-        'Quantity --> ' + CartComponent.getQuantity(this.isViewedInWholesale, cart) + ' ' + cart.stock.unit + ' \t' +
-        'Unit Price --> ' + CartComponent.getPrice(this.isViewedInWholesale, cart) + '\t' +
-        'Sub Amount  --> ' + cart.amount + ' \t'
+        (index + 1) + '.  ' + sale.stock.product + '\n' +
+        'Product --> ' + sale.stock.product.toString() + ' ' + sale.stock.unit + ' \t' +
+        'Amount --> ' + sale.amount + '\t' +
+        'Quantity  --> ' + sale.quantity + ' \t'
       );
     });
+
     data = data.concat(
       '\n--------------------------------\n' +
-      'Total Bill : ' + totalBill +
+      'Total Bill : ' + invoice.amount +
       '\n--------------------------------\n'
     );
+
     return data;
   }
 
