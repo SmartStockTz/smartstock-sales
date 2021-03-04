@@ -347,7 +347,7 @@ export class CartComponent implements OnInit {
         customer: this.isViewedInWholesale
           ? this.customerFormControl.value
           : null,
-        timer: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
+        time: moment(new Date()).format('HH:mm:ss'),
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
         stock: value.product,

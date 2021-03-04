@@ -15,7 +15,7 @@ export interface SalesModel {
   discount?: number;
   user?: string;
   sellerObject?: any;
-  timer: string;
+  time: string;
   channel?: string;
   stock?: StockModel;
   batch?: string; // for offline sync
