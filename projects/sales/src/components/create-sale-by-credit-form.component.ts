@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TransferState} from '../states/transfer.state';
-import {MessageService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {MessageService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {MatDialog} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {StockModel} from '../models/stock.model';
@@ -10,7 +10,6 @@ import {CreateCreditorComponent} from './create-creditor.component';
 import {Observable} from 'rxjs';
 import {CreditorState} from '../states/creditor.state';
 import {of} from 'rxjs/internal/observable/of';
-import {SalesModel} from '../models/sale.model';
 import {SalesState} from '../states/sales.state';
 import {CustomerState} from '../states/customer.state';
 import {CreateCustomerComponent} from './create-customer-form.component';
@@ -53,7 +52,7 @@ import {Router} from '@angular/router';
               <mat-form-field style="width:100%" appearance="fill">
                 <mat-select style="width:100%" formControlName="customer">
                   <mat-option *ngFor="let option of customers | async" [value]='option.firstName'>
-                    {{option.secondName ? (option.firstName + " " + option.secondName) : option.firstName}}
+                    {{(option.firstName + " " + option.secondName) + ' @ ' + option.company}}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -190,22 +189,16 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       customer: [null, [Validators.required, Validators.nullValidator]],
       amount: [null, [Validators.required, Validators.nullValidator]],
     });
-
-    // this._handleCreditorNameControl();
-    // this._getCreditors();
     this._getCurrentUser();
     this._handleCustomerNameControl();
     this._getCustomers();
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(CreateCustomerComponent, {
-      height: '400px',
-      width: '600px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+    this.dialog.open(CreateCustomerComponent, {
+      maxWidth: '600px'
+    }).afterClosed().subscribe(_34 => {
+      this._getCustomers();
     });
   }
 
@@ -242,41 +235,41 @@ export class SaleByCreditCreateFormComponent implements OnInit {
         if (!customers) {
           customers = [];
         }
-
-        customers = customers.filter(customer => customer.firstName);
+        // customers = customers.filter(customer => customer.firstName);
         this.customers = of(customers);
       })
-      .catch();
+      .catch(_345 => {
+      });
   }
 
-  private _handleCreditorNameControl(): void {
+  // private _handleCreditorNameControl(): void {
+  //
+  //   this.transferFormGroup.get('creditor').valueChanges.subscribe((enteredName: string) => {
+  //     if (enteredName) {
+  //       this.creditorState.getCreditors()
+  //         .then(customers => {
+  //           if (!customers) {
+  //             customers = [];
+  //           }
+  //           this.creditors = of(
+  //             customers
+  //           );
+  //         })
+  //         .catch();
+  //     }
+  //   });
+  // }
 
-    this.transferFormGroup.get('creditor').valueChanges.subscribe((enteredName: string) => {
-      if (enteredName) {
-        this.creditorState.getCreditors()
-          .then(customers => {
-            if (!customers) {
-              customers = [];
-            }
-            this.creditors = of(
-              customers
-            );
-          })
-          .catch();
-      }
-    });
-  }
-
-  _getCreditors(): void {
-    this.creditorState.getCreditors()
-      .then(customers => {
-        if (!customers) {
-          customers = [];
-        }
-        this.creditors = of(customers);
-      })
-      .catch();
-  }
+  // _getCreditors(): void {
+  //   this.creditorState.getCreditors()
+  //     .then(customers => {
+  //       if (!customers) {
+  //         customers = [];
+  //       }
+  //       this.creditors = of(customers);
+  //     })
+  //     .catch();
+  // }
 
   updateTotalCost(): void {
     this.totalCost = this.transfersDatasource.data
