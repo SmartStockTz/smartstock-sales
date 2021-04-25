@@ -32,6 +32,7 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
               private readonly salesState: SalesState,
   ) {
     super();
+    document.title = 'SmartStock - Retail Sale';
   }
 
   ngOnInit() {
