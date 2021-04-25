@@ -9,7 +9,7 @@ import {ProductSearchDialogComponent} from './product-search.component';
 import {CreateCreditorComponent} from './create-creditor.component';
 import {Observable} from 'rxjs';
 import {CreditorState} from '../states/creditor.state';
-import {of} from 'rxjs/internal/observable/of';
+import {of} from 'rxjs';
 import {SalesState} from '../states/sales.state';
 import {CustomerState} from '../states/customer.state';
 import {CreateCustomerComponent} from './create-customer-form.component';
