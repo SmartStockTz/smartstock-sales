@@ -29,7 +29,7 @@ import {SaleComponent} from './components/sale.component';
 import {CartPreviewComponent} from './components/cart-preview.component';
 import {RouterModule, ROUTES, Routes} from '@angular/router';
 import {WholePageComponent} from './pages/whole.page';
-import {LibModule} from '@smartstocktz/core-libs';
+import {ConfigsService, LibModule} from '@smartstocktz/core-libs';
 import {IndexPage} from './pages/index.page';
 import {OrderPage} from './pages/order.page';
 import {OrdersTableComponent} from './components/orders-table.component';
@@ -41,7 +41,6 @@ import {OrderPaymentStatusComponent} from './components/order-payment-status.com
 import {OrdersTableOptionsComponent} from './components/orders-table-options.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {OrdersTableShowItemsComponent} from './components/orders-table-show-items.component';
-import {ConfigsService} from '@smartstocktz/core-libs';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component';
 import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
@@ -155,7 +154,7 @@ const routes: Routes = [
 export class SalesModule {
   constructor(private readonly configs: ConfigsService) {
     this.configs.addMenu({
-      name: 'sale',
+      name: 'Sale',
       icon: 'shop',
       roles: ['*'],
       link: '/sale',
@@ -182,20 +181,6 @@ export class SalesModule {
         }
       ]
     });
+    this.configs.selectedModuleName = 'Sale';
   }
-  // static start(config: { android: boolean, electron: boolean, browser: boolean, production: boolean } = {
-  //                android: false,
-  //                electron: false,
-  //                browser: true,
-  //                production: true
-  //              },
-  //              smartstock: { databaseURL: string, functionsURL: string } = {databaseURL: '', functionsURL: ''},
-  //              printerUrl: string = ''): void {
-  //   ConfigsService.android = config.android;
-  //   ConfigsService.electron = config.electron;
-  //   ConfigsService.browser = config.browser;
-  //   ConfigsService.production = config.browser;
-  //   ConfigsService.smartstock = smartstock;
-  //   ConfigsService.printerUrl = printerUrl;
-  // }
 }
