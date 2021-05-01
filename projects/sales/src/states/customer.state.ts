@@ -19,7 +19,7 @@ export class CustomerState {
     });
   }
 
-  saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
+  async saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
     customer.firstName = customer.firstName.concat('@').concat(SecurityUtil.generateUUID());
     return this.storage.saveCustomer(customer);
   }

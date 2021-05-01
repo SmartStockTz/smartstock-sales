@@ -7,9 +7,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SalesModel} from '../models/sale.model';
 import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
-import {PrintService} from '@smartstocktz/core-libs';
+import {PrintService, SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
-import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 
@@ -226,7 +225,10 @@ export class CartComponent implements OnInit {
     if (this.customerFormControl.valid) {
       this.customerState.saveCustomer({
         displayName: this.customerFormControl.value,
-      }).catch();
+        firstName: this.customerFormControl.value,
+      }).catch(reason => {
+        console.log(reason);
+      });
     }
     this.printCart();
   }
