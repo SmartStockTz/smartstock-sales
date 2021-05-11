@@ -7,8 +7,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SalesModel} from '../models/sale.model';
 import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
-import {PrintService, SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {PrintService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
+import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 
@@ -118,15 +119,15 @@ export class CartComponent implements OnInit {
   private currentUser: any;
   isMobile = false;
 
-  private static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
+  static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
     return (data.totalDiscount / data.totalItems);
   }
 
-  private static getQuantity(isViewedInWholesale: boolean, cart: CartModel): number {
+  static getQuantity(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? (cart.quantity * cart.stock.wholesaleQuantity) : cart.quantity;
   }
 
-  private static getPrice(isViewedInWholesale: boolean, cart: CartModel): number {
+  static getPrice(isViewedInWholesale: boolean, cart: CartModel): number {
     return isViewedInWholesale ? cart.stock.wholesalePrice : cart.stock.retailPrice;
   }
 
@@ -134,8 +135,9 @@ export class CartComponent implements OnInit {
     this.getUser();
     this._cartListener();
     this._discountListener();
-    this._handleCustomerNameControl();
     this._getCustomers();
+    this._handleCustomerNameControl();
+
   }
 
   private getUser(): void {
@@ -151,19 +153,15 @@ export class CartComponent implements OnInit {
   private _handleCustomerNameControl(): void {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
+
       if (enteredName) {
-        this.customerState.getCustomers()
-          .then(customers => {
-            if (!customers) {
-              customers = [];
-            }
-            this.customers = of(
-              customers
-                .map(customer => customer.firstName ? customer.firstName : customer.displayName)
-                .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()))
-            );
-          })
-          .catch();
+        this.customerState.customers$.subscribe(
+          customers => {
+            customers
+              .map(customer => customer.firstName ? customer.firstName : customer.displayName)
+              .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()));
+          }
+        );
       }
     });
   }
@@ -225,10 +223,7 @@ export class CartComponent implements OnInit {
     if (this.customerFormControl.valid) {
       this.customerState.saveCustomer({
         displayName: this.customerFormControl.value,
-        firstName: this.customerFormControl.value,
-      }).catch(reason => {
-        console.log(reason);
-      });
+      }).catch();
     }
     this.printCart();
   }
@@ -349,7 +344,7 @@ export class CartComponent implements OnInit {
         customer: this.isViewedInWholesale
           ? this.customerFormControl.value
           : null,
-        time: moment(new Date()).format('HH:mm:ss'),
+        timer: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
         stock: value.product,
@@ -363,14 +358,16 @@ export class CartComponent implements OnInit {
     if (!this.isViewedInWholesale) {
       return;
     }
-    this.customerState.getCustomers()
-      .then(customers => {
+
+    this.customerState.customers$.subscribe(
+      customers => {
         if (!customers) {
           customers = [];
         }
+
         this.customers = of(customers.map(value => value.displayName));
-      })
-      .catch();
+      }
+    );
   }
 
 }
