@@ -1,14 +1,13 @@
-import { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { DeviceInfoUtil } from '@smartstocktz/core-libs';
+import {Component, OnInit} from '@angular/core';
+import {DeviceInfoUtil} from '@smartstocktz/core-libs';
 
 @Component({
-    template: `
+  template: `
     <app-layout-sidenav [body]="body"
-                               [leftDrawer]="leftDrawer"
-                               [leftDrawerMode]="enoughWidth()?'side': 'over'"
-                               [leftDrawerOpened]="enoughWidth()"
-                               [heading]="'Sell by Credit'">
+                        [leftDrawer]="leftDrawer"
+                        [leftDrawerMode]="enoughWidth()?'side': 'over'"
+                        [leftDrawerOpened]="enoughWidth()"
+                        [heading]="'Sell by Credit'">
       <ng-template #leftDrawer>
         <app-drawer></app-drawer>
       </ng-template>
@@ -21,11 +20,17 @@ import { DeviceInfoUtil } from '@smartstocktz/core-libs';
         </div>
       </ng-template>
     </app-layout-sidenav>
-    `,
-    selector: 'app-pay-by-invoices'
+  `,
+  selector: 'app-pay-by-invoices'
 })
 export class PayByInvoicesComponent extends DeviceInfoUtil implements OnInit {
-    ngOnInit(){
 
-    }
+  constructor() {
+    super();
+    document.title = 'SmartStock - Credit Sale';
+  }
+
+  ngOnInit() {
+
+  }
 }

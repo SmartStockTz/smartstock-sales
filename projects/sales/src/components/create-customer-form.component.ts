@@ -1,15 +1,28 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CustomerState } from '../states/customer.state';
+import {Component, Inject, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {CustomerState} from '../states/customer.state';
 
 @Component({
   template: `
-       <div class="row" mat-dialog-content>
-           <mat-card-title>Create Customer</mat-card-title>
+    <div class="row" mat-dialog-content>
+      <mat-card-title>Create Customer</mat-card-title>
 
       <form [formGroup]="createCustomerForm" (ngSubmit)="createCustomer()" class="create-shop-form-container" style="margin-top: 10px">
+        <mat-form-field appearance="" style="width:100%">
+          <mat-label>Company Name</mat-label>
+          <input matInput formControlName="company" placeholder="company">
+          <mat-error>Company name required</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="" style="width:100%">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phone" placeholder="Phone Number">
+          <mat-error>Phone Number required</mat-error>
+        </mat-form-field>
+
+        <p>Optional Details</p>
+
         <mat-form-field appearance="" style="width:100%">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" placeholder="First Name">
@@ -23,21 +36,13 @@ import { CustomerState } from '../states/customer.state';
         </mat-form-field>
 
         <mat-form-field appearance="" style="width:100%">
-          <mat-label>Phone Number</mat-label>
-          <input matInput formControlName="phone" placeholder="Phone Number">
-          <mat-error>Phone Number required</mat-error>
+          <mat-label>Customer TIN</mat-label>
+          <input matInput formControlName="tin" placeholder="tin">
         </mat-form-field>
 
         <mat-form-field appearance="" style="width:100%">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" placeholder="Email">
-          <mat-error>Email is required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="" style="width:100%">
-          <mat-label>Company</mat-label>
-          <input matInput formControlName="company" placeholder="Company">
-          <mat-error>Company name required</mat-error>
+          <input matInput formControlName="email" placeholder="email">
         </mat-form-field>
 
         <div class="row">
@@ -54,7 +59,7 @@ import { CustomerState } from '../states/customer.state';
         Close
       </button>
     </div>
-    `,
+  `,
   selector: 'app-create-customer'
 })
 export class CreateCustomerComponent implements OnInit {
@@ -71,11 +76,12 @@ export class CreateCustomerComponent implements OnInit {
 
   ngOnInit() {
     this.createCustomerForm = this.formBuilder.group({
-      firstName: ['', [Validators.nullValidator, Validators.required]],
-      secondName: ['', [Validators.nullValidator, Validators.required]],
+      firstName: [''],
+      secondName: [''],
       phone: ['', [Validators.nullValidator, Validators.required]],
-      email: ['', [Validators.nullValidator]],
+      email: [''],
       company: ['', [Validators.nullValidator, Validators.required]],
+      tin: [''],
       returns: [[]],
     });
   }
@@ -91,7 +97,7 @@ export class CreateCustomerComponent implements OnInit {
           duration: 3000
         });
         this.dialogRef.close(null);
-      }).catch( err => {
+      }).catch(err => {
         this.snack.open('Failed to create Customer', 'Cancel', {
           duration: 3000
         });

@@ -1,6 +1,5 @@
-
 import {Injectable} from '@angular/core';
-import { StorageService } from '@smartstocktz/core-libs';
+import {SecurityUtil, StorageService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 
 @Injectable({
@@ -12,10 +11,16 @@ export class CustomerState {
   }
 
   getCustomers(): Promise<CustomerModel[]> {
-    return this.storage.getCustomers();
+    return this.storage.getCustomers().then((value: any) => {
+      return value.map(x => {
+        x.firstName = x.firstName.toString().split('@')[0];
+        return x;
+      });
+    });
   }
 
-  saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
+  async saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
+    customer.firstName = customer.firstName.concat('@').concat(SecurityUtil.generateUUID());
     return this.storage.saveCustomer(customer);
   }
 }

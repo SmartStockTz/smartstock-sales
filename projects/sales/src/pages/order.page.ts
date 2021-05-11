@@ -24,6 +24,7 @@ import {OrderState} from '../states/order.state';
 export class OrderPage extends DeviceInfoUtil {
   constructor(private readonly orderState: OrderState) {
     super();
+    document.title = 'SmartStock - Orders Sale';
   }
 
   onSearch($event: string): void {

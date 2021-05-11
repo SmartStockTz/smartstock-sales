@@ -10,6 +10,7 @@ import {Component, OnInit} from '@angular/core';
 export class WholePageComponent implements OnInit {
 
   constructor() {
+    document.title = 'SmartStock - Wholesale Sale';
   }
 
   ngOnInit() {
