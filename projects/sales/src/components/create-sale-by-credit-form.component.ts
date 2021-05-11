@@ -197,7 +197,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     // this._handleCreditorNameControl();
     // this._getCreditors();
     this._getCurrentUser();
-    this._handleCustomerNameControl();
+    // this._handleCustomerNameControl();
     this._getCustomers();
   }
 
@@ -225,31 +225,31 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   private _handleCustomerNameControl(): void {
     this.transferFormGroup.get('customer').valueChanges.subscribe((enteredName: string) => {
       if (enteredName) {
-        this.customerState.getCustomers()
-          .then(customers => {
-            if (!customers) {
-              customers = [];
-            }
-            this.customers = of(
-              customers
-            );
-          })
-          .catch();
+        // this.customerState.getCustomers()
+        //   .then(customers => {
+        //     if (!customers) {
+        //       customers = [];
+        //     }
+        //     this.customers = of(
+        //       customers
+        //     );
+        //   })
+        //   .catch();
       }
     });
   }
 
   _getCustomers(): void {
-    this.customerState.getCustomers()
-      .then(customers => {
+    this.customerState.customers$.subscribe(
+      customers => {
         if (!customers) {
           customers = [];
         }
 
         customers = customers.filter(customer => customer.firstName);
         this.customers = of(customers);
-      })
-      .catch();
+      }
+    );
   }
 
   private _handleCreditorNameControl(): void {
@@ -358,7 +358,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
       data = data.concat('-------------------------------\nInvoice To ---> ' +
         (customer.firstName ? customer.firstName + ' ' + customer.secondName : customer.displayName));
     }
-    data = data.concat('\nInvoice Id ---> ' + invoice.batchId)
+    data = data.concat('\nInvoice Id ---> ' + invoice.batchId);
     invoice.items.forEach((sale, index) => {
       data = data.concat(
         '\n-------------------------------\n' +

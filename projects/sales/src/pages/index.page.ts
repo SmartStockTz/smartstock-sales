@@ -50,6 +50,11 @@ export class IndexPage extends DeviceInfoUtil implements OnInit {
       name: 'Invoices',
       path: '/sale/invoices',
       icon: 'payments'
+    },
+    {
+      name: 'Customers',
+      path: '/sale/customers',
+      icon: 'groups'
     }
   ];
 

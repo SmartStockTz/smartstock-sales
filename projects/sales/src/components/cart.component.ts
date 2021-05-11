@@ -135,8 +135,9 @@ export class CartComponent implements OnInit {
     this.getUser();
     this._cartListener();
     this._discountListener();
-    this._handleCustomerNameControl();
     this._getCustomers();
+    this._handleCustomerNameControl();
+
   }
 
   private getUser(): void {
@@ -152,19 +153,15 @@ export class CartComponent implements OnInit {
   private _handleCustomerNameControl(): void {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
+
       if (enteredName) {
-        this.customerState.getCustomers()
-          .then(customers => {
-            if (!customers) {
-              customers = [];
-            }
-            this.customers = of(
-              customers
-                .map(customer => customer.firstName ? customer.firstName : customer.displayName)
-                .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()))
-            );
-          })
-          .catch();
+        this.customerState.customers$.subscribe(
+          customers => {
+            customers
+              .map(customer => customer.firstName ? customer.firstName : customer.displayName)
+              .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()));
+          }
+        );
       }
     });
   }
@@ -361,14 +358,16 @@ export class CartComponent implements OnInit {
     if (!this.isViewedInWholesale) {
       return;
     }
-    this.customerState.getCustomers()
-      .then(customers => {
+
+    this.customerState.customers$.subscribe(
+      customers => {
         if (!customers) {
           customers = [];
         }
+
         this.customers = of(customers.map(value => value.displayName));
-      })
-      .catch();
+      }
+    );
   }
 
 }

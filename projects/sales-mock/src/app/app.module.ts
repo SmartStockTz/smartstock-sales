@@ -15,7 +15,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import { SalesWorkerService } from 'projects/sales/src/public-api';
+import {SalesWorkerService} from 'projects/sales/src/public-api';
 
 
 @NgModule({
@@ -51,8 +51,8 @@ export class AppModule {
   }
 
   shouldRun = true;
-  
- async startSalesSync(){
+
+  async startSalesSync() {
     console.log('sales worker started');
     this.salesWorkerService.initiateSmartStock();
     setInterval(_ => {
