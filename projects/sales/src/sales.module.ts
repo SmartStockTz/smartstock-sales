@@ -61,7 +61,11 @@ import {InvoiceDetailsComponent} from './components/invoice-details.component';
 import {AddReturnSheetComponent} from './components/add-returns-sheet.component';
 import {CustomersPage} from './pages/customers.page';
 import {CustomerListComponent} from './components/customer-list.component';
-
+import {ReturnsPage} from './pages/returns.page';
+import {ReturnsListComponent} from './components/returns-list.component';
+import {ReturnsDetailsComponent} from './components/returns-details.component';
+import {CreateReturnComponent} from './components/create-return.component';
+import {PeriodDateRangeComponent} from './components/period-range.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -71,7 +75,8 @@ const routes: Routes = [
   {path: 'retail', component: RetailPageComponent},
   {path: 'invoices', component: PayByCreditPageComponent},
   {path: 'invoices/create', component: PayByInvoicesComponent},
-  {path: 'invoices/list', component: InvoicesPageComponent}
+  {path: 'invoices/list', component: InvoicesPageComponent},
+  {path: 'returns', component: ReturnsPage},
 ];
 
 @NgModule({
@@ -124,6 +129,11 @@ const routes: Routes = [
     MatSnackBarModule
   ],
   declarations: [
+    PeriodDateRangeComponent,
+    CreateReturnComponent,
+    ReturnsDetailsComponent,
+    ReturnsListComponent,
+    ReturnsPage,
     CustomerListComponent,
     CustomersPage,
     AddReturnSheetComponent,
@@ -165,24 +175,34 @@ export class SalesModule {
       link: '/sale',
       pages: [
         {
-          name: 'retail',
+          name: 'Retail',
           roles: ['*'],
           link: '/sale/retail'
         },
         {
-          name: 'wholesale',
+          name: 'Wholesale',
           roles: ['*'],
           link: '/sale/whole'
         },
         {
-          name: 'orders',
+          name: 'Orders',
           roles: ['*'],
           link: '/sale/order'
         },
         {
-          name: 'credit sale',
+          name: 'Credit sale',
           roles: ['*'],
           link: '/sale/invoices'
+        },
+        {
+          name: 'Customers',
+          roles: ['*'],
+          link: '/sale/customers'
+        },
+        {
+          name: 'returns',
+          roles: ['*'],
+          link: '/sale/returns'
         }
       ]
     });

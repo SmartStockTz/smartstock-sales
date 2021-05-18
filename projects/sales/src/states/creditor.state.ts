@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { StorageService } from '@smartstocktz/core-libs';
-import {CustomerModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/customer.model';
 import { CreditorService } from '../services/creditor.services';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { CreditorService } from '../services/creditor.services';
 export class CreditorState {
 
   constructor(private readonly creditorService: CreditorService) {
-    
+
   }
 
   getCreditors(): Promise<any[]> {

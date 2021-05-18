@@ -1,10 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {CustomerModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/customer.model';
 import {MatSort} from '@angular/material/sort';
 import {TransactionModel} from 'bfastjs/dist/models/TransactionModel';
 import {MatPaginator} from '@angular/material/paginator';
 import {CustomerState} from '../states/customer.state';
+import {CustomerModel} from '@smartstocktz/core-libs/models/customer.model';
 
 @Component({
   selector: 'app-customer-list',
@@ -47,7 +48,7 @@ import {CustomerState} from '../states/customer.state';
 export class CustomerListComponent implements OnInit {
   isLoading = true;
   noData = false;
-  customers: CustomerModel[];
+  customers: ReturnsModel[];
   dataSource: MatTableDataSource<CustomerModel>;
 
   displayColumns = ['First Name', 'Second Name', 'Mobile', 'Email'];
@@ -91,7 +92,7 @@ export class CustomerListComponent implements OnInit {
     this.dataSource = new MatTableDataSource(customers);
     // // console.log(this.dataSource.data);
     this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = (customer: CustomerModel, sortHeaderId: string) => {
+    this.dataSource.sortingDataAccessor = (customer: ReturnsModel, sortHeaderId: string) => {
       return customer[this.keysMap[sortHeaderId]];
     };
     this.dataSource.paginator = this.paginator;

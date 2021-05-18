@@ -11,7 +11,7 @@ export class CustomerService{
 
     async getCustomers(size = 20, skip = 0): Promise<any[]> {
         const shop = await this.storageService.getActiveShop();
-        const customers = await BFast.database(shop.projectId).collection('customers')
+        const customers = await BFast.database(shop.projectId).collection('returns')
           .query()
           .skip(skip)
           .size(size)
@@ -19,6 +19,6 @@ export class CustomerService{
           .find<any[]>();
         return customers;
       }
-    
-    
+
+
 }

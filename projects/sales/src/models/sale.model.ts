@@ -1,6 +1,7 @@
 import {StockModel} from './stock.model';
 
 export interface SalesModel {
+  isReturned?: boolean;
   soldBy?: { username: string };
   id?: string;
   idTra?: string;

@@ -5,5 +5,6 @@ export interface CartModel {
   quantity: number;
   amount: number;
   discount?: number;
+  isReturned?: boolean;
   stock: StockModel;
 }

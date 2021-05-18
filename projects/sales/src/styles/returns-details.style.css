@@ -1,0 +1,19 @@
+.header{
+  background: #1b5e20!important;
+  margin: -10px -16px 0 -17px;
+}
+.header-icon {
+  font-size: 18px;
+}
+.header mat-icon{
+  width: 40px;
+  height:40px;
+  font-size: 36px;
+  border-radius: 8px;
+}
+th {
+  color: black;
+}
+td.mat-cell {
+  border-bottom-style: none;
+}

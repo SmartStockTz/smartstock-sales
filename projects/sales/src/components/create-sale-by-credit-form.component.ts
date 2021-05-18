@@ -226,12 +226,12 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     this.transferFormGroup.get('customer').valueChanges.subscribe((enteredName: string) => {
       if (enteredName) {
         // this.customerState.getCustomers()
-        //   .then(customers => {
-        //     if (!customers) {
-        //       customers = [];
+        //   .then(returns => {
+        //     if (!returns) {
+        //       returns = [];
         //     }
-        //     this.customers = of(
-        //       customers
+        //     this.returns = of(
+        //       returns
         //     );
         //   })
         //   .catch();
