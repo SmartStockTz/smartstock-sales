@@ -40,6 +40,12 @@ import { CustomerState } from '../states/customer.state';
           <mat-error>Company name required</mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="" style="width:100%">
+          <mat-label>TIN No</mat-label>
+          <input matInput formControlName="tin" placeholder="TIN No">
+          <mat-error>TIN No required</mat-error>
+        </mat-form-field>
+
         <div class="row">
           <button style="width: 100%" [disabled]="createShopProgress" class="ft-button btn-block" color="primary" mat-raised-button>
             Create Customer
@@ -75,7 +81,8 @@ export class CreateCustomerComponent implements OnInit {
       secondName: ['', [Validators.nullValidator, Validators.required]],
       phone: ['', [Validators.nullValidator, Validators.required]],
       email: ['', [Validators.nullValidator]],
-      company: ['', [Validators.nullValidator, Validators.required]],
+      company: ['', [Validators.nullValidator]],
+      tin: ['', [Validators.nullValidator]],
       returns: [[]],
     });
   }

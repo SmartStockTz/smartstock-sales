@@ -41,6 +41,8 @@ export class ReturnsState {
       .collection(ReturnsState.COLLECTION_NAME)
       .query()
       .orderBy('_created_at', -1)
+      // .size()
+      // .skip()
       .find();
   }
 

@@ -14,6 +14,8 @@ import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
 import {last} from 'rxjs/operators';
+import {CreateCustomerComponent} from './create-customer-form.component';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cart',
@@ -28,18 +30,23 @@ import {last} from 'rxjs/operators';
       </mat-toolbar>
       <!--<div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">-->
       <div style="padding: 5px 0 0 0">
-        <div style="width: 100%; padding: 6px">
-          <input autocomplete="false"
-                 style="border: none; background-color: rgba(0, 170, 7, 0.1);
+        <div style="width: 100%; padding: 6px" class="row">
+          <div class="flex-fill">
+            <input autocomplete="false"
+                   style="border: none; background-color: rgba(0, 170, 7, 0.1);
              padding: 4px; border-radius: 4px;width: 100%; height: 48px;"
-                 [formControl]="customerFormControl" placeholder="Customer Name"
-                 type="text" [matAutocomplete]="auto">
-          <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let option of customers | async" [value]="option.firstName + ' ' + option.secondName"
-                        (click)="setSelectedCustomer(option)">
-              {{option.firstName + " " + option.secondName}}
-            </mat-option>
-          </mat-autocomplete>
+                   [formControl]="customerFormControl" placeholder="Customer Name"
+                   type="text" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of customers | async" [value]="option.firstName + ' ' + option.secondName"
+                          (click)="setSelectedCustomer(option)">
+                {{option.firstName + " " + option.secondName}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+          <button color="primary" (click)="createCustomer()" mat-icon-button>
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
         </div>
       </div>
       <div style="margin-bottom: 300px">
@@ -108,7 +115,8 @@ export class CartComponent implements OnInit {
               private readonly userService: UserService,
               private readonly customerState: CustomerState,
               public readonly cartState: CartState,
-              private readonly snack: MatSnackBar) {
+              private readonly snack: MatSnackBar,
+              private readonly dialog: MatDialog) {
   }
 
   @Input() isViewedInWholesale = false;
@@ -220,8 +228,8 @@ export class CartComponent implements OnInit {
   }
 
   checkout(): void {
-    if (this.isViewedInWholesale && !this.customerFormControl.valid) {
-      this.snack.open('Please enter customer name, atleast three characters required', 'Ok', {
+    if (this.isViewedInWholesale && !this.selectedCustomer) {
+      this.snack.open('Please enter customer name, or add a customer', 'Ok', {
         duration: 3000
       });
       return;
@@ -358,6 +366,17 @@ export class CartComponent implements OnInit {
       });
     });
     return sales;
+  }
+
+  createCustomer() {
+    const dialogRef = this.dialog.open(CreateCustomerComponent, {
+      height: '400px',
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 
   private _getCustomers(): void {
