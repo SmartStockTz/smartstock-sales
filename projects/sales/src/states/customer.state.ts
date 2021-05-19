@@ -35,7 +35,17 @@ export class CustomerState {
 
   async fetchCustomers(): Promise<CustomerModel[]> {
     // fetch from server or local storage
+    const customersFromStorage = await this.getCustomersFromStorage();
     const shop = await this.storage.getActiveShop();
+    if (customersFromStorage && Array.isArray(customersFromStorage) && customersFromStorage.length > 0) {
+      bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>().then(
+        onlineCustomers => {
+          return [...onlineCustomers, ...customersFromStorage];
+        }
+      ).catch(err => {
+        return customersFromStorage;
+      });
+    }
     return bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>();
   }
 

@@ -173,7 +173,7 @@ export class CartComponent implements OnInit {
               .filter(customer => {
                 const name = customer.firstName ?
                   customer.firstName + ' ' + customer.secondName : customer.displayName;
-                return name.toLowerCase().includes(enteredName);
+                return name.toLowerCase().includes(enteredName.toLowerCase());
               }));
           }
         );
