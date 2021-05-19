@@ -40,13 +40,16 @@ export class CustomerState {
     if (customersFromStorage && Array.isArray(customersFromStorage) && customersFromStorage.length > 0) {
       bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>().then(
         onlineCustomers => {
+          [...onlineCustomers, ...customersFromStorage].forEach(this.storage.saveCustomer);
           return [...onlineCustomers, ...customersFromStorage];
         }
       ).catch(err => {
         return customersFromStorage;
       });
     }
-    return bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>();
+    const customers = await bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>();
+    customers.forEach(this.storage.saveCustomer);
+    return customers;
   }
 
 
