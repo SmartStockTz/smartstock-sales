@@ -21,15 +21,14 @@ import {Subject} from 'rxjs';
       <div>
         <mat-card-title>Create Return</mat-card-title>
         <div class="row m-0 justify-content-end">
-          <mat-form-field appearance="outline">
-            <mat-label>Filter</mat-label>
-            <input matInput [formControl]="filterFormControl" placeholder="type here ...">
-          </mat-form-field>
-          <app-period-date-range [hidePeriod]="true"></app-period-date-range>
+          <!--<mat-form-field appearance="outline">-->
+            <!--<mat-label>Filter</mat-label>-->
+            <!--<input matInput [formControl]="filterFormControl" placeholder="type here ...">-->
+          <!--</mat-form-field>-->
+          <app-period-date-range [hidePeriod]="true" [hideEndDate]="true"></app-period-date-range>
         </div>
       </div>
       <div class="flex-fill">
-
         <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="primary"></mat-progress-bar>
         <div class="mat-elevation-z8 d-flex flex-fill flex-column justify-content-center " style="width: 100%; height: 100%">
           <table mat-table [dataSource]="dataSource" matSort>
@@ -186,6 +185,7 @@ export class CreateReturnComponent implements OnInit {
     const user = await this.storage.getActiveUser();
     returns.returnedBy = user;
     returns.returnedDate = toSqlDate(new Date());
+    this.salesReportsState.removeSale(returns);
 
     // save in returns
     this.returnsState.saveReturn(returns);

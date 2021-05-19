@@ -77,7 +77,7 @@ import {FormControl, Validators} from '@angular/forms';
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
         <tr mat-row class="table-data-row"
-            *matRowDef="let row; columns: displayColumns;" (click)="openReturnsDetails(row)"></tr>
+            *matRowDef="let row; columns: displayColumns;" ></tr>
         <!--<tr mat-footer-row *matFooterRowDef="displayColumns; sticky: true"></tr>-->
       </table>
       <app-data-not-ready *ngIf="noData && !isLoading"></app-data-not-ready>

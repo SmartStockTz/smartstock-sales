@@ -46,12 +46,11 @@ export class ReturnsPage extends DeviceInfoUtil implements OnInit {
 
   returnSale() {
     const dialogRef = this.dialog.open(CreateReturnComponent, {
-      height: '600px',
       width: '900px',
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      // console.log(`Dialog result: ${result}`);
     });
   }
 }

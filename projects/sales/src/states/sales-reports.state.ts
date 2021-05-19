@@ -93,4 +93,10 @@ export class SalesReportsState {
       this.loadingSalesSubject.next(false);
     });
   }
+
+  removeSale(returns) {
+    let sales = this.getSalesFromSource();
+    sales = sales.filter(value => value.id !== returns.id);
+    this.salesSource.next(sales);
+  }
 }

@@ -16,58 +16,24 @@ export class SalesReportsService {
   }
 
   async fetchSales(date: any) {
-    // console.log(date)
+    // console.log(date);
     const shop = await this.storage.getActiveShop();
-
-    // const results = await bfast.database(shop.projectId).collection(SalesReportsState.COLLECTION_NAME)
-    //   .query().aggregate([
-    //   {
-    //     $match: {
-    //       $and: [
-    //         {date: {$gte: date.startDate}},
-    //         {date: {$lte: date.endDate}},
-    //       ]
-    //     }
-    //   },
-    //   {
-    //     $lookup:
-    //       {
-    //         from: ReturnsState.COLLECTION_NAME,
-    //         localField: 'returnsId',
-    //         foreignField: 'id',
-    //         as: ReturnsState.COLLECTION_NAME
-    //       }
-    //   },
-    //
-    //   {
-    //     $project: {
-    //       ab:
-    //         {
-    //           $cmp: ['$id', '$returnsId']
-    //         }
-    //     }
-    //   },
-    //   {
-    //     $match:
-    //       {ab: {$eq: 1}}
-    //   }
-    // ], {});
     // console.log(results);
     const sales = await bfast.database(shop.projectId)
       .collection(SalesReportsState.COLLECTION_NAME)
-      .getAll<SalesModel>();
-      // .query()
-      // .greaterThan('date', date.startDate)
-      // .lessThan('date', date.endDate)
-      // .find<SalesModel[]>();
+      // .getAll<SalesModel>();
+      .query()
+      // .orderBy('date', -1)
+      .equalTo('date', date.startDate)
+      .find<SalesModel[]>();
 
     const returns = await bfast.database(shop.projectId)
       .collection(ReturnsState.COLLECTION_NAME)
-      .getAll<SalesModel>();
-      // .query()
-      // .greaterThan('date', date.startDate)
-      // .lessThan('date', date.endDate)
-      // .find<ReturnsModel[]>();
+      // .getAll<SalesModel>();
+      .query()
+      // .orderBy('date', -1)
+      .equalTo('date', date.startDate)
+      .find<ReturnsModel[]>();
 
     return sales.filter(sale => {
       return !returns.find(aReturn => aReturn.id === sale.id);

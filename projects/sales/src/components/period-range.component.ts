@@ -51,7 +51,7 @@ export const MY_FORMATS = {
         >
         </mat-datepicker>
       </mat-form-field>
-      <mat-form-field class="px-3" appearance="outline">
+      <mat-form-field *ngIf="!hideEndDate" class="px-3" appearance="outline">
         <mat-label>End Date</mat-label>
         <input matInput [matDatepicker]="dp2" [min]="minDate" [max]="maxDate" [formControl]="toDateFormControl"
                (dateChange)="chosenDayHandler($event, dp, 'endDate')">
@@ -81,9 +81,10 @@ export class PeriodDateRangeComponent implements OnInit {
   dateRange: FormGroup;
   maxDate = new Date();
   minDate = new Date(new Date().setFullYear(2015));
-  from = new Date(new Date().setDate(new Date().getDate() - 7));
+  from = new Date();
   to = new Date();
   @ Input() hidePeriod = false;
+  @Input() hideEndDate = false;
   @ Input() setPeriod = 'day';
 
   fromDateFormControl = new FormControl(moment());
