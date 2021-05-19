@@ -12,6 +12,8 @@ import {StockModel} from '../models/stock.model';
 import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
+import {CustomerModel} from '../models/customer.model';
+import {last} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cart',
@@ -24,7 +26,8 @@ import * as moment from 'moment';
           <mat-icon>close</mat-icon>
         </button>
       </mat-toolbar>
-      <div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">
+      <!--<div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">-->
+      <div style="padding: 5px 0 0 0">
         <div style="width: 100%; padding: 6px">
           <input autocomplete="false"
                  style="border: none; background-color: rgba(0, 170, 7, 0.1);
@@ -32,8 +35,9 @@ import * as moment from 'moment';
                  [formControl]="customerFormControl" placeholder="Customer Name"
                  type="text" [matAutocomplete]="auto">
           <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let option of customers | async" [value]="option">
-              {{option}}
+            <mat-option *ngFor="let option of customers | async" [value]="option.firstName + ' ' + option.secondName"
+                        (click)="setSelectedCustomer(option)">
+              {{option.firstName + " " + option.secondName}}
             </mat-option>
           </mat-autocomplete>
         </div>
@@ -113,7 +117,8 @@ export class CartComponent implements OnInit {
   totalCost = 0;
   discountFormControl = new FormControl(0, [Validators.nullValidator, Validators.min(0)]);
   customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(3)]);
-  customers: Observable<string[]>;
+  customers: Observable<CustomerModel[]>;
+  selectedCustomer: CustomerModel;
   customersArray: string[];
   checkoutProgress = false;
   private currentUser: any;
@@ -153,13 +158,15 @@ export class CartComponent implements OnInit {
   private _handleCustomerNameControl(): void {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
-
-      if (enteredName) {
+      if (enteredName !== null) {
         this.customerState.customers$.subscribe(
           customers => {
-            customers
-              .map(customer => customer.firstName ? customer.firstName : customer.displayName)
-              .filter(value1 => value1.toLowerCase().startsWith(enteredName.toLowerCase()));
+            this.customers = of(customers
+              .filter(customer => {
+                const name = customer.firstName ?
+                  customer.firstName + ' ' + customer.secondName : customer.displayName;
+                return name.toLowerCase().includes(enteredName);
+              }));
           }
         );
       }
@@ -220,11 +227,11 @@ export class CartComponent implements OnInit {
       return;
     }
     this.checkoutProgress = true;
-    if (this.customerFormControl.valid) {
-      this.customerState.saveCustomer({
-        displayName: this.customerFormControl.value,
-      }).catch();
-    }
+    // if (this.customerFormControl.valid) {
+    //   this.customerState.saveCustomer({
+    //     displayName: this.customerFormControl.value,
+    //   }).catch();
+    // }
     this.printCart();
   }
 
@@ -236,7 +243,7 @@ export class CartComponent implements OnInit {
   }
 
   async submitBill(cartId: string): Promise<void> {
-    const sales: SalesModel[] = this._getSalesBatch();
+    const sales: SalesModel[] = await this._getSalesBatch();
     await this.salesState.saveSales(sales, cartId);
     this.cartState.carts.next([]);
     this.customerFormControl.setValue(null);
@@ -248,7 +255,7 @@ export class CartComponent implements OnInit {
     const cartId = SecurityUtil.generateUUID();
     const cartItems = this._getCartItems();
     this.printService.print({
-      data: this.cartItemsToPrinterData(cartItems, this.isViewedInWholesale ? this.customerFormControl.value : null),
+      data: this.cartItemsToPrinterData(cartItems, this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : ' '),
       printer: 'tm20',
       id: cartId,
       qr: cartId
@@ -315,7 +322,7 @@ export class CartComponent implements OnInit {
     });
   }
 
-  private _getSalesBatch(): SalesModel[] {
+  private async _getSalesBatch(): Promise<SalesModel[]> {
     const stringDate = toSqlDate(new Date());
     const idTra = 'n';
     const channel = this.isViewedInWholesale ? 'whole' : 'retail';
@@ -341,9 +348,8 @@ export class CartComponent implements OnInit {
         channel,
         date: stringDate,
         idTra,
-        customer: this.isViewedInWholesale
-          ? this.customerFormControl.value
-          : null,
+        customer: this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : '',
+        customerObject: this.selectedCustomer,
         timer: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
@@ -355,9 +361,9 @@ export class CartComponent implements OnInit {
   }
 
   private _getCustomers(): void {
-    if (!this.isViewedInWholesale) {
-      return;
-    }
+    // if (!this.isViewedInWholesale) {
+    //   return;
+    // }
 
     this.customerState.customers$.subscribe(
       customers => {
@@ -365,9 +371,14 @@ export class CartComponent implements OnInit {
           customers = [];
         }
 
-        this.customers = of(customers.map(value => value.displayName));
+        // this.customers = of(customers.map(value => value.displayName));
+        this.customers = of(customers);
       }
     );
   }
 
+  setSelectedCustomer(option: CustomerModel) {
+    // console.log(option);
+    this.selectedCustomer = option;
+  }
 }

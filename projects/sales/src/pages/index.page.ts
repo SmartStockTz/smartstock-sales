@@ -53,7 +53,7 @@ export class IndexPage extends DeviceInfoUtil implements OnInit {
     },
     {
       name: 'Customers',
-      path: '/sale/returns',
+      path: '/sale/customers',
       icon: 'groups'
     },
     {

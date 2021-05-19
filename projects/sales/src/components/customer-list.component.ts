@@ -1,11 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {ReturnsModel} from '../models/customer.model';
+import {CustomerModel} from '../models/customer.model';
 import {MatSort} from '@angular/material/sort';
 import {TransactionModel} from 'bfastjs/dist/models/TransactionModel';
 import {MatPaginator} from '@angular/material/paginator';
 import {CustomerState} from '../states/customer.state';
-import {CustomerModel} from '@smartstocktz/core-libs/models/customer.model';
+import {ReturnsModel} from '../models/returns.model';
+// import {CustomerModel} from '@smartstocktz/core-libs/models/customer.model';
 
 @Component({
   selector: 'app-customer-list',
@@ -48,7 +49,7 @@ import {CustomerModel} from '@smartstocktz/core-libs/models/customer.model';
 export class CustomerListComponent implements OnInit {
   isLoading = true;
   noData = false;
-  customers: ReturnsModel[];
+  customers: CustomerModel[];
   dataSource: MatTableDataSource<CustomerModel>;
 
   displayColumns = ['First Name', 'Second Name', 'Mobile', 'Email'];
@@ -84,7 +85,7 @@ export class CustomerListComponent implements OnInit {
       loading => {
         this.isLoading = loading;
       }
-    )
+    );
     this.configureDataSource(this.customers);
   }
 
@@ -92,7 +93,7 @@ export class CustomerListComponent implements OnInit {
     this.dataSource = new MatTableDataSource(customers);
     // // console.log(this.dataSource.data);
     this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = (customer: ReturnsModel, sortHeaderId: string) => {
+    this.dataSource.sortingDataAccessor = (customer: CustomerModel, sortHeaderId: string) => {
       return customer[this.keysMap[sortHeaderId]];
     };
     this.dataSource.paginator = this.paginator;

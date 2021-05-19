@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {StorageService} from '@smartstocktz/core-libs';
-import {ReturnsModel} from '../models/customer.model';
+import {CustomerModel} from '../models/customer.model';
 import {BehaviorSubject} from 'rxjs';
 import bfast from 'bfastjs';
 
@@ -10,7 +10,7 @@ import bfast from 'bfastjs';
 export class CustomerState {
   static COLLECTION_NAME = 'customers';
 
-  private customersSource = new BehaviorSubject<ReturnsModel[]>([]);
+  private customersSource = new BehaviorSubject<CustomerModel[]>([]);
   readonly customers$ = this.customersSource.asObservable();
 
   private loadingCustomersSubject = new BehaviorSubject<boolean>(true);
@@ -25,22 +25,22 @@ export class CustomerState {
     });
   }
 
-  getCustomersFromStorage(): Promise<ReturnsModel[]> {
+  getCustomersFromStorage(): Promise<CustomerModel[]> {
     return this.storage.getCustomers();
   }
 
-  getCustomersFromSource(): ReturnsModel[] {
+  getCustomersFromSource(): CustomerModel[] {
     return this.customersSource.getValue();
   }
 
-  async fetchCustomers(): Promise<ReturnsModel[]> {
+  async fetchCustomers(): Promise<CustomerModel[]> {
     // fetch from server or local storage
     const shop = await this.storage.getActiveShop();
-    return bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<ReturnsModel>();
+    return bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>();
   }
 
 
-  async saveCustomer(customer: ReturnsModel): Promise<ReturnsModel> {
+  async saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.storage.getActiveShop();
     bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).save(customer).then(val => {
       const customers = [...this.getCustomersFromSource(), customer];
@@ -50,7 +50,7 @@ export class CustomerState {
     return this.storage.saveCustomer(customer);
   }
 
-  private setCustomers(customers: ReturnsModel[]) {
+  private setCustomers(customers: CustomerModel[]) {
     this.customersSource.next(customers);
   }
 }

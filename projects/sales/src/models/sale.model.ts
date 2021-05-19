@@ -1,4 +1,5 @@
 import {StockModel} from './stock.model';
+import {CustomerModel} from './customer.model';
 
 export interface SalesModel {
   isReturned?: boolean;
@@ -12,6 +13,7 @@ export interface SalesModel {
   quantity?: number;
   amount?: number;
   customer?: string;
+  customerObject?: CustomerModel;
   cartId?: string; // for retrieve sold items per cart/order
   discount?: number;
   user?: string;

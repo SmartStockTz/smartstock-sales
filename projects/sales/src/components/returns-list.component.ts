@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
-import {ReturnsModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/returns.model';
 import {MatSort} from '@angular/material/sort';
 import {TransactionModel} from 'bfastjs/dist/models/TransactionModel';
 import {MatPaginator} from '@angular/material/paginator';
@@ -16,13 +16,13 @@ import {FormControl, Validators} from '@angular/forms';
   template: `
     <div class="row m-0">
       <!--<span style="flex-grow: 1;"></span>-->
-      <div class="row justify-content-end">
-        <mat-form-field appearance="outline">
-          <mat-label>Filter</mat-label>
-          <input matInput [formControl]="filterFormControl" placeholder="type here ...">
-        </mat-form-field>
+      <!--<div class="row justify-content-end">-->
+        <!--<mat-form-field appearance="outline">-->
+          <!--<mat-label>Filter</mat-label>-->
+          <!--<input matInput [formControl]="filterFormControl" placeholder="type here ...">-->
+        <!--</mat-form-field>-->
         <!--<app-period-date-range [hidePeriod]="true"></app-period-date-range>-->
-      </div>
+      <!--</div>-->
       </div>
     <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="primary"></mat-progress-bar>
     <div class="mat-elevation-z8 d-flex flex-column justify-content-center" style="width: 100%;">

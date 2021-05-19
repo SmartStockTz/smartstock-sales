@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {StorageService} from '@smartstocktz/core-libs';
-import {ReturnsModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/returns.model';
 import {BehaviorSubject, Subject} from 'rxjs';
 import bfast from 'bfastjs';
 import {SalesModel} from '../models/sale.model';

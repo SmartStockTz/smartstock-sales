@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {ReturnsModel} from '../models/customer.model';
 import {toSqlDate} from '@smartstocktz/core-libs';
 
 @Injectable({

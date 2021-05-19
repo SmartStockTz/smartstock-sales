@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {StorageService} from '@smartstocktz/core-libs';
-import {ReturnsModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/returns.model';
 import {BehaviorSubject} from 'rxjs';
 import bfast from 'bfastjs';
+import {CustomerModel} from '../models/customer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +26,9 @@ export class ReturnsState {
     });
   }
 
-  getReturnsFromStorage(): Promise<ReturnsModel[]> {
-    return this.storage.getCustomers();
-  }
+  // getReturnsFromStorage(): Promise<CustomerModel[]> {
+  //   // return this.storage.getCustomers();
+  // }
 
   getReturnsFromSource(): ReturnsModel[] {
     return this.returnsSource.getValue();

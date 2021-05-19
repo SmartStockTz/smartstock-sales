@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { StorageService } from '@smartstocktz/core-libs';
-import {ReturnsModel} from '../models/customer.model';
+import {CustomerModel} from '../models/customer.model';
 import { CreditorService } from '../services/creditor.services';
 
 @Injectable({

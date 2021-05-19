@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import bfast from 'bfastjs';
 import {SalesModel} from '../models/sale.model';
 import {ReturnsState} from '../states/returns.state';
-import {ReturnsModel} from '../models/customer.model';
+import {ReturnsModel} from '../models/returns.model';
 import {SalesReportsState} from '../states/sales-reports.state';
 import {StorageService} from '@smartstocktz/core-libs';
 

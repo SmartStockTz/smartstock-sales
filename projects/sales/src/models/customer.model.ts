@@ -1,4 +1,4 @@
-export interface ReturnsModel {
+export interface CustomerModel {
   firstName?: string;
   secondName?: string;
   mobile?: string;
