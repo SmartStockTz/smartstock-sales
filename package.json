@@ -23,7 +23,7 @@
     "@angular/material-moment-adapter": "^11.0.3",
     "@angular/router": "~11.0.5",
     "@smartstocktz/core-libs": "^0.2.0",
-    "bfastjs": "^4.2.5",
+    "bfastjs": "~4.2.9",
     "moment": "^2.29.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
