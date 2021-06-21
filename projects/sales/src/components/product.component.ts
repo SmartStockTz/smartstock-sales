@@ -1,37 +1,47 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {DeviceInfoUtil, EventService} from '@smartstocktz/core-libs';
+import {DeviceState} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
 import {CartState} from '../states/cart.state';
+import {ProductState} from '../states/product.state';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
 
 @Component({
   selector: 'app-product-card',
   template: `
     <div>
-      <div class='card-container' [ngClass]="{'flipped':productIndex == flipped}">
+      <div *ngIf="(deviceState.isSmallScreen | async ) === false"
+           class='card-container' [ngClass]="{'flipped':productIndex == flipped}">
         <div class='flippable-card' [ngClass]="{'flipped':productIndex == flipped}">
           <mat-card class='front' style="text-align: center; width: 150px; height: 160px;" (click)='flip(productIndex)'>
             <mat-card-content>
-              <p style="color: gray;">{{product.category}}</p>
-              <p matTooltip="{{product.product}}"
-                 style="font-weight: bold;overflow: hidden; height: 46px;">{{product.product}}</p>
-              <p style="font-weight: 500;">
-                {{(isViewedInWholesale ? product.wholesalePrice : product.retailPrice)  | number}}
+              <p class="text-truncate" style="color: gray;">{{stock.category}}</p>
+              <p class="text-truncate"
+                 matTooltip="{{stock.product}}"
+                 style="font-weight: bold;height: 46px;">
+                {{stock.product}}
+              </p>
+              <p class="text-wrap" style="font-weight: 500;">
+                {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
               </p>
             </mat-card-content>
           </mat-card>
           <mat-card *ngIf="productIndex===flipped" class='back'>
             <mat-card-content>
-              <button mat-icon-button (click)="flipped = null" style="margin: 0;padding: 0;float: right;">
+              <button mat-icon-button (click)="flip(-1)" style="margin: 0;padding: 0;float: right;">
                 <mat-icon>close</mat-icon>
               </button>
               <p>
             <span style="font-weight: 500;">
-              {{(isViewedInWholesale ? product.wholesalePrice : product.retailPrice)  | number}}
-            </span><br>
-                <span style="color: gray;">{{product.product}}</span>
+              {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
+            </span>
+                <br>
+                <span style="color: gray;">{{stock.product}}</span>
               </p>
               <p style="display: flex;flex-direction: row;">
                 <label style="padding-top: 10px;">Qty</label>
@@ -46,18 +56,36 @@ import {CartState} from '../states/cart.state';
                   <mat-icon>add_circle</mat-icon>
                 </button>
             </span>
-                <button mat-flat-button color="primary" (click)="addToCart(product)">Add</button>
+                <button mat-flat-button color="primary" (click)="addToCart(stock)">Add</button>
               </p>
             </mat-card-content>
           </mat-card>
         </div>
       </div>
+
+      <div style="width: 95vw" *ngIf="(deviceState.isSmallScreen | async) === true">
+        <mat-list-item style="width: 100%;" (click)='openSheet(productIndex)'>
+          <mat-icon color="{{stock.stockable && stock.quantity > 0 ? 'primary' : 'warn'}}" matListIcon>
+            {{stock.stockable && stock.quantity > 0 ? 'done' : 'close'}}
+          </mat-icon>
+          <p matLine class="text-wrap"
+             matTooltip="{{stock.product}}"
+             style="font-weight: bold;">
+            {{stock.product}}
+          </p>
+          <p matLine class="text-truncate" style="color: gray;">{{stock.category}}
+            | {{stock.stockable && stock.quantity > 0 ? 'IN' : 'OUT'}}</p>
+          <p matLine class="text-wrap" style="font-weight: 500;">
+            Tsh {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
+          </p>
+        </mat-list-item>
+      </div>
     </div>
   `,
   styleUrls: ['../styles/product.style.css']
 })
-export class ProductComponent extends DeviceInfoUtil implements OnInit {
-  @Input() product: StockModel;
+export class ProductComponent implements OnInit, OnDestroy {
+  @Input() stock: StockModel;
   @Input() productIndex: number;
   @Input() isViewedInWholesale = false;
   @Input() cartdrawer: MatSidenav;
@@ -65,36 +93,43 @@ export class ProductComponent extends DeviceInfoUtil implements OnInit {
 
   detailView = false;
   quantityFormControl = new FormControl(1, [Validators.nullValidator, Validators.min(1)]);
-
   flipped: number;
+  fdestroy: Subject<any> = new Subject();
 
-  constructor(private readonly eventService: EventService,
-              private readonly cartState: CartState,
-              private readonly snack: MatSnackBar) {
-    super();
+  constructor(public readonly cartState: CartState,
+              public readonly deviceState: DeviceState,
+              public readonly productState: ProductState,
+              public readonly sheet: MatBottomSheet,
+              public readonly snack: MatSnackBar) {
   }
 
-  ngOnInit(): void {
+  async ngOnDestroy(): Promise<void> {
+    this.fdestroy.next('done');
   }
 
-  flip(value): void {
-    this.eventService.listen('flipping', (data) => {
-      this.flipped = data.detail;
+  async ngOnInit(): Promise<void> {
+    this.productState.flipped.pipe(
+      takeUntil(this.fdestroy)
+    ).subscribe(value => {
+      this.flipped = value;
     });
-    this.eventService.broadcast('flipping', value);
   }
 
-  decrementQty(): void {
+  async flip(value: number): Promise<void> {
+    this.productState.flipped.next(value);
+  }
+
+  async decrementQty(): Promise<void> {
     if (this.quantityFormControl.value > 0) {
       this.quantityFormControl.setValue(this.quantityFormControl.value - 1);
     }
   }
 
-  incrementQty(): void {
+  async incrementQty(): Promise<void> {
     this.quantityFormControl.setValue(this.quantityFormControl.value + 1);
   }
 
-  addToCart(product: StockModel): void {
+  async addToCart(product: StockModel): Promise<void> {
     if (!this.quantityFormControl.valid) {
       this.snack.open('Quantity must be greater than 1', 'Ok', {
         duration: 3000,
@@ -104,12 +139,25 @@ export class ProductComponent extends DeviceInfoUtil implements OnInit {
     }
     const quantity = this.quantityFormControl.value;
     this.cartState.addToCart({product, quantity});
-    if (this.enoughWidth()) {
+    if (this.deviceState.enoughWidth.value === true) {
       this.cartdrawer.opened = true;
     }
     this.afterAddToCart.emit();
     this.quantityFormControl.reset(1);
     this.detailView = false;
     this.flipped = null;
+  }
+
+  async openSheet(_12: number): Promise<any> {
+    this.sheet.open(AddToCartSheetComponent, {
+      data: {
+        stock: this.stock,
+        isViewedInWholesale: this.isViewedInWholesale,
+        quantityFormControl: this.quantityFormControl,
+        addToCart: (s) => this.addToCart(s),
+        incrementQty: () => this.incrementQty(),
+        decrementQty: () => this.decrementQty()
+      }
+    });
   }
 }

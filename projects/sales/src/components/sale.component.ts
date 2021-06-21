@@ -1,58 +1,66 @@
-import {AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
-import {Router} from '@angular/router';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
-import {DeviceInfoUtil, LogService, StorageService} from '@smartstocktz/core-libs';
+import {DeviceState, LogService, StorageService} from '@smartstocktz/core-libs';
 import {ConfigsService} from '../services/config.service';
 import {UserService} from '../user-modules/user.service';
 import {CartState} from '../states/cart.state';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-sale',
   template: `
     <mat-sidenav-container class="match-parent">
 
-      <mat-sidenav class="match-parent-side" #sidenav [mode]="enoughWidth()?'side':'over'" [opened]="enoughWidth()">
+      <mat-sidenav class="match-parent-side" #sidenav
+                   [mode]="(deviceState.enoughWidth | async)===true?'side':'over'"
+                   [opened]="(deviceState.enoughWidth | async)===true">
         <app-drawer></app-drawer>
       </mat-sidenav>
 
-      <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end" [mode]="enoughWidth()?'side':'over'"
+      <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end"
+                   [mode]="(deviceState.enoughWidth | async)===true?'side':'over'"
                    [opened]="false">
-        <app-cart  [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></app-cart>
+        <app-cart [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></app-cart>
       </mat-sidenav>
 
       <mat-sidenav-content style="display:flex; flex-direction: column">
 
         <app-toolbar (searchCallback)="filterProduct($event)"
-                            [showSearch]="true"
-                            [hasBackRoute]="true" [backLink]="'/sale/'"
-                            searchPlaceholder="Filter product"
-                            [searchInputControl]="searchInputControl"
-                            [searchProgressFlag]="searchProgressFlag"
-                            [heading]="isViewedInInvoice ? 'Invoice' :isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
-                            [cartDrawer]="cartdrawer"
-                            [showProgress]="showProgress"></app-toolbar>
+                     [showSearch]="true"
+                     [hasBackRoute]="true" [backLink]="'/sale/'"
+                     searchPlaceholder="Filter product"
+                     [searchInputControl]="searchInputControl"
+                     [searchProgressFlag]="searchProgressFlag"
+                     [heading]="isViewedInInvoice ? 'Invoice' :isViewedInWholesale?'WholeSale':'Retail'" [sidenav]="sidenav"
+                     [cartDrawer]="cartdrawer"
+                     [showProgress]="showProgress">
+        </app-toolbar>
 
         <app-on-fetch *ngIf="!products || fetchDataProgress" [isLoading]="fetchDataProgress"
-                             (refreshCallback)="getProductsFromServer()"></app-on-fetch>
+                      (refreshCallback)="getProductsFromServer()">
+        </app-on-fetch>
 
-        <cdk-virtual-scroll-viewport style="flex-grow: 1" itemSize="25" *ngIf="products && !fetchDataProgress">
-          <app-product-card style="margin: 0 5px; display: inline-block"
-                                   [cartdrawer]="cartdrawer"
-                                   [product]="product"
-                                   (afterAddToCart)="afterAddToCart($event)"
-                                   [productIndex]="idx"
-                                   [isViewedInWholesale]="isViewedInWholesale"
-                                   *cdkVirtualFor="let product of products; let idx = index">
-          </app-product-card>
+        <cdk-virtual-scroll-viewport style="flex-grow: 1" itemSize="{{(deviceState.isSmallScreen | async) ===true?'80': '30'}}"
+                                     *ngIf="products && !fetchDataProgress">
+          <mat-nav-list>
+            <app-product-card style="margin: 0 3px; display: inline-block"
+                              [cartdrawer]="cartdrawer"
+                              [stock]="product"
+                              (afterAddToCart)="afterAddToCart($event)"
+                              [productIndex]="idx"
+                              [isViewedInWholesale]="isViewedInWholesale"
+                              *cdkVirtualFor="let product of products; let idx = index">
+            </app-product-card>
+            <div style="height: 200px"></div>
+          </mat-nav-list>
         </cdk-virtual-scroll-viewport>
 
-        <div style="position: absolute; width: 100%;display: flex; flex-direction: row; justify-content: center;
-        flex-wrap: wrap;
-           align-items: center; z-index: 3000; left: 0; bottom: 0; right: 0;">
+        <div class="bottom-actions-container">
           <button mat-button color="primary"
                   style="margin: 16px"
                   *ngIf="!fetchDataProgress && products && showRefreshCart"
@@ -74,7 +82,7 @@ import {CartState} from '../states/cart.state';
     UserService
   ]
 })
-export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewInit {
+export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   products: StockModel[] = undefined;
   fetchDataProgress = false;
   showProgress = false;
@@ -86,22 +94,29 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
   searchInputControl = new FormControl('');
   showRefreshCart = false;
   @ViewChild('cartdrawer') cartDrawer: MatDrawer;
+  _destroy: Subject<any> = new Subject<any>();
 
-  constructor(private readonly router: Router,
-              private readonly userDatabase: UserService,
-              private readonly storage: StorageService,
-              private readonly snack: MatSnackBar,
-              private readonly logger: LogService,
-              private readonly changeDetect: ChangeDetectorRef,
-              private readonly cartState: CartState,
-              private readonly salesState: SalesState,
+  constructor(public readonly storage: StorageService,
+              public readonly snack: MatSnackBar,
+              public readonly logger: LogService,
+              public readonly changeDetect: ChangeDetectorRef,
+              public readonly cartState: CartState,
+              public readonly deviceState: DeviceState,
+              public readonly salesState: SalesState,
   ) {
-    super();
   }
 
-  ngOnInit(): void {
+  async ngOnDestroy(): Promise<void> {
+    this._destroy.next('done');
+  }
+
+  async ngOnInit(): Promise<void> {
     this.getProducts();
-    this.showRefreshCart = this.cartState.carts.value.length === 0;
+    this.cartState.carts.pipe(
+      takeUntil(this._destroy)
+    ).subscribe(value => {
+      this.showRefreshCart = value ? value.length === 0 : false;
+    });
   }
 
   getProductsFromServer(): void {
@@ -129,7 +144,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
     });
   }
 
-  filterProduct(query: string): void {
+  async filterProduct(query: string): Promise<void> {
     query = query ? query.trim() : '';
     this.searchProgressFlag = true;
     if (query === '') {
@@ -140,7 +155,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
     this.storage.getStocks().then(allStocks => {
       this.searchProgressFlag = false;
       if (allStocks) {
-        // get index of product by barcode
+        // get index of stock by barcode
         const index = allStocks.findIndex((x: StockModel) => {
           const barcode = x.barcode ? x.barcode : '';
           return query.trim() === barcode.trim();
@@ -151,7 +166,7 @@ export class SaleComponent extends DeviceInfoUtil implements OnInit, AfterViewIn
             quantity: 1
           });
           this.searchInputControl.setValue('');
-          if (this.enoughWidth()) {
+          if (this.deviceState.enoughWidth.value === true) {
             this.cartDrawer.open().catch();
           }
         } else {

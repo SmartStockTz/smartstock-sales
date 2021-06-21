@@ -3,24 +3,22 @@ import {FormControl, Validators} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SalesState} from '../states/sales.state';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {SalesModel} from '../models/sale.model';
 import {CartModel} from '../models/cart.model';
 import {CustomerState} from '../states/customer.state';
-import {PrintService} from '@smartstocktz/core-libs';
+import {DeviceState, PrintService, SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {StockModel} from '../models/stock.model';
-import {SecurityUtil, SettingsService, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
-import {last} from 'rxjs/operators';
 import {CreateCustomerComponent} from './create-customer-form.component';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cart',
   template: `
-    <div id="cart_view" [ngClass]="isMobile?'cart-mobile':'cart'">
+    <div id="cart_view" [ngClass]="(deviceState.isSmallScreen | async)===true?'cart-mobile':'cart'">
       <mat-toolbar class="mat-elevation-z3" style="z-index: 10000">
         <span [matBadge]="getTotalCartItem().toString()" matBadgeOverlap="false">Cart</span>
         <span style="flex-grow: 1;"></span>
@@ -28,7 +26,6 @@ import {MatDialog} from '@angular/material/dialog';
           <mat-icon>close</mat-icon>
         </button>
       </mat-toolbar>
-      <!--<div style="padding: 5px 0 0 0" *ngIf="isViewedInWholesale">-->
       <div style="padding: 5px 0 0 0">
         <div style="width: 100%; padding: 6px" class="row">
           <div class="flex-fill">
@@ -56,7 +53,7 @@ import {MatDialog} from '@angular/material/dialog';
               <button (click)="removeCart(i)" matSuffix mat-icon-button>
                 <mat-icon color="warn">delete</mat-icon>
               </button>
-              <h4 matLine>{{cart.product.product}}</h4>
+              <h4 matLine class="text-wrap">{{cart.product.product}}</h4>
               <mat-card-subtitle
                 matLine>{{isViewedInWholesale ? '(' + cart.product.wholesaleQuantity + ') ' : ''}}{{cart.quantity}} {{cart.product.unit}}
                 @{{isViewedInWholesale ? cart.product.wholesalePrice : cart.product.retailPrice}}
@@ -71,7 +68,7 @@ import {MatDialog} from '@angular/material/dialog';
                 </button>
               </div>
             </mat-list-item>
-            <mat-divider style="margin-left: 5%; margin-right: 5%"></mat-divider>
+            <mat-divider style="margin-left: 5%; margin-right: 5%; margin-top: 4px"></mat-divider>
           </div>
         </mat-list>
       </div>
@@ -91,7 +88,7 @@ import {MatDialog} from '@angular/material/dialog';
           </p>
         </div>
         <button [disabled]="checkoutProgress" (click)="checkout()"
-                style="width: 100%;text-align:left;height: 54px;font-size: 20px" color="primary"
+                style="width: 100%;text-align:left;height: 48px;font-size: 18px" color="primary"
                 mat-raised-button>
           <span style="float: left;">{{totalCost | currency: 'TZS '}}</span>
           <mat-progress-spinner color="primary" *ngIf="checkoutProgress" mode="indeterminate" diameter="25"
@@ -115,7 +112,8 @@ export class CartComponent implements OnInit {
               private readonly userService: UserService,
               private readonly customerState: CustomerState,
               public readonly cartState: CartState,
-              private readonly snack: MatSnackBar,
+              public readonly deviceState: DeviceState,
+              public readonly snack: MatSnackBar,
               private readonly dialog: MatDialog) {
   }
 
@@ -130,7 +128,6 @@ export class CartComponent implements OnInit {
   customersArray: string[];
   checkoutProgress = false;
   private currentUser: any;
-  isMobile = false;
 
   static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
     return (data.totalDiscount / data.totalItems);

@@ -1,7 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
-import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {LibModule} from '@smartstocktz/core-libs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -16,7 +15,15 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {SalesWorkerService} from 'projects/sales/src/public-api';
+import {RouterModule, Routes} from '@angular/router';
+import {AuthGuard} from './guards/auth.guard';
+import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 
+const routes: Routes = [
+  {path: '', component: WelcomePage},
+  {path: 'login', component: LoginPageComponent},
+  {path: 'sale', canActivate: [AuthGuard], loadChildren: () => import('../../../sales/src/public-api').then(mod => mod.SalesModule)}
+];
 
 @NgModule({
   declarations: [
@@ -26,7 +33,7 @@ import {SalesWorkerService} from 'projects/sales/src/public-api';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
+    RouterModule.forRoot(routes),
     LibModule,
     BrowserAnimationsModule,
     HttpClientModule,
@@ -37,7 +44,12 @@ import {SalesWorkerService} from 'projects/sales/src/public-api';
     MatCardModule,
     MatSnackBarModule
   ],
-  providers: [],
+  providers: [
+    // {
+    //   provide: LocationStrategy,
+    //   useClass: HashLocationStrategy
+    // }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
@@ -45,9 +57,8 @@ export class AppModule {
     BFast.init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
-      appPassword: 'ZMUGVn72o3yd8kSbMGhfWpI80N9nA2IHjxWKlAhG'
     });
-    this.startSalesSync();
+    this.startSalesSync().catch(console.log);
   }
 
   shouldRun = true;

@@ -343,7 +343,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
     }).then(val => {
       return this.router.navigateByUrl('/sale/invoices/list').catch(console.log);
     }).catch(err => {
-      this.snack.open('Please fix all errors, and make sure you add at least one product then submit again', 'Ok', {
+      this.snack.open('Please fix all errors, and make sure you add at least one stock then submit again', 'Ok', {
         duration: 3000
       });
     });

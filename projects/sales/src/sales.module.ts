@@ -46,14 +46,13 @@ import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component
 import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {PayByCreditPageComponent} from './pages/pay_by_credit.page';
+import {InvoiceIndexPage} from './pages/invoice-index.page';
 import {PayByInvoicesComponent} from './pages/pay_by_invoices.page';
 import {CreateCreditorComponent} from './components/create-creditor.component';
 import {SaleByCreditCreateFormComponent} from './components/create-sale-by-credit-form.component';
 import {ProductSearchDialogComponent} from './components/product-search.component';
 import {InfoDialogComponent} from './components/info-dialog.component';
 import {MatSelectModule} from '@angular/material/select';
-import {InvoicesPageComponent} from './pages/invoices.page';
 import {CreateCustomerComponent} from './components/create-customer-form.component';
 import {MatMenuModule} from '@angular/material/menu';
 import {IncompleteInvoicesTableComponent} from './components/incomplete-invoices-table.component';
@@ -66,6 +65,8 @@ import {ReturnsListComponent} from './components/returns-list.component';
 import {ReturnsDetailsComponent} from './components/returns-details.component';
 import {CreateReturnComponent} from './components/create-return.component';
 import {PeriodDateRangeComponent} from './components/period-range.component';
+import {InvoiceListPage} from './pages/invoice-list.page';
+import {AddToCartSheetComponent} from './components/add-to-cart-sheet.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -73,10 +74,10 @@ const routes: Routes = [
   {path: 'customers', component: CustomersPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  {path: 'invoices', component: PayByCreditPageComponent},
+  {path: 'invoices', component: InvoiceIndexPage},
   {path: 'invoices/create', component: PayByInvoicesComponent},
-  {path: 'invoices/list', component: InvoicesPageComponent},
-  {path: 'returns', component: ReturnsPage},
+  {path: 'invoices/list', component: InvoiceListPage},
+  {path: 'refund', component: ReturnsPage},
 ];
 
 @NgModule({
@@ -92,7 +93,6 @@ const routes: Routes = [
         }
       ]
     },
-    LibModule,
     MatSortModule,
     MatMenuModule,
     MatSelectModule,
@@ -126,9 +126,11 @@ const routes: Routes = [
     MatBottomSheetModule,
     MatDialogModule,
     MatExpansionModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    LibModule
   ],
   declarations: [
+    AddToCartSheetComponent,
     PeriodDateRangeComponent,
     CreateReturnComponent,
     ReturnsDetailsComponent,
@@ -139,14 +141,14 @@ const routes: Routes = [
     AddReturnSheetComponent,
     IncompleteInvoicesTableComponent,
     CreateCustomerComponent,
-    InvoicesPageComponent,
+    InvoiceListPage,
     InvoiceDetailsComponent,
     InfoDialogComponent,
     ProductSearchDialogComponent,
     SaleByCreditCreateFormComponent,
     CreateCreditorComponent,
     PayByInvoicesComponent,
-    PayByCreditPageComponent,
+    InvoiceIndexPage,
     OrdersTableShowItemsComponent,
     OrdersTableOptionsComponent,
     OrderPaymentStatusComponent,
@@ -162,9 +164,7 @@ const routes: Routes = [
     CartPreviewComponent,
     VerifyEMailDialogComponent,
     MobilePayDetailsComponent
-  ], entryComponents: [
-    InvoiceDetailsComponent
-  ]
+  ], entryComponents: []
 })
 export class SalesModule {
   constructor(private readonly configs: ConfigsService) {
@@ -200,9 +200,9 @@ export class SalesModule {
           link: '/sale/customers'
         },
         {
-          name: 'returns',
+          name: 'Sale returns',
           roles: ['*'],
-          link: '/sale/returns'
+          link: '/sale/refund'
         }
       ]
     });
