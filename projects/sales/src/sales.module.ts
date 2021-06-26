@@ -29,7 +29,7 @@ import {SaleComponent} from './components/sale.component';
 import {CartPreviewComponent} from './components/cart-preview.component';
 import {RouterModule, ROUTES, Routes} from '@angular/router';
 import {WholePageComponent} from './pages/whole.page';
-import {ConfigsService, LibModule} from '@smartstocktz/core-libs';
+import {LibModule} from '@smartstocktz/core-libs';
 import {IndexPage} from './pages/index.page';
 import {OrderPage} from './pages/order.page';
 import {OrdersTableComponent} from './components/orders-table.component';
@@ -67,17 +67,18 @@ import {CreateReturnComponent} from './components/create-return.component';
 import {PeriodDateRangeComponent} from './components/period-range.component';
 import {InvoiceListPage} from './pages/invoice-list.page';
 import {AddToCartSheetComponent} from './components/add-to-cart-sheet.component';
+import {SalesNavigationService} from './services/sales-navigation.service';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
-  {path: 'order', component: OrderPage},
+  // {path: 'order', component: OrderPage},
   {path: 'customers', component: CustomersPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  {path: 'invoices', component: InvoiceIndexPage},
-  {path: 'invoices/create', component: PayByInvoicesComponent},
-  {path: 'invoices/list', component: InvoiceListPage},
-  {path: 'refund', component: ReturnsPage},
+  // {path: 'invoices', component: InvoiceIndexPage},
+  // {path: 'invoices/create', component: PayByInvoicesComponent},
+  // {path: 'invoices/list', component: InvoiceListPage},
+  // {path: 'refund', component: ReturnsPage},
 ];
 
 @NgModule({
@@ -167,45 +168,8 @@ const routes: Routes = [
   ], entryComponents: []
 })
 export class SalesModule {
-  constructor(private readonly configs: ConfigsService) {
-    this.configs.addMenu({
-      name: 'Sale',
-      icon: 'shop',
-      roles: ['*'],
-      link: '/sale',
-      pages: [
-        {
-          name: 'Retail',
-          roles: ['*'],
-          link: '/sale/retail'
-        },
-        {
-          name: 'Wholesale',
-          roles: ['*'],
-          link: '/sale/whole'
-        },
-        {
-          name: 'Orders',
-          roles: ['*'],
-          link: '/sale/order'
-        },
-        {
-          name: 'Credit sale',
-          roles: ['*'],
-          link: '/sale/invoices'
-        },
-        {
-          name: 'Customers',
-          roles: ['*'],
-          link: '/sale/customers'
-        },
-        {
-          name: 'Sale returns',
-          roles: ['*'],
-          link: '/sale/refund'
-        }
-      ]
-    });
-    this.configs.selectedModuleName = 'Sale';
+  constructor(private readonly salesNav: SalesNavigationService) {
+    this.salesNav.init();
+    this.salesNav.selected();
   }
 }

@@ -14,18 +14,9 @@ import {FormControl, Validators} from '@angular/forms';
 @Component({
   selector: 'app-returns-list',
   template: `
-    <div class="row m-0">
-      <!--<span style="flex-grow: 1;"></span>-->
-      <!--<div class="row justify-content-end">-->
-        <!--<mat-form-field appearance="outline">-->
-          <!--<mat-label>Filter</mat-label>-->
-          <!--<input matInput [formControl]="filterFormControl" placeholder="type here ...">-->
-        <!--</mat-form-field>-->
-        <!--<app-period-date-range [hidePeriod]="true"></app-period-date-range>-->
-      <!--</div>-->
-      </div>
+    <div class="row m-0"></div>
     <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="primary"></mat-progress-bar>
-    <div class="mat-elevation-z8 d-flex flex-column justify-content-center" style="width: 100%;">
+    <div class="mat-elevation-z2 d-flex flex-column justify-content-center" style="width: 100%;">
       <table mat-table [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="Product">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
@@ -77,7 +68,7 @@ import {FormControl, Validators} from '@angular/forms';
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
         <tr mat-row class="table-data-row"
-            *matRowDef="let row; columns: displayColumns;" ></tr>
+            *matRowDef="let row; columns: displayColumns;"></tr>
         <!--<tr mat-footer-row *matFooterRowDef="displayColumns; sticky: true"></tr>-->
       </table>
       <app-data-not-ready *ngIf="noData && !isLoading"></app-data-not-ready>
@@ -93,7 +84,7 @@ export class ReturnsListComponent implements OnInit {
   dataSource: MatTableDataSource<ReturnsModel>;
   filterFormControl = new FormControl('', [Validators.nullValidator]);
 
-  displayColumns = ['Date of Sale', 'Channel', 'Product' ,'Total Amount', 'Total Items', 'Seller', 'Customer', 'Returned By', 'Date Returned'];
+  displayColumns = ['Date of Sale', 'Channel', 'Product', 'Total Amount', 'Total Items', 'Seller', 'Customer', 'Returned By', 'Date Returned'];
   keysMap = {
     'Date of Sale': 'date',
     Channel: 'channel',

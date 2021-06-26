@@ -34,36 +34,49 @@ export class CustomerState {
   }
 
   async fetchCustomers(): Promise<CustomerModel[]> {
-    // fetch from server or local storage
-    const customersFromStorage = await this.getCustomersFromStorage();
-    const shop = await this.storage.getActiveShop();
-    if (customersFromStorage && Array.isArray(customersFromStorage) && customersFromStorage.length > 0) {
-      bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>().then(
-        onlineCustomers => {
-          [...onlineCustomers, ...customersFromStorage].forEach(this.storage.saveCustomer);
-          return [...onlineCustomers, ...customersFromStorage];
-        }
-      ).catch(err => {
-        return customersFromStorage;
-      });
+    let customersFromStorage: any[];
+    try {
+      customersFromStorage = await this.getCustomersFromStorage();
+    } catch (e) {
+      customersFromStorage = [];
     }
-    const customers = await bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>();
-    customers.forEach(this.storage.saveCustomer);
-    return customers;
+    const shop = await this.storage.getActiveShop();
+    // if (customersFromStorage && Array.isArray(customersFromStorage) && customersFromStorage.length > 0) {
+    //   bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>().then(onlineCustomers => {
+    //       [...onlineCustomers, ...customersFromStorage].forEach(this.storage.saveCustomer);
+    //       return [...onlineCustomers, ...customersFromStorage];
+    //     }
+    //   ).catch(err => {
+    //     return customersFromStorage;
+    //   });
+    // }
+    bfast.database(shop.projectId)
+      .collection(CustomerState.COLLECTION_NAME)
+      .getAll<CustomerModel>()
+      .then(customers => {
+        customers.forEach(value => {
+          this.storage.saveCustomer(value);
+        });
+      })
+      .catch(console.log);
+    return customersFromStorage;
   }
 
 
   async saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.storage.getActiveShop();
-    bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).save(customer).then(val => {
-      const customers = [...this.getCustomersFromSource(), customer];
-      this.customersSource.next(customers);
-      return customer;
-    });
+    bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME)
+      .save(customer)
+      .then(_ => {
+        // const customers = [...this.getCustomersFromSource(), customer];
+        // this.customersSource.next(customers);
+        // return customer;
+      }).catch(console.log);
     return this.storage.saveCustomer(customer);
   }
 
   private setCustomers(customers: CustomerModel[]) {
+    this.customersSource.next([]);
     this.customersSource.next(customers);
   }
 }

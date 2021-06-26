@@ -20,14 +20,19 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
         <div class='flippable-card' [ngClass]="{'flipped':productIndex == flipped}">
           <mat-card class='front' style="text-align: center; width: 150px; height: 160px;" (click)='flip(productIndex)'>
             <mat-card-content>
-              <p class="text-truncate" style="color: gray;">{{stock.category}}</p>
-              <p class="text-truncate"
+              <p class="text-truncate" style="color: gray;">
+                <b [ngClass]="instock ? 'text-success' : 'text-danger'">
+                  {{instock ? 'IN' : 'OUT'}}
+                </b>
+                | {{stock.category}}
+              </p>
+              <p class="text-wrap"
                  matTooltip="{{stock.product}}"
-                 style="font-weight: bold;height: 46px;">
+                 style="font-weight: bold; overflow: hidden; height: 58px;">
                 {{stock.product}}
               </p>
               <p class="text-wrap" style="font-weight: 500;">
-                {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
+                Tsh {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
               </p>
             </mat-card-content>
           </mat-card>
@@ -65,16 +70,18 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
 
       <div style="width: 95vw" *ngIf="(deviceState.isSmallScreen | async) === true">
         <mat-list-item style="width: 100%;" (click)='openSheet(productIndex)'>
-          <mat-icon color="{{stock.stockable && stock.quantity > 0 ? 'primary' : 'warn'}}" matListIcon>
-            {{stock.stockable && stock.quantity > 0 ? 'done' : 'close'}}
+          <mat-icon [ngClass]="instock ? 'text-success' : 'text-danger'" matListIcon>
+            {{instock ? 'widgets' : 'widgets'}}
           </mat-icon>
           <p matLine class="text-wrap"
              matTooltip="{{stock.product}}"
              style="font-weight: bold;">
             {{stock.product}}
           </p>
-          <p matLine class="text-truncate" style="color: gray;">{{stock.category}}
-            | {{stock.stockable && stock.quantity > 0 ? 'IN' : 'OUT'}}</p>
+          <p matLine class="text-truncate" style="color: gray;">
+            {{stock.category}}
+            | <span [ngClass]="instock ? 'text-success' : 'text-danger'">{{instock ? 'IN' : 'OUT'}}</span>
+          </p>
           <p matLine class="text-wrap" style="font-weight: 500;">
             Tsh {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
           </p>
@@ -95,6 +102,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   quantityFormControl = new FormControl(1, [Validators.nullValidator, Validators.min(1)]);
   flipped: number;
   fdestroy: Subject<any> = new Subject();
+  instock = true;
 
   constructor(public readonly cartState: CartState,
               public readonly deviceState: DeviceState,
@@ -108,6 +116,16 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.stock && this.stock.stockable === true && this.stock.quantity > 0) {
+      this.instock = true;
+    } else if (this.stock && this.stock.stockable === true && this.stock.quantity <= 0) {
+      this.instock = false;
+    } else if (this.stock && this.stock.stockable === false) {
+      this.instock = true;
+    } else {
+      this.instock = true;
+    }
+    this.instock = this.stock.stockable === true && this.stock.quantity > 0 || this.stock.stockable === false;
     this.productState.flipped.pipe(
       takeUntil(this.fdestroy)
     ).subscribe(value => {

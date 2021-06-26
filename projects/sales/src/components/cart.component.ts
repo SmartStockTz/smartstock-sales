@@ -232,11 +232,6 @@ export class CartComponent implements OnInit {
       return;
     }
     this.checkoutProgress = true;
-    // if (this.customerFormControl.valid) {
-    //   this.customerState.saveCustomer({
-    //     displayName: this.customerFormControl.value,
-    //   }).catch();
-    // }
     this.printCart();
   }
 
@@ -260,7 +255,8 @@ export class CartComponent implements OnInit {
     const cartId = SecurityUtil.generateUUID();
     const cartItems = this._getCartItems();
     this.printService.print({
-      data: this.cartItemsToPrinterData(cartItems, this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : ' '),
+      data: this.cartItemsToPrinterData(cartItems,
+        this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : ' '),
       printer: 'tm20',
       id: cartId,
       qr: cartId
@@ -278,32 +274,35 @@ export class CartComponent implements OnInit {
       );
     }).finally(() => {
       this.discountFormControl.setValue(0);
+      this.selectedCustomer = null;
+      this.checkoutProgress = false;
     });
   }
 
   private cartItemsToPrinterData(carts: CartModel[], customer: string): string {
     let data = '';
     data = data.concat('-------------------------------\n');
-    data = data.concat(new Date().toDateString() + '\n');
+    data = data.concat(new Date().toDateString());
     if (customer) {
-      data = data.concat('-------------------------------\nTo ---> ' + customer);
+      data = data.concat('\n-------------------------------\nCUSTOMER : ' + customer + '\n');
     }
     let totalBill = 0;
     carts.forEach((cart, index) => {
       totalBill += (cart.amount as number);
       data = data.concat(
-        '\n-------------------------------\n' +
-        (index + 1) + '.  ' + cart.product + '\n' +
-        'Quantity --> ' + CartComponent.getQuantity(this.isViewedInWholesale, cart) + ' ' + cart.stock.unit + ' \t' +
-        'Unit Price --> ' + CartComponent.getPrice(this.isViewedInWholesale, cart) + '\t' +
-        'Sub Amount  --> ' + cart.amount + ' \t'
+        `------------------------------------
+ITEM : ${cart.product}
+QUANTITY : ${CartComponent.getQuantity(this.isViewedInWholesale, cart)} / ${cart.stock.unit}
+SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInWholesale, cart)}
+        \n`
       );
     });
     data = data.concat(
-      '\n--------------------------------\n' +
-      'Total Bill : ' + totalBill +
+      '--------------------------------\n' +
+      'TOTAL AMOUNT : ' + totalBill +
       '\n--------------------------------\n'
     );
+    console.log(data);
     return data;
   }
 
@@ -367,8 +366,8 @@ export class CartComponent implements OnInit {
 
   createCustomer() {
     const dialogRef = this.dialog.open(CreateCustomerComponent, {
-      height: '400px',
-      width: '600px',
+      // height: ,
+      // width: ,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -377,24 +376,17 @@ export class CartComponent implements OnInit {
   }
 
   private _getCustomers(): void {
-    // if (!this.isViewedInWholesale) {
-    //   return;
-    // }
-
     this.customerState.customers$.subscribe(
       customers => {
         if (!customers) {
           customers = [];
         }
-
-        // this.customers = of(customers.map(value => value.displayName));
         this.customers = of(customers);
       }
     );
   }
 
   setSelectedCustomer(option: CustomerModel) {
-    // console.log(option);
     this.selectedCustomer = option;
   }
 }

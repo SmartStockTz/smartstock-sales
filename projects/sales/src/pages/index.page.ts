@@ -38,7 +38,7 @@ import {DeviceState} from '@smartstocktz/core-libs';
                 <mat-icon color="primary" matListIcon>{{page.icon}}</mat-icon>
                 <h1 matLine>{{page.name}}</h1>
                 <mat-card-subtitle matLine>{{page.detail}}</mat-card-subtitle>
-                <mat-icon matSuffix>chevron_right</mat-icon>
+<!--                <mat-icon matSuffix>chevron_right</mat-icon>-->
               </mat-list-item>
               <mat-divider></mat-divider>
             </div>
@@ -67,20 +67,20 @@ export class IndexPage implements OnInit {
       detail: 'Cash sale in wholesale',
       rbac: ['*']
     },
-    {
-      name: 'Orders',
-      path: '/sale/order',
-      icon: 'local_shipping',
-      detail: 'Manage online sales',
-      rbac: ['*']
-    },
-    {
-      name: 'Invoices',
-      path: '/sale/invoices',
-      icon: 'payments',
-      detail: 'Manage credit sale',
-      rbac: ['*']
-    },
+    // {
+    //   name: 'Orders',
+    //   path: '/sale/order',
+    //   icon: 'local_shipping',
+    //   detail: 'Manage online sales',
+    //   rbac: ['*']
+    // },
+    // {
+    //   name: 'Invoices',
+    //   path: '/sale/invoices',
+    //   icon: 'payments',
+    //   detail: 'Manage credit sale',
+    //   rbac: ['*']
+    // },
     {
       name: 'Customers',
       path: '/sale/customers',
@@ -88,13 +88,13 @@ export class IndexPage implements OnInit {
       detail: 'Manage your customers',
       rbac: ['*']
     },
-    {
-      name: 'Sale Returns',
-      path: '/sale/refund',
-      detail: 'Return sold products',
-      icon: 'history',
-      rbac: ['*']
-    }
+    // {
+    //   name: 'Sale Returns',
+    //   path: '/sale/refund',
+    //   detail: 'Return sold products',
+    //   icon: 'history',
+    //   rbac: ['*']
+    // }
   ];
 
   constructor(public readonly deviceState: DeviceState) {
