@@ -3,6 +3,7 @@ import {FormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
 import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
+// @dynamic
 @Component({
   selector: 'app-add-to-cart-sheet',
   template: `
