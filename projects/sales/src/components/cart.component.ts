@@ -122,7 +122,7 @@ export class CartComponent implements OnInit {
 
   totalCost = 0;
   discountFormControl = new FormControl(0, [Validators.nullValidator, Validators.min(0)]);
-  customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(3)]);
+  customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(1)]);
   customers: Observable<CustomerModel[]>;
   selectedCustomer: CustomerModel;
   customersArray: string[];
@@ -164,16 +164,16 @@ export class CartComponent implements OnInit {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
       if (enteredName !== null) {
-        this.customerState.customers$.subscribe(
-          customers => {
-            this.customers = of(customers
-              .filter(customer => {
-                const name = customer.firstName ?
-                  customer.firstName + ' ' + customer.secondName : customer.displayName;
-                return name.toLowerCase().includes(enteredName.toLowerCase());
-              }));
-          }
-        );
+        let _customers = [];
+        try {
+          _customers = this.customerState.customers$.value.filter(customer => {
+            const name = customer.firstName ?
+              customer.firstName + ' ' + customer.secondName : customer.displayName;
+            return name.toLowerCase().includes(enteredName.toLowerCase());
+          });
+        } catch (e) {
+        }
+        this.customers = of(_customers);
       }
     });
   }
@@ -225,7 +225,13 @@ export class CartComponent implements OnInit {
   }
 
   checkout(): void {
-    if (this.isViewedInWholesale && !this.selectedCustomer) {
+    if (!this.selectedCustomer && this.customerFormControl.valid) {
+      this.selectedCustomer = {
+        firstName: this.customerFormControl.value,
+        displayName: this.customerFormControl.value
+      };
+    }
+    if (this.isViewedInWholesale && (!this.selectedCustomer || !this.customerFormControl.valid)) {
       this.snack.open('Please enter customer name, or add a customer', 'Ok', {
         duration: 3000
       });
@@ -256,7 +262,7 @@ export class CartComponent implements OnInit {
     const cartItems = this._getCartItems();
     this.printService.print({
       data: this.cartItemsToPrinterData(cartItems,
-        this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : ' '),
+        this.selectedCustomer ? this.selectedCustomer.firstName : 'N/A'),
       printer: 'tm20',
       id: cartId,
       qr: cartId
@@ -302,7 +308,6 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
       'TOTAL AMOUNT : ' + totalBill +
       '\n--------------------------------\n'
     );
-    console.log(data);
     return data;
   }
 
@@ -386,7 +391,7 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
     );
   }
 
-  setSelectedCustomer(option: CustomerModel) {
-    this.selectedCustomer = option;
+  setSelectedCustomer(customer: CustomerModel) {
+    this.selectedCustomer = customer;
   }
 }

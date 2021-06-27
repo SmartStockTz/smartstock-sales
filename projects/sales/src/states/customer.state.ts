@@ -11,7 +11,7 @@ export class CustomerState {
   static COLLECTION_NAME = 'customers';
 
   private customersSource = new BehaviorSubject<CustomerModel[]>([]);
-  readonly customers$ = this.customersSource.asObservable();
+  readonly customers$ = this.customersSource;
 
   private loadingCustomersSubject = new BehaviorSubject<boolean>(true);
   readonly loadingCustomers$ = this.loadingCustomersSubject.asObservable();
