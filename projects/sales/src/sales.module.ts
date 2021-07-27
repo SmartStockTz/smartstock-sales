@@ -42,8 +42,6 @@ import {OrdersTableOptionsComponent} from './components/orders-table-options.com
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {OrdersTableShowItemsComponent} from './components/orders-table-show-items.component';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {VerifyEMailDialogComponent} from './user-modules/verify-dialog.component';
-import {MobilePayDetailsComponent} from './user-modules/mobile-pay-details.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {InvoiceIndexPage} from './pages/invoice-index.page';
@@ -68,17 +66,18 @@ import {PeriodDateRangeComponent} from './components/period-range.component';
 import {InvoiceListPage} from './pages/invoice-list.page';
 import {AddToCartSheetComponent} from './components/add-to-cart-sheet.component';
 import {SalesNavigationService} from './services/sales-navigation.service';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
-  // {path: 'order', component: OrderPage},
+  {path: 'order', component: OrderPage},
   {path: 'customers', component: CustomersPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  // {path: 'invoices', component: InvoiceIndexPage},
-  // {path: 'invoices/create', component: PayByInvoicesComponent},
-  // {path: 'invoices/list', component: InvoiceListPage},
-  // {path: 'refund', component: ReturnsPage},
+  {path: 'invoices', component: InvoiceIndexPage},
+  {path: 'invoices/create', component: PayByInvoicesComponent},
+  {path: 'invoices/list', component: InvoiceListPage},
+  {path: 'refund', component: ReturnsPage},
 ];
 
 @NgModule({
@@ -128,7 +127,8 @@ const routes: Routes = [
     MatDialogModule,
     MatExpansionModule,
     MatSnackBarModule,
-    LibModule
+    LibModule,
+    MatCheckboxModule
   ],
   declarations: [
     AddToCartSheetComponent,
@@ -163,9 +163,8 @@ const routes: Routes = [
     RetailPageComponent,
     SaleComponent,
     CartPreviewComponent,
-    VerifyEMailDialogComponent,
-    MobilePayDetailsComponent
-  ], entryComponents: []
+  ],
+  entryComponents: []
 })
 export class SalesModule {
   constructor(private readonly salesNav: SalesNavigationService) {

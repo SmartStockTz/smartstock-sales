@@ -2,81 +2,64 @@ import {Injectable} from '@angular/core';
 import {StorageService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {BehaviorSubject} from 'rxjs';
-import bfast from 'bfastjs';
+import {CustomerService} from '../services/customer.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerState {
-  static COLLECTION_NAME = 'customers';
+  customers = new BehaviorSubject<CustomerModel[]>([]);
+  loadingCustomers = new BehaviorSubject<boolean>(false);
+  saveCustomerFlag = new BehaviorSubject<boolean>(false);
 
-  private customersSource = new BehaviorSubject<CustomerModel[]>([]);
-  readonly customers$ = this.customersSource;
+  constructor(private readonly storage: StorageService,
+              private readonly snack: MatSnackBar,
+              private readonly customerService: CustomerService) {
+  }
 
-  private loadingCustomersSubject = new BehaviorSubject<boolean>(true);
-  readonly loadingCustomers$ = this.loadingCustomersSubject.asObservable();
-
-  constructor(private readonly storage: StorageService) {
-    this.fetchCustomers().then(customers => {
-      this.loadingCustomersSubject.next(true);
-      this.setCustomers(customers); // assume all returns transactions are online
+  fetchCustomers(): void {
+    this.loadingCustomers.next(true);
+    this.customerService.getCustomers().then(value => {
+      if (value && Array.isArray(value)) {
+        this.customers.next(value);
+      }
+    }).catch(reason => {
+      this.errorMessage(reason);
     }).finally(() => {
-      this.loadingCustomersSubject.next(false);
+      this.loadingCustomers.next(false);
     });
   }
 
-  getCustomersFromStorage(): Promise<CustomerModel[]> {
-    return this.storage.getCustomers();
+  async saveCustomer(customer: CustomerModel): Promise<any> {
+    this.saveCustomerFlag.next(true);
+    return this.customerService.createCustomer(customer).then(value => {
+      if (value) {
+        this.customers.value.push(value);
+        this.customers.next(this.customers.value);
+      }
+      return value;
+    }).catch(reason => {
+      this.errorMessage(reason);
+    }).finally(() => {
+      this.saveCustomerFlag.next(false);
+    });
   }
 
-  getCustomersFromSource(): CustomerModel[] {
-    return this.customersSource.getValue();
+  private errorMessage(reason) {
+    this.snack.open(reason.message ? reason.message : reason.toString(), 'Ok', {duration: 2000});
   }
 
-  async fetchCustomers(): Promise<CustomerModel[]> {
-    let customersFromStorage: any[];
-    try {
-      customersFromStorage = await this.getCustomersFromStorage();
-    } catch (e) {
-      customersFromStorage = [];
-    }
-    const shop = await this.storage.getActiveShop();
-    // if (customersFromStorage && Array.isArray(customersFromStorage) && customersFromStorage.length > 0) {
-    //   bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME).getAll<CustomerModel>().then(onlineCustomers => {
-    //       [...onlineCustomers, ...customersFromStorage].forEach(this.storage.saveCustomer);
-    //       return [...onlineCustomers, ...customersFromStorage];
-    //     }
-    //   ).catch(err => {
-    //     return customersFromStorage;
-    //   });
-    // }
-    bfast.database(shop.projectId)
-      .collection(CustomerState.COLLECTION_NAME)
-      .getAll<CustomerModel>()
-      .then(customers => {
-        customers.forEach(value => {
-          this.storage.saveCustomer(value);
-        });
-      })
-      .catch(console.log);
-    return customersFromStorage;
-  }
-
-
-  async saveCustomer(customer: CustomerModel): Promise<CustomerModel> {
-    const shop = await this.storage.getActiveShop();
-    bfast.database(shop.projectId).collection(CustomerState.COLLECTION_NAME)
-      .save(customer)
-      .then(_ => {
-        // const customers = [...this.getCustomersFromSource(), customer];
-        // this.customersSource.next(customers);
-        // return customer;
-      }).catch(console.log);
-    return this.storage.saveCustomer(customer);
-  }
-
-  private setCustomers(customers: CustomerModel[]) {
-    this.customersSource.next([]);
-    this.customersSource.next(customers);
+  search(query: string) {
+    this.loadingCustomers.next(true);
+    this.customerService.search(query).then(value => {
+      if (value && Array.isArray(value)) {
+        this.customers.next(value);
+      }
+    }).catch(reason => {
+      this.errorMessage(reason);
+    }).finally(() => {
+      this.loadingCustomers.next(false);
+    });
   }
 }

@@ -88,13 +88,13 @@ export class IndexPage implements OnInit {
       detail: 'Manage your customers',
       rbac: ['*']
     },
-    // {
-    //   name: 'Sale Returns',
-    //   path: '/sale/refund',
-    //   detail: 'Return sold products',
-    //   icon: 'history',
-    //   rbac: ['*']
-    // }
+    {
+      name: 'Sale Returns',
+      path: '/sale/refund',
+      detail: 'Return sold products',
+      icon: 'history',
+      rbac: ['*']
+    }
   ];
 
   constructor(public readonly deviceState: DeviceState) {

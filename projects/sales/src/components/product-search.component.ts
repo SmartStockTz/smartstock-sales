@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
-import {StockState} from "../states/stock.state";
-import {FormControl} from "@angular/forms";
-import {StockModel} from "../models/stock.model";
-import {debounceTime} from "rxjs/operators";
+import {StockState} from '../states/stock.state';
+import {FormControl} from '@angular/forms';
+import {StockModel} from '../models/stock.model';
+import {debounceTime} from 'rxjs/operators';
 
 @Component({
   selector: 'app-stock-products-search-dialog',
@@ -59,7 +59,7 @@ export class ProductSearchDialogComponent implements OnInit {
       .pipe(
         debounceTime(500)
       ).subscribe(value => {
-        this.stockState.filter(value);
+      this.stockState.filter(value);
     });
     this.stockState.getStocks();
   }

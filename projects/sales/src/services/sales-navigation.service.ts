@@ -25,26 +25,26 @@ export class SalesNavigationService {
           roles: ['*'],
           link: '/sale/whole'
         },
-        // {
-        //   name: 'Orders',
-        //   roles: ['*'],
-        //   link: '/sale/order'
-        // },
-        // {
-        //   name: 'Credit sale',
-        //   roles: ['*'],
-        //   link: '/sale/invoices'
-        // },
+        {
+          name: 'Orders',
+          roles: ['*'],
+          link: '/sale/order'
+        },
+        {
+          name: 'Credit sale',
+          roles: ['*'],
+          link: '/sale/invoices'
+        },
         {
           name: 'Customers',
           roles: ['*'],
           link: '/sale/customers'
         },
-        // {
-        //   name: 'Sale returns',
-        //   roles: ['*'],
-        //   link: '/sale/refund'
-        // }
+        {
+          name: 'Sale returns',
+          roles: ['*'],
+          link: '/sale/refund'
+        }
       ]
     });
   }

@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { SecurityUtil, StorageService, toSqlDate } from '@smartstocktz/core-libs';
-import { BFast } from 'bfastjs';
-import { OrderModel } from '../models/order.model';
+import {Injectable} from '@angular/core';
+import {SecurityUtil, StorageService, toSqlDate} from '@smartstocktz/core-libs';
+import {BFast} from 'bfastjs';
+import {OrderModel} from '../models/order.model';
 
 @Injectable({
   providedIn: 'any'

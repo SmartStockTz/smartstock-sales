@@ -74,7 +74,7 @@ export class OrdersTableOptionsComponent implements OnInit {
         );
         this.bottomSheetRef.dismiss(val);
       }).catch(err => {
-        console.warn(err)
+        console.warn(err);
         this.snack.open('Cancelling is unsuccessful please try again', 'Ok', {
           duration: 3000
         });
@@ -88,7 +88,7 @@ export class OrdersTableOptionsComponent implements OnInit {
         );
         this.bottomSheetRef.dismiss(val);
       }).catch(err => {
-        console.warn(err)
+        console.warn(err);
         this.snack.open('Reopening order is unsuccessful please try again', 'Ok', {
           duration: 3000
         });

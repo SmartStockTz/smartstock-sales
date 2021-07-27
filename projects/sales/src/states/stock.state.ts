@@ -12,8 +12,6 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class StockState {
 
   stocks: BehaviorSubject<StockModel[]> = new BehaviorSubject<StockModel[]>([]);
-  // stocksDatasource: BehaviorSubject<MatTableDataSource<StockModel[]>>
-  //   = new BehaviorSubject(new MatTableDataSource<StockModel[]>([]));
   selectedStock: BehaviorSubject<StockModel> = new BehaviorSubject<StockModel>(null);
   isFetchStocks: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isExportToExcel: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
