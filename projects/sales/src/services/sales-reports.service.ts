@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import bfast from 'bfastjs';
+import {bfast} from 'bfastjs';
 import {SalesModel} from '../models/sale.model';
 import {ReturnsState} from '../states/returns.state';
 import {ReturnsModel} from '../models/returns.model';

@@ -11,9 +11,9 @@ import {StockModel} from '../models/stock.model';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
-import {CreateCustomerComponent} from './create-customer-form.component';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 
 @Component({
   selector: 'app-cart',
@@ -35,9 +35,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
                    [formControl]="customerFormControl" placeholder="Customer Name"
                    type="text" [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let option of customers | async" [value]="option.firstName + ' ' + option.secondName"
-                          (click)="setSelectedCustomer(option)">
-                {{option.firstName + " " + option.secondName}}
+              <mat-option *ngFor="let option of customers | async" [value]="option.displayName" (click)="setSelectedCustomer(option)">
+                {{option.displayName}}
               </mat-option>
             </mat-autocomplete>
           </div>
@@ -54,8 +53,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
                 <mat-icon color="warn">delete</mat-icon>
               </button>
               <h4 matLine class="text-wrap">{{cart.product.product}}</h4>
-              <mat-card-subtitle
-                matLine>{{isViewedInWholesale ? '(' + cart.product.wholesaleQuantity + ') ' : ''}}{{cart.quantity}} {{cart.product.unit}}
+              <mat-card-subtitle matLine>
+                {{isViewedInWholesale ? '(' + cart.product.wholesaleQuantity + ') ' : ''}}{{cart.quantity}} {{cart.product.unit}}
                 @{{isViewedInWholesale ? cart.product.wholesalePrice : cart.product.retailPrice}}
                 = {{cart.quantity * (isViewedInWholesale ? cart.product.wholesalePrice : cart.product.retailPrice) | number}}
               </mat-card-subtitle>
@@ -164,16 +163,15 @@ export class CartComponent implements OnInit {
     this.customersArray = [];
     this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
       if (enteredName !== null) {
-        let _customers = [];
+        let customers = [];
         try {
-          _customers = this.customerState.customers$.value.filter(customer => {
-            const name = customer.firstName ?
-              customer.firstName + ' ' + customer.secondName : customer.displayName;
+          customers = this.customerState.customers.value.filter(customer => {
+            const name = customer.displayName;
             return name.toLowerCase().includes(enteredName.toLowerCase());
           });
         } catch (e) {
         }
-        this.customers = of(_customers);
+        this.customers = of(customers);
       }
     });
   }
@@ -227,8 +225,7 @@ export class CartComponent implements OnInit {
   checkout(): void {
     if (!this.selectedCustomer && this.customerFormControl.valid) {
       this.selectedCustomer = {
-        firstName: this.customerFormControl.value,
-        displayName: this.customerFormControl.value
+        displayName: this.customerFormControl.value,
       };
     }
     if (this.isViewedInWholesale && (!this.selectedCustomer || !this.customerFormControl.valid)) {
@@ -262,7 +259,7 @@ export class CartComponent implements OnInit {
     const cartItems = this._getCartItems();
     this.printService.print({
       data: this.cartItemsToPrinterData(cartItems,
-        this.selectedCustomer ? this.selectedCustomer.firstName : 'N/A'),
+        this.selectedCustomer ? this.selectedCustomer.displayName : 'N/A'),
       printer: 'tm20',
       id: cartId,
       qr: cartId
@@ -357,8 +354,17 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
         channel,
         date: stringDate,
         idTra,
-        customer: this.selectedCustomer ? this.selectedCustomer.firstName + ' ' + this.selectedCustomer.secondName : '',
-        customerObject: this.selectedCustomer,
+        customer: this.selectedCustomer ? this.selectedCustomer.displayName : '',
+        customerObject: {
+          displayName: this.selectedCustomer.displayName,
+          email: this.selectedCustomer.email,
+          firstName: this.selectedCustomer.displayName,
+          lastName: this.selectedCustomer.displayName,
+          mobile: this.selectedCustomer.phone
+        },
+        soldBy: {
+          username: this.currentUser.username
+        },
         timer: moment(new Date()).format('YYYY-MM-DDTHH:mm'),
         user: this.currentUser?.id,
         sellerObject: this.currentUser,
@@ -370,7 +376,7 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(CreateCustomerComponent, {
+    const dialogRef = this.dialog.open(DialogCreateCustomerComponent, {
       // height: ,
       // width: ,
     });
@@ -381,7 +387,7 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
   }
 
   private _getCustomers(): void {
-    this.customerState.customers$.subscribe(
+    this.customerState.customers.subscribe(
       customers => {
         if (!customers) {
           customers = [];

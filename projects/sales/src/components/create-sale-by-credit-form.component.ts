@@ -1,25 +1,21 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TransferState} from '../states/transfer.state';
-import {MessageService, PrintService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {MessageService, PrintService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {MatDialog} from '@angular/material/dialog';
 import {MatTableDataSource} from '@angular/material/table';
 import {StockModel} from '../models/stock.model';
 import {ProductSearchDialogComponent} from './product-search.component';
 import {CreateCreditorComponent} from './create-creditor.component';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {CreditorState} from '../states/creditor.state';
-import {of} from 'rxjs/internal/observable/of';
-import {SalesModel} from '../models/sale.model';
 import {SalesState} from '../states/sales.state';
 import {CustomerState} from '../states/customer.state';
-import {CreateCustomerComponent} from './create-customer-form.component';
 import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceState} from '../states/invoice.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
-import {CartModel} from '../models/cart.model';
-import {CartComponent} from './cart.component';
+import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 
 @Component({
   selector: 'app-sales-create-sale-by-credit-form',
@@ -202,7 +198,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(CreateCustomerComponent, {
+    const dialogRef = this.dialog.open(DialogCreateCustomerComponent, {
       height: '400px',
       width: '600px',
     });
@@ -240,13 +236,13 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   }
 
   _getCustomers(): void {
-    this.customerState.customers$.subscribe(
+    this.customerState.customers.subscribe(
       customers => {
         if (!customers) {
           customers = [];
         }
 
-        customers = customers.filter(customer => customer.firstName);
+        customers = customers.filter(customer => customer.displayName);
         this.customers = of(customers);
       }
     );

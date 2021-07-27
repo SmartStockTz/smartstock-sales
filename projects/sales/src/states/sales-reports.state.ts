@@ -1,8 +1,7 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {StorageService} from '@smartstocktz/core-libs';
-import {ReturnsModel} from '../models/returns.model';
-import {BehaviorSubject, Subject} from 'rxjs';
-import bfast from 'bfastjs';
+import {BehaviorSubject} from 'rxjs';
+import {bfast} from 'bfastjs';
 import {SalesModel} from '../models/sale.model';
 import {PeriodState} from './period.state';
 import {FaasUtil} from '../utils/faas.util';
@@ -65,7 +64,7 @@ export class SalesReportsState {
 
   async fetchSales(date): Promise<SalesModel[]> {
     // fetch from server or local storage
-      return this.salesReportsService.fetchSales(date);
+    return this.salesReportsService.fetchSales(date);
   }
 
   private setSales(sales: SalesModel[]) {

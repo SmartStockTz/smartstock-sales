@@ -5,8 +5,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {Observable, of} from 'rxjs';
 import {StockModel} from '../models/stock.model';
 import {SalesState} from '../states/sales.state';
-import { DeviceInfoUtil, LogService, StorageService } from '@smartstocktz/core-libs';
-import { UserService } from '../user-modules/user.service';
+import {DeviceInfoUtil, LogService, StorageService, UserService} from '@smartstocktz/core-libs';
 
 @Component({
   selector: 'app-retail-sale',
@@ -56,6 +55,7 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
     this.productsObservable = undefined;
     this.storage.getStocks().then(products => {
       this.fetchDataProgress = false;
+      // @ts-ignore
       this.productsObservable = of(products);
     }).catch(reason => {
       this.fetchDataProgress = false;
@@ -76,6 +76,7 @@ export class RetailPageComponent extends DeviceInfoUtil implements OnInit {
         const result = value.filter(value1 =>
           (value1.product.toLowerCase().includes(product.toLowerCase()))
         );
+        // @ts-ignore
         this.productsObservable = of(result.slice(0, result.length > 50 ? 50 : result.length));
       } else {
         this.snack.open('No products found, try again or refresh products', 'Ok', {

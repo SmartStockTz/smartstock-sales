@@ -3,7 +3,6 @@ import {StorageService} from '@smartstocktz/core-libs';
 import {ReturnsModel} from '../models/returns.model';
 import {BehaviorSubject} from 'rxjs';
 import bfast from 'bfastjs';
-import {CustomerModel} from '../models/customer.model';
 
 @Injectable({
   providedIn: 'root'

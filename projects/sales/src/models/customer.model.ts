@@ -1,12 +1,13 @@
 export interface CustomerModel {
-  firstName?: string;
-  secondName?: string;
-  mobile?: string;
+  phone?: string;
   email?: string;
+  company?: string;
   street?: string;
   createdAt?: any;
+  _created_at?: any;
   updatedAt?: any;
   displayName: string;
   tin?: string;
-  id?: any;
+  id?: string;
+  _id?: string;
 }

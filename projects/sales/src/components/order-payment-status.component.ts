@@ -3,7 +3,6 @@ import {OrderService} from '../services/order.service';
 import {OrderModel} from '../models/order.model';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import { LogService } from '@smartstocktz/core-libs';
-import { MobilePayDetailsComponent } from '../user-modules/mobile-pay-details.component';
 
 @Component({
   selector: 'app-oder-paid-status',
@@ -49,16 +48,16 @@ export class OrderPaymentStatusComponent implements OnInit {
   }
 
   makePayment(): void {
-    this.bottomSheet.open(MobilePayDetailsComponent, {
-      data: {
-        ref: this.order.id.split('-')[1],
-        amount: this.order.total
-      },
-      closeOnNavigation: false
-    }).afterDismissed().subscribe(value => {
-      if (value === true) {
-        this.checkOrderStatus();
-      }
-    });
+    // this.bottomSheet.open(MobilePayDetailsComponent, {
+    //   data: {
+    //     ref: this.order.id.split('-')[1],
+    //     amount: this.order.total
+    //   },
+    //   closeOnNavigation: false
+    // }).afterDismissed().subscribe(value => {
+    //   if (value === true) {
+    //     this.checkOrderStatus();
+    //   }
+    // });
   }
 }

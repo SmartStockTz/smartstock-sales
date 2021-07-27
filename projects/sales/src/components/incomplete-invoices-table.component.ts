@@ -70,7 +70,7 @@ import * as moment from 'moment';
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row class="table-data-row" (click)="clickRow(row, 'invoice')"
+        <tr mat-row class="table-data-row" (click)="clickRow(row, 'invoice', $event)"
             *matRowDef="let row; columns: displayedColumns;"></tr>
 
       </table>
@@ -109,7 +109,8 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
   constructor(private invoiceState: InvoiceState,
               private invoiceDetails: MatBottomSheet,
               private addReturnsSheet: MatBottomSheet,
-              private snack: MatSnackBar) {}
+              private snack: MatSnackBar) {
+  }
 
   ngOnInit(): void {
     this.fetchInvoices();
@@ -118,7 +119,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
 
   async fetchInvoices() {
     this.fetchingInvoices = true;
-    try{
+    try {
       let invoices = await this.invoiceState.fetchSync(await this.invoiceState.countAll(), 0);
       invoices = invoices.map(((value: InvoiceModel, index) => {
         return {
@@ -148,7 +149,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
   configureDataSource(invoices) {
     this.dataSource = new MatTableDataSource(invoices);
     this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = ( invoice: InvoiceModel, sortHeaderId: string) => {
+    this.dataSource.sortingDataAccessor = (invoice: InvoiceModel, sortHeaderId: string) => {
       return invoice[this.keysMap[sortHeaderId]];
     };
     this.dataSource.paginator = this.paginator;
@@ -173,7 +174,7 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
       this.recordPayment(data);
     } else if (route === 'invoice') {
       this.openInvoiceDetails(data);
-    } else{
+    } else {
       return;
     }
   }
@@ -200,22 +201,22 @@ export class IncompleteInvoicesTableComponent implements OnInit, AfterViewInit {
     const addReturnSheetRef = this.addReturnsSheet.open(AddReturnSheetComponent, {
       data: {
         id: invoice.id,
-        date:  invoice.date,
+        date: invoice.date,
         amount: invoice.amount,
         amountDue: invoice.amountDue,
-        businessName:  invoice.sellerObject.businessName,
-        sellerFirstName:  invoice.sellerObject.firstname,
-        sellerLastName:  invoice.sellerObject.lastname,
-        region:  invoice.sellerObject.region,
-        items:  invoice.returns
+        businessName: invoice.sellerObject.businessName,
+        sellerFirstName: invoice.sellerObject.firstname,
+        sellerLastName: invoice.sellerObject.lastname,
+        region: invoice.sellerObject.region,
+        items: invoice.returns
       }
     });
 
-    addReturnSheetRef.afterDismissed().subscribe( result => {
-      if (result){
-        this.dataSource.data = this.dataSource.data.map( value => {
-          if (value.id === result.id){
-            if (value.returns && Array.isArray(value.returns)){
+    addReturnSheetRef.afterDismissed().subscribe(result => {
+      if (result) {
+        this.dataSource.data = this.dataSource.data.map(value => {
+          if (value.id === result.id) {
+            if (value.returns && Array.isArray(value.returns)) {
               value.returns.push(result.returns);
             } else {
               value.returns = [result.returns];

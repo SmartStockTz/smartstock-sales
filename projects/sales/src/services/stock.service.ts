@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {StorageService} from '@smartstocktz/core-libs';
+import {StorageService, UserService} from '@smartstocktz/core-libs';
 import {BFast} from 'bfastjs';
 import {StockModel} from '../models/stock.model';
-import { UserService } from '../user-modules/user.service';
 
 @Injectable({
   providedIn: 'any'

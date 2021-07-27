@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {SettingsService, StorageService} from '@smartstocktz/core-libs';
 import {BFast} from 'bfastjs';
 import {InvoiceModel} from '../models/invoice.model';
-import {QueryOrder} from 'bfastjs/dist/controllers/QueryController';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +58,7 @@ export class InvoiceService {
       .collection('invoices')
       .get(id);
 
-    if (invoice && invoice.returns && Array.isArray(invoice.returns) ) {
+    if (invoice && invoice.returns && Array.isArray(invoice.returns)) {
       invoice.returns.push(value);
     } else {
       invoice.returns = [value];

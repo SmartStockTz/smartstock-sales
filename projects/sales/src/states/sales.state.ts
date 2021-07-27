@@ -4,7 +4,7 @@ import {OrderModel} from '../models/order.model';
 import {BatchModel} from '../models/batch.model';
 import {StockModel} from '../models/stock.model';
 import {BFast} from 'bfastjs';
-import { SecurityUtil, StorageService } from '@smartstocktz/core-libs';
+import {SecurityUtil, StorageService} from '@smartstocktz/core-libs';
 
 @Injectable({
   providedIn: 'any'
@@ -53,15 +53,12 @@ export class SalesState {
         path: '/classes/sales'
       });
     });
+    // @ts-ignore
     return await this.storageService.saveSales(batchs);
   }
 
   async getAllStock(): Promise<StockModel[]> {
     const shop = await this.storageService.getActiveShop();
-    // const totalStock = await BFast.database(shop.projectId)
-    //   .collection('stocks')
-    //   .query()
-    //   .count({}, {cacheEnable: false, dtl: 0});
     const stocks: StockModel[] = await BFast.database(shop.projectId)
       .collection<StockModel>('stocks')
       .getAll<StockModel>(undefined, {
@@ -69,9 +66,6 @@ export class SalesState {
         dtl: 0
       });
     await this.storageService.saveStocks(stocks);
-    // stocks.sort((a, b) => {
-    //   return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    // });
     return stocks;
   }
 

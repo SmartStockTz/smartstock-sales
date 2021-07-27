@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {DeviceInfoUtil} from '@smartstocktz/core-libs';
-import {CreateCustomerComponent} from '../components/create-customer-form.component';
 import {MatDialog} from '@angular/material/dialog';
 import {CreateReturnComponent} from '../components/create-return.component';
 

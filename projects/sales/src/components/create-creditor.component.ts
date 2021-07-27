@@ -1,13 +1,13 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CreditorState } from '../states/creditor.state';
+import {Component, Inject, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {CreditorState} from '../states/creditor.state';
 
 @Component({
   template: `
-       <div class="row" mat-dialog-content>
-           <mat-card-title>Create Creditor</mat-card-title>
+    <div class="row" mat-dialog-content>
+      <mat-card-title>Create Creditor</mat-card-title>
 
       <form [formGroup]="createCreditorForm" (ngSubmit)="createCreditor()" class="create-shop-form-container" style="margin-top: 10px">
         <mat-form-field appearance="" style="width:100%">
@@ -55,17 +55,17 @@ import { CreditorState } from '../states/creditor.state';
         Close
       </button>
     </div>
-    `,
-  selector: 'app-create-customer'
+  `,
+  selector: 'app-create-creditor'
 })
 export class CreateCreditorComponent implements OnInit {
   createCreditorForm: FormGroup;
   createShopProgress = false;
 
   constructor(public dialogRef: MatDialogRef<CreateCreditorComponent>,
-    private readonly formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public data: any, private readonly snack: MatSnackBar,
-    private readonly creditorState: CreditorState,) {
+              public readonly formBuilder: FormBuilder,
+              @Inject(MAT_DIALOG_DATA) public data: any, private readonly snack: MatSnackBar,
+              public readonly creditorState: CreditorState) {
 
   }
 

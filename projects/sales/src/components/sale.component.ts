@@ -5,8 +5,6 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
 import {DeviceState, LogService, StorageService} from '@smartstocktz/core-libs';
-import {ConfigsService} from '../services/config.service';
-import {UserService} from '../user-modules/user.service';
 import {CartState} from '../states/cart.state';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -78,8 +76,7 @@ import {takeUntil} from 'rxjs/operators';
   `,
   styleUrls: ['../styles/sale.style.css'],
   providers: [
-    SalesState,
-    UserService
+    SalesState
   ]
 })
 export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -90,11 +87,10 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   searchProgressFlag = false;
   @Input() isViewedInWholesale = true;
   @Input() isViewedInInvoice = false;
-  isMobile = ConfigsService.android;
   searchInputControl = new FormControl('');
   showRefreshCart = false;
   @ViewChild('cartdrawer') cartDrawer: MatDrawer;
-  _destroy: Subject<any> = new Subject<any>();
+  destroyer: Subject<any> = new Subject<any>();
 
   constructor(public readonly storage: StorageService,
               public readonly snack: MatSnackBar,
@@ -107,13 +103,13 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async ngOnDestroy(): Promise<void> {
-    this._destroy.next('done');
+    this.destroyer.next('done');
   }
 
   async ngOnInit(): Promise<void> {
     this.getProducts();
     this.cartState.carts.pipe(
-      takeUntil(this._destroy)
+      takeUntil(this.destroyer)
     ).subscribe(value => {
       this.showRefreshCart = value ? value.length === 0 : false;
     });
@@ -136,6 +132,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.storage.getStocks().then(products => {
       this.fetchDataProgress = false;
       if (products && products.length > 0) {
+        // @ts-ignore
         this.products = products.filter(x => x.saleable === true);
       }
     }).catch(reason => {
@@ -156,12 +153,13 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.searchProgressFlag = false;
       if (allStocks) {
         // get index of stock by barcode
-        const index = allStocks.findIndex((x: StockModel) => {
+        const index = allStocks.findIndex((x: any) => {
           const barcode = x.barcode ? x.barcode : '';
           return query.trim() === barcode.trim();
         });
         if (index >= 0) {
           this.cartState.addToCart({
+            // @ts-ignore
             product: allStocks[index],
             quantity: 1
           });
@@ -170,6 +168,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
             this.cartDrawer.open().catch();
           }
         } else {
+          // @ts-ignore
           this.products = allStocks.filter((stock: StockModel) => {
               const barcode = stock.barcode ? stock.barcode : '';
               const productName = stock.product ? stock.product : '';

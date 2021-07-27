@@ -21,10 +21,6 @@ import {Subject} from 'rxjs';
       <div>
         <mat-card-title>Create Return</mat-card-title>
         <div class="row m-0 justify-content-end">
-          <!--<mat-form-field appearance="outline">-->
-            <!--<mat-label>Filter</mat-label>-->
-            <!--<input matInput [formControl]="filterFormControl" placeholder="type here ...">-->
-          <!--</mat-form-field>-->
           <app-period-date-range [hidePeriod]="true" [hideEndDate]="true"></app-period-date-range>
         </div>
       </div>
@@ -141,6 +137,7 @@ export class CreateReturnComponent implements OnInit {
     });
 
     this.salesReportsState.sales$.subscribe(value => {
+      // @ts-ignore
       this.sales = value.filter(value1 => value1 && !value1.isReturned);
       this.noData = (0 === this.sales.length);
       this.configureDataSource(this.sales);

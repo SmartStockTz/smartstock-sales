@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
-import { MessageService, StorageService } from '@smartstocktz/core-libs';
-import { BFast } from 'bfastjs';
-import { BehaviorSubject } from 'rxjs';
-import { InvoiceModel } from '../models/invoice.model';
-import { InvoiceService } from '../services/invoice.services';
+import {Injectable} from '@angular/core';
+import {MessageService} from '@smartstocktz/core-libs';
+import {BehaviorSubject} from 'rxjs';
+import {InvoiceModel} from '../models/invoice.model';
+import {InvoiceService} from '../services/invoice.services';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +17,11 @@ export class InvoiceState {
   }
 
   async countAll(): Promise<any> {
-      return this.invoiceService.invoicesCount();
+    return this.invoiceService.invoicesCount();
   }
 
-  calculateTotalReturns(returns: [any]){
-    if (returns && Array.isArray(returns)){
+  calculateTotalReturns(returns: [any]) {
+    if (returns && Array.isArray(returns)) {
       return returns.map(a => a.amount).reduce((a, b, i) => {
         return a + b;
       });
@@ -45,14 +44,14 @@ export class InvoiceState {
     });
   }
 
-  async fetchSync(size= 20, skip = 0): Promise<InvoiceModel[]>{
+  async fetchSync(size = 20, skip = 0): Promise<InvoiceModel[]> {
     return await this.invoiceService.getInvoices({
       skip,
       size
     });
   }
 
-  async saveInvoice(invoice){
+  async saveInvoice(invoice) {
     return await this.invoiceService.saveInvoice(invoice);
   }
 }
