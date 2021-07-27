@@ -6,14 +6,19 @@ import {sha256} from 'crypto-hash';
 
 function init(shop: ShopModel) {
   bfast.init({
+    applicationId: 'smartstock_lb',
+    projectId: 'smartstock'
+  });
+  bfast.init({
     applicationId: shop.applicationId,
-    projectId: shop.projectId
+    projectId: shop.projectId,
+    adapters: {
+      auth: 'DEFAULT'
+    }
   }, shop.projectId);
 }
 
 export class CustomerWorker {
-
-  private remoteAllCustomerRunning = false;
 
   constructor(shop: ShopModel) {
     init(shop);
@@ -36,14 +41,14 @@ export class CustomerWorker {
       if (response && response.body && response.body.change) {
         // console.log(response.body.change);
         if (response.body.change.name === 'create') {
-          this.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
+          CustomerWorker.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
           // return;
         } else if (response.body.change.name === 'update') {
-          this.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
+          CustomerWorker.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
           // return;
         } else if (response.body.change.name === 'delete') {
           // console.log(response.body.change.snapshot);
-          await this.removeCustomerLocal(response.body.change.snapshot?.id, shop);
+          await CustomerWorker.removeCustomerLocal(response.body.change.snapshot?.id, shop);
           // return;
         } else {
           // return;
@@ -51,6 +56,8 @@ export class CustomerWorker {
       }
     });
   }
+
+  private remoteAllCustomerRunning = false;
 
   private static async customerLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
     const hashesMap = {};
@@ -62,6 +69,25 @@ export class CustomerWorker {
     return hashesMap;
   }
 
+  private static async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
+    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).getAll();
+    // const localCustomers: any[] = await this.customersCache.get('_all');
+  }
+
+  private static async removeCustomerLocal(id: string, shop: ShopModel) {
+    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).remove(id, true);
+  }
+
+  private static async setCustomerLocal(customer: CustomerModel, shop: ShopModel) {
+    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).set(customer.id, customer);
+  }
+
+  private static async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {
+    for (const customer of customers) {
+      await CustomerWorker.setCustomerLocal(customer, shop);
+    }
+  }
+
   private async remoteAllCustomers(shop: ShopModel, hashes: any[] = []): Promise<CustomerModel[]> {
     this.remoteAllCustomerRunning = true;
     return bfast.database(shop.projectId)
@@ -71,25 +97,6 @@ export class CustomerWorker {
       }).finally(() => {
         this.remoteAllCustomerRunning = false;
       });
-  }
-
-  private async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).getAll();
-    // const localCustomers: any[] = await this.customersCache.get('_all');
-  }
-
-  private async removeCustomerLocal(id: string, shop: ShopModel) {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).remove(id, true);
-  }
-
-  private async setCustomerLocal(customer: CustomerModel, shop: ShopModel) {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).set(customer.id, customer);
-  }
-
-  private async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {
-    for (const customer of customers) {
-      await this.setCustomerLocal(customer, shop);
-    }
   }
 
   private remoteCustomerMapping(customers: CustomerModel[], hashesMap): CustomerModel[] {
@@ -106,7 +113,7 @@ export class CustomerWorker {
   }
 
   async getCustomersRemote(shop: ShopModel): Promise<CustomerModel[]> {
-    const localCustomers = await this.getCustomersLocal(shop);
+    const localCustomers = await CustomerWorker.getCustomersLocal(shop);
     const hashesMap = await CustomerWorker.customerLocalHashMap(localCustomers);
     let customers = [];
     try {
@@ -116,12 +123,12 @@ export class CustomerWorker {
       console.log(e);
       customers = localCustomers;
     }
-    await this.setCustomersLocal(customers, shop);
+    await CustomerWorker.setCustomersLocal(customers, shop);
     return customers;
   }
 
   async getCustomers(shop: ShopModel): Promise<CustomerModel[]> {
-    const localCustomers: any[] = await this.getCustomersLocal(shop); // await this.customersCache.get('_all');
+    const localCustomers: any[] = await CustomerWorker.getCustomersLocal(shop); // await this.customersCache.get('_all');
     if (Array.isArray(localCustomers) && localCustomers.length !== 0) {
       return localCustomers;
     } else {
@@ -141,12 +148,12 @@ export class CustomerWorker {
       .doc(customer)
       .upsert(true)
       .update();
-    await this.setCustomerLocal(c, shop);
+    await CustomerWorker.setCustomerLocal(c, shop);
     return c;
   }
 
   async search(query: string, shop: ShopModel): Promise<CustomerModel[]> {
-    const localCustomers: any[] = await this.getCustomersLocal(shop);
+    const localCustomers: any[] = await CustomerWorker.getCustomersLocal(shop);
     if (Array.isArray(localCustomers)) {
       return localCustomers.filter(y => JSON.stringify(y).toLowerCase().includes(query.toLowerCase()));
     } else {
@@ -160,7 +167,7 @@ export class CustomerWorker {
       .query()
       .byId(customer.id)
       .delete();
-    await this.removeCustomerLocal(customer.id, shop);
+    await CustomerWorker.removeCustomerLocal(customer.id, shop);
     return c;
   }
 }

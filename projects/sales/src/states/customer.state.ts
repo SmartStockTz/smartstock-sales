@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {StorageService} from '@smartstocktz/core-libs';
+import {SecurityUtil, StorageService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {BehaviorSubject} from 'rxjs';
 import {CustomerService} from '../services/customer.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {v4} from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -61,7 +60,7 @@ export class CustomerState {
   async saveCustomer(customer: CustomerModel): Promise<any> {
     this.saveCustomerFlag.next(true);
     if (!customer.id) {
-      customer.id = v4();
+      customer.id = SecurityUtil.generateUUID();
     }
     if (!customer.createdAt) {
       customer._created_at = new Date();

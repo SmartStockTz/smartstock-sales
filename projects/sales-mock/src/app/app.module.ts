@@ -5,7 +5,6 @@ import {AppComponent} from './app.component';
 import {LibModule} from '@smartstocktz/core-libs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
-import {BFast} from 'bfastjs';
 import {LoginPageComponent} from './pages/login.page';
 import {WelcomePage} from './pages/welcome.page';
 import {MatInputModule} from '@angular/material/input';
@@ -14,10 +13,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {SalesWorkerService} from 'projects/sales/src/public-api';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from './guards/auth.guard';
-import {HashLocationStrategy, LocationStrategy} from '@angular/common';
+import {bfast} from 'bfastjs';
+import {SalesNavigationService} from '../../../sales/src/services/sales-navigation.service';
 
 const routes: Routes = [
   {path: '', component: WelcomePage},
@@ -44,43 +43,39 @@ const routes: Routes = [
     MatCardModule,
     MatSnackBarModule
   ],
-  providers: [
-    // {
-    //   provide: LocationStrategy,
-    //   useClass: HashLocationStrategy
-    // }
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(private salesWorkerService: SalesWorkerService) {
-    BFast.init({
+  constructor(private readonly navigationState: SalesNavigationService) {
+    bfast.init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
     });
-    this.startSalesSync().catch(console.log);
+    //   this.startSalesSync().catch(console.log);
+    // }
+    //
+    // shouldRun = true;
+
+    // async startSalesSync() {
+    //   console.log('sales worker started');
+    //   this.salesWorkerService.initiateSmartStock();
+    //   setInterval(_ => {
+    //     if (this.shouldRun === true) {
+    //       this.shouldRun = false;
+    //       this.salesWorkerService.run()
+    //         .then(_1 => {
+    //         })
+    //         .catch(_2 => {
+    //         })
+    //         .finally(() => {
+    //           this.shouldRun = true;
+    //         });
+    //     } else {
+    //       console.log('another save sales routine runs');
+    //     }
+    //   }, 5000);
+    // }
+
   }
-
-  shouldRun = true;
-
-  async startSalesSync() {
-    console.log('sales worker started');
-    this.salesWorkerService.initiateSmartStock();
-    setInterval(_ => {
-      if (this.shouldRun === true) {
-        this.shouldRun = false;
-        this.salesWorkerService.run()
-          .then(_1 => {
-          })
-          .catch(_2 => {
-          })
-          .finally(() => {
-            this.shouldRun = true;
-          });
-      } else {
-        console.log('another save sales routine runs');
-      }
-    }, 5000);
-  }
-
 }

@@ -245,9 +245,9 @@ export class CartComponent implements OnInit {
     return amount - CartComponent._getCartItemDiscount({totalDiscount: cart.totalDiscount, totalItems: cart.totalItems});
   }
 
-  async submitBill(cartId: string): Promise<void> {
+  async submitBill(): Promise<void> {
     const sales: SalesModel[] = await this._getSalesBatch();
-    await this.salesState.saveSales(sales, cartId);
+    await this.salesState.saveSales(sales);
     this.cartState.carts.next([]);
     this.customerFormControl.setValue(null);
     this._getTotal(0);
@@ -255,16 +255,15 @@ export class CartComponent implements OnInit {
 
   printCart(): void {
     this.checkoutProgress = true;
-    const cartId = SecurityUtil.generateUUID();
     const cartItems = this._getCartItems();
     this.printService.print({
       data: this.cartItemsToPrinterData(cartItems,
         this.selectedCustomer ? this.selectedCustomer.displayName : 'N/A'),
       printer: 'tm20',
-      id: cartId,
-      qr: cartId
+      id: SecurityUtil.generateUUID(),
+      qr: null
     }).then(_ => {
-      return this.submitBill(cartId);
+      return this.submitBill();
     }).then(_ => {
       this.checkoutProgress = false;
       this.snack.open('Done save sales', 'Ok', {duration: 2000});

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-whole-sale',
+  selector: 'app-whole-page',
   template: `
     <app-sale [isViewedInWholesale]="true"></app-sale>
   `,
