@@ -16,7 +16,7 @@ export class CustomerService {
   }
 
   private async initClass(shop: ShopModel) {
-    if (!this.customerWorker){
+    if (!this.customerWorker) {
       const CW = wrap(new Worker(new URL('../workers/customer.worker', import.meta.url))) as unknown as any;
       this.customerWorker = await new CW(shop);
     }
@@ -26,6 +26,12 @@ export class CustomerService {
     const shop = await this.userService.getCurrentShop();
     await this.initClass(shop);
     return this.customerWorker.getCustomers(shop);
+  }
+
+  async getRemoteCustomers(): Promise<CustomerModel[]> {
+    const shop = await this.userService.getCurrentShop();
+    await this.initClass(shop);
+    return this.customerWorker.getCustomersRemote(shop);
   }
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
@@ -38,5 +44,11 @@ export class CustomerService {
     const shop = await this.userService.getCurrentShop();
     await this.initClass(shop);
     return this.customerWorker.search(query, shop);
+  }
+
+  async deleteCustomer(customer: CustomerModel): Promise<any> {
+    const shop = await this.userService.getCurrentShop();
+    await this.initClass(shop);
+    return this.customerWorker.deleteCustomer(customer, shop);
   }
 }

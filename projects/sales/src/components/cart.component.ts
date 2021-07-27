@@ -11,9 +11,9 @@ import {StockModel} from '../models/stock.model';
 import {CartState} from '../states/cart.state';
 import * as moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
-import {CreateCustomerComponent} from './create-customer-form.component';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 
 @Component({
   selector: 'app-cart',
@@ -376,7 +376,7 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(CreateCustomerComponent, {
+    const dialogRef = this.dialog.open(DialogCreateCustomerComponent, {
       // height: ,
       // width: ,
     });

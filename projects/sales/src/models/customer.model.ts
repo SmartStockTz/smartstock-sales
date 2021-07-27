@@ -4,6 +4,7 @@ export interface CustomerModel {
   company?: string;
   street?: string;
   createdAt?: any;
+  _created_at?: any;
   updatedAt?: any;
   displayName: string;
   tin?: string;

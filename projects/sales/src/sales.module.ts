@@ -67,6 +67,9 @@ import {InvoiceListPage} from './pages/invoice-list.page';
 import {AddToCartSheetComponent} from './components/add-to-cart-sheet.component';
 import {SalesNavigationService} from './services/sales-navigation.service';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {DeleteConfirmDialogComponent} from './components/delete-confirm-dialog.component';
+import {DialogCreateCustomerComponent} from './components/dialog-create-customer.component';
+import {SheetCreateCustomerComponent} from './components/sheet-create-customer.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -163,6 +166,9 @@ const routes: Routes = [
     RetailPageComponent,
     SaleComponent,
     CartPreviewComponent,
+    DeleteConfirmDialogComponent,
+    DialogCreateCustomerComponent,
+    SheetCreateCustomerComponent
   ],
   entryComponents: []
 })

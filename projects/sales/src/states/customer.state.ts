@@ -4,6 +4,7 @@ import {CustomerModel} from '../models/customer.model';
 import {BehaviorSubject} from 'rxjs';
 import {CustomerService} from '../services/customer.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {v4} from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -31,12 +32,55 @@ export class CustomerState {
     });
   }
 
+  hotFetchCustomers(): void {
+    this.loadingCustomers.next(true);
+    this.customerService.getRemoteCustomers().then(value => {
+      if (value && Array.isArray(value)) {
+        this.customers.next(value);
+      }
+    }).catch(reason => {
+      this.errorMessage(reason);
+    }).finally(() => {
+      this.loadingCustomers.next(false);
+    });
+  }
+
+  deleteCustomer(customer: CustomerModel): void {
+    this.loadingCustomers.next(true);
+    this.errorMessage('Deleting...');
+    this.customerService.deleteCustomer(customer).then(v => {
+      this.customers.next(this.customers.value.filter(x => x.id !== customer.id));
+      this.errorMessage(`Customer ${customer.displayName} deleted permanent`);
+    }).catch(reason => {
+      this.errorMessage(reason);
+    }).finally(() => {
+      this.loadingCustomers.next(false);
+    });
+  }
+
   async saveCustomer(customer: CustomerModel): Promise<any> {
     this.saveCustomerFlag.next(true);
+    if (!customer.id) {
+      customer.id = v4();
+    }
+    if (!customer.createdAt) {
+      customer._created_at = new Date();
+    }
     return this.customerService.createCustomer(customer).then(value => {
       if (value) {
-        this.customers.value.push(value);
-        this.customers.next(this.customers.value);
+        let update = false;
+        const c = this.customers.value.map(x => {
+          if (x.id === customer.id) {
+            update = true;
+            return value;
+          } else {
+            return x;
+          }
+        });
+        if (update === false) {
+          c.push(value);
+        }
+        this.customers.next(c);
       }
       return value;
     }).catch(reason => {

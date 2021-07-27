@@ -56,7 +56,7 @@ import {CreditorState} from '../states/creditor.state';
       </button>
     </div>
   `,
-  selector: 'app-create-customer'
+  selector: 'app-create-creditor'
 })
 export class CreateCreditorComponent implements OnInit {
   createCreditorForm: FormGroup;

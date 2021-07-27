@@ -4,8 +4,6 @@ import {CustomerModel} from '../models/customer.model';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {sha256} from 'crypto-hash';
 
-// import {v4} from 'uuid';
-
 function init(shop: ShopModel) {
   bfast.init({
     applicationId: shop.applicationId,
@@ -44,7 +42,7 @@ export class CustomerWorker {
           this.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
           // return;
         } else if (response.body.change.name === 'delete') {
-          console.log(response.body.change.snapshot);
+          // console.log(response.body.change.snapshot);
           await this.removeCustomerLocal(response.body.change.snapshot?.id, shop);
           // return;
         } else {
@@ -132,16 +130,38 @@ export class CustomerWorker {
   }
 
   async createCustomer(customer: CustomerModel, shop: ShopModel): Promise<CustomerModel> {
-    return bfast.database(shop.projectId).table('customers').save(customer);
+    if (!customer.id) {
+      throw {message: 'id field is required'};
+    }
+    const c = await bfast.database(shop.projectId)
+      .table('customers')
+      .query()
+      .byId(customer.id)
+      .updateBuilder()
+      .doc(customer)
+      .upsert(true)
+      .update();
+    await this.setCustomerLocal(c, shop);
+    return c;
   }
 
   async search(query: string, shop: ShopModel): Promise<CustomerModel[]> {
-    const localCustomers: any[] = await this.getCustomersLocal(shop); // this.customersCache.get('_all');
+    const localCustomers: any[] = await this.getCustomersLocal(shop);
     if (Array.isArray(localCustomers)) {
       return localCustomers.filter(y => JSON.stringify(y).toLowerCase().includes(query.toLowerCase()));
     } else {
       return [];
     }
+  }
+
+  async deleteCustomer(customer: CustomerModel, shop: ShopModel): Promise<any> {
+    const c = await bfast.database(shop.projectId)
+      .table('customers')
+      .query()
+      .byId(customer.id)
+      .delete();
+    await this.removeCustomerLocal(customer.id, shop);
+    return c;
   }
 }
 

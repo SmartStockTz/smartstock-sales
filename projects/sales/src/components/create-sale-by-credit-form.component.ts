@@ -7,16 +7,15 @@ import {MatTableDataSource} from '@angular/material/table';
 import {StockModel} from '../models/stock.model';
 import {ProductSearchDialogComponent} from './product-search.component';
 import {CreateCreditorComponent} from './create-creditor.component';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {CreditorState} from '../states/creditor.state';
-import {of} from 'rxjs';
 import {SalesState} from '../states/sales.state';
 import {CustomerState} from '../states/customer.state';
-import {CreateCustomerComponent} from './create-customer-form.component';
 import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceState} from '../states/invoice.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
+import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 
 @Component({
   selector: 'app-sales-create-sale-by-credit-form',
@@ -199,7 +198,7 @@ export class SaleByCreditCreateFormComponent implements OnInit {
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(CreateCustomerComponent, {
+    const dialogRef = this.dialog.open(DialogCreateCustomerComponent, {
       height: '400px',
       width: '600px',
     });
