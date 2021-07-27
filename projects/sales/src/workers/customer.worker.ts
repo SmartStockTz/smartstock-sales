@@ -15,6 +15,8 @@ function init(shop: ShopModel) {
 
 export class CustomerWorker {
 
+  private remoteAllCustomerRunning = false;
+
   constructor(shop: ShopModel) {
     init(shop);
     // this.customersCache = ;
@@ -23,13 +25,18 @@ export class CustomerWorker {
       .query()
       .changes(() => {
         console.log('customer changes connected');
-        this.getCustomersRemote(shop).catch(console.log);
+        if (this.remoteAllCustomerRunning === false) {
+          this.getCustomersRemote(shop)
+            .catch(console.log);
+        } else {
+          console.log('already fetched');
+        }
       }, () => {
         console.log('customer changes disconnected');
       });
     changes.addListener(async response => {
       if (response && response.body && response.body.change) {
-        console.log(response.body.change);
+        // console.log(response.body.change);
         if (response.body.change.name === 'create') {
           this.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
           // return;
@@ -57,11 +64,14 @@ export class CustomerWorker {
     return hashesMap;
   }
 
-  private static async remoteAllCustomers(shop: ShopModel, hashes: any[] = []): Promise<CustomerModel[]> {
+  private async remoteAllCustomers(shop: ShopModel, hashes: any[] = []): Promise<CustomerModel[]> {
+    this.remoteAllCustomerRunning = true;
     return bfast.database(shop.projectId)
       .collection('customers')
       .getAll<CustomerModel>({
         hashes
+      }).finally(() => {
+        this.remoteAllCustomerRunning = false;
       });
   }
 
@@ -102,7 +112,7 @@ export class CustomerWorker {
     const hashesMap = await CustomerWorker.customerLocalHashMap(localCustomers);
     let customers = [];
     try {
-      customers = await CustomerWorker.remoteAllCustomers(shop, Object.keys(hashesMap));
+      customers = await this.remoteAllCustomers(shop, Object.keys(hashesMap));
       customers = this.remoteCustomerMapping(customers, hashesMap);
     } catch (e) {
       console.log(e);
