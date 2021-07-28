@@ -39,7 +39,7 @@ export class SaleWorker {
   }
 
   async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
-    return bfast.cache({database: shop.projectId, collection: 'stocks'}, shop.projectId).get('all');
+    return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).get('all');
   }
 
   async removeProductLocal(product: StockModel, shop: ShopModel) {
@@ -68,7 +68,7 @@ export class SaleWorker {
     // for (const product of products) {
     //   await this.setProductLocal(product, shop);
     // }
-    return bfast.cache({database: shop.projectId, collection: 'stocks'}, shop.projectId).set('all', products);
+    return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).set('all', products);
   }
 
   private async remoteAllProducts(shop: ShopModel, hashes: any[] = []): Promise<StockModel[]> {

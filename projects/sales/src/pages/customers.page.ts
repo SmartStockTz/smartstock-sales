@@ -34,12 +34,12 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
               Load
             </button>
             <span class="actions-spacer"></span>
-            <div *ngIf="(deviceState.isSmallScreen | async)===false">
-              <mat-paginator #c_paginator></mat-paginator>
-            </div>
+            <!--            <div *ngIf="(deviceState.isSmallScreen | async)===false">-->
+            <mat-paginator [ngStyle]="{display: (deviceState.isSmallScreen | async)===true?'none':''}" #c_paginator></mat-paginator>
+            <!--            </div>-->
           </div>
           <app-customer-list
-            [paginator]="(deviceState.isSmallScreen | async)===false?null:c_paginator"></app-customer-list>
+            [paginator]="c_paginator"></app-customer-list>
         </div>
       </ng-template>
     </app-layout-sidenav>

@@ -26,15 +26,16 @@ export class CustomerWorker {
       .table('customers')
       .query()
       .changes(() => {
-        console.log('customer changes connected');
+        // console.log('customer changes connected');
+        this.syncCustomers(shop).catch(console.log);
         if (this.remoteAllCustomerRunning === false) {
           this.getCustomersRemote(shop)
             .catch(console.log);
         } else {
-          console.log('already fetched');
+          // console.log('already fetched');
         }
       }, () => {
-        console.log('customer changes disconnected');
+        // console.log('customer changes disconnected');
       });
     changes.addListener(async response => {
       if (response && response.body && response.body.change) {
@@ -56,6 +57,7 @@ export class CustomerWorker {
     });
   }
 
+  private syncInterval;
   private remoteAllCustomerRunning = false;
 
   private static async customerLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
@@ -69,22 +71,76 @@ export class CustomerWorker {
   }
 
   private static async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
-    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).getAll();
+    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).getAll();
     // const localCustomers: any[] = await this.customersCache.get('_all');
   }
 
   private static async removeCustomerLocal(id: string, shop: ShopModel) {
-    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).remove(id, true);
+    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).remove(id, true);
   }
 
   private static async setCustomerLocal(customer: CustomerModel, shop: ShopModel) {
-    return bfast.cache({database: shop.projectId, collection: 'customers'}, shop.projectId).set(customer.id, customer);
+    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).set(customer.id, customer);
+  }
+
+  private static async setCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
+    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).set(customer.id, customer);
+  }
+
+  private static async getCustomersLocalSync(shop: ShopModel) {
+    // console.log('******');
+    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).getAll();
+  }
+
+  private static async removeCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
+    // console.log(customer);
+    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).remove(customer.id, true);
   }
 
   private static async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {
     for (const customer of customers) {
       await CustomerWorker.setCustomerLocal(customer, shop);
     }
+  }
+
+  private async syncCustomers(shop: ShopModel) {
+    let isRunn = false;
+    if (this.syncInterval) {
+      return;
+    }
+    // console.log('customer sync start');
+    this.syncInterval = setInterval(async () => {
+      if (isRunn === true) {
+        return;
+      }
+      isRunn = true;
+      const customers = await CustomerWorker.getCustomersLocalSync(shop);
+      // console.log(customers);
+      if (Array.isArray(customers) && customers.length === 0) {
+        isRunn = false;
+        clearInterval(this.syncInterval);
+        this.syncInterval = undefined;
+        // console.log('customer sync stop');
+      } else {
+        for (const customer of customers) {
+          try {
+            await bfast.database(shop.projectId)
+              .table('customers')
+              .query()
+              .byId(customer.id)
+              .updateBuilder()
+              .doc(customer)
+              .upsert(true)
+              .update();
+            await CustomerWorker.removeCustomerLocalSync(customer, shop);
+            isRunn = false;
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
+      // isRunn = false;
+    }, 2000);
   }
 
   private async remoteAllCustomers(shop: ShopModel, hashes: any[] = []): Promise<CustomerModel[]> {
@@ -139,16 +195,10 @@ export class CustomerWorker {
     if (!customer.id) {
       throw {message: 'id field is required'};
     }
-    const c = await bfast.database(shop.projectId)
-      .table('customers')
-      .query()
-      .byId(customer.id)
-      .updateBuilder()
-      .doc(customer)
-      .upsert(true)
-      .update();
-    await CustomerWorker.setCustomerLocal(c, shop);
-    return c;
+    await CustomerWorker.setCustomerLocalSync(customer, shop);
+    await CustomerWorker.setCustomerLocal(customer, shop);
+    this.syncCustomers(shop).catch(console.log);
+    return customer;
   }
 
   async search(query: string, shop: ShopModel): Promise<CustomerModel[]> {

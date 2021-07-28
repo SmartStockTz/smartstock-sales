@@ -1,6 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
-import {Observable, of} from 'rxjs';
 import {MatSidenav} from '@angular/material/sidenav';
 import {SalesState} from '../states/sales.state';
 import {SalesModel} from '../models/sale.model';
@@ -14,6 +13,10 @@ import {CustomerModel} from '../models/customer.model';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-cart',
@@ -35,7 +38,8 @@ import {DialogCreateCustomerComponent} from './dialog-create-customer.component'
                    [formControl]="customerFormControl" placeholder="Customer Name"
                    type="text" [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let option of customers | async" [value]="option.displayName" (click)="setSelectedCustomer(option)">
+              <mat-option *ngFor="let option of customerState.customers | async" [value]="option.displayName"
+                          (click)="setSelectedCustomer(option)">
                 {{option.displayName}}
               </mat-option>
             </mat-autocomplete>
@@ -103,16 +107,17 @@ import {DialogCreateCustomerComponent} from './dialog-create-customer.component'
     SettingsService
   ]
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
 
   constructor(private readonly salesState: SalesState,
               private readonly settingsService: SettingsService,
               private readonly printService: PrintService,
               private readonly userService: UserService,
-              private readonly customerState: CustomerState,
+              public readonly customerState: CustomerState,
               public readonly cartState: CartState,
               public readonly deviceState: DeviceState,
               public readonly snack: MatSnackBar,
+              public readonly sheet: MatBottomSheet,
               private readonly dialog: MatDialog) {
   }
 
@@ -120,12 +125,14 @@ export class CartComponent implements OnInit {
   @Input() cartdrawer: MatSidenav;
 
   totalCost = 0;
-  discountFormControl = new FormControl(0, [Validators.nullValidator, Validators.min(0)]);
-  customerFormControl = new FormControl('', [Validators.nullValidator, Validators.required, Validators.minLength(1)]);
-  customers: Observable<CustomerModel[]>;
+  discountFormControl = new FormControl(0,
+    [Validators.nullValidator, Validators.min(0)]);
+  customerFormControl = new FormControl('',
+    [Validators.nullValidator, Validators.required, Validators.minLength(1)]);
   selectedCustomer: CustomerModel;
   customersArray: string[];
   checkoutProgress = false;
+  destroyer = new Subject();
   private currentUser: any;
 
   static _getCartItemDiscount(data: { totalDiscount: number, totalItems: number }): number {
@@ -140,13 +147,18 @@ export class CartComponent implements OnInit {
     return isViewedInWholesale ? cart.stock.wholesalePrice : cart.stock.retailPrice;
   }
 
+  ngOnDestroy(): void {
+    this.customerState.customers.next([]);
+    this.destroyer.next('done');
+  }
+
   ngOnInit(): void {
+    this.customerState.fetchCustomers();
     this.getUser();
     this._cartListener();
     this._discountListener();
-    this._getCustomers();
+    // this._getCustomers();
     this._handleCustomerNameControl();
-
   }
 
   private getUser(): void {
@@ -161,23 +173,15 @@ export class CartComponent implements OnInit {
 
   private _handleCustomerNameControl(): void {
     this.customersArray = [];
-    this.customerFormControl.valueChanges.subscribe((enteredName: string) => {
+    this.customerFormControl.valueChanges.pipe(takeUntil(this.destroyer)).subscribe((enteredName: string) => {
       if (enteredName !== null) {
-        let customers = [];
-        try {
-          customers = this.customerState.customers.value.filter(customer => {
-            const name = customer.displayName;
-            return name.toLowerCase().includes(enteredName.toLowerCase());
-          });
-        } catch (e) {
-        }
-        this.customers = of(customers);
+        this.customerState.search(enteredName);
       }
     });
   }
 
   private _cartListener(): void {
-    this.cartState.carts.subscribe(_ => {
+    this.cartState.carts.pipe(takeUntil(this.destroyer)).subscribe(_ => {
       if (!_ || (_ && _.length === 0)) {
         this.cartdrawer.opened = false;
       }
@@ -212,7 +216,7 @@ export class CartComponent implements OnInit {
   }
 
   private _discountListener(): void {
-    this.discountFormControl.valueChanges.subscribe(value => {
+    this.discountFormControl.valueChanges.pipe(takeUntil(this.destroyer)).subscribe(value => {
       if (!value) {
         this._getTotal(0);
       }
@@ -227,6 +231,9 @@ export class CartComponent implements OnInit {
       this.selectedCustomer = {
         displayName: this.customerFormControl.value,
       };
+      this.customerState.saveCustomer({
+        displayName: this.selectedCustomer.displayName,
+      }).catch(console.log);
     }
     if (this.isViewedInWholesale && (!this.selectedCustomer || !this.customerFormControl.valid)) {
       this.snack.open('Please enter customer name, or add a customer', 'Ok', {
@@ -375,25 +382,13 @@ SUB TOTAL : ${cart.amount}, UNIT PRICE ${CartComponent.getPrice(this.isViewedInW
   }
 
   createCustomer() {
-    const dialogRef = this.dialog.open(DialogCreateCustomerComponent, {
-      // height: ,
-      // width: ,
+    if (this.deviceState.isSmallScreen.value === true) {
+      this.sheet.open(SheetCreateCustomerComponent);
+      return;
+    }
+    this.dialog.open(DialogCreateCustomerComponent, {
+      maxWidth: '500px'
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
-  }
-
-  private _getCustomers(): void {
-    this.customerState.customers.subscribe(
-      customers => {
-        if (!customers) {
-          customers = [];
-        }
-        this.customers = of(customers);
-      }
-    );
   }
 
   setSelectedCustomer(customer: CustomerModel) {
