@@ -22,7 +22,6 @@ export class CustomerWorker {
 
   constructor(shop: ShopModel) {
     init(shop);
-    // this.customersCache = ;
     const changes = bfast.database(shop.projectId)
       .table('customers')
       .query()

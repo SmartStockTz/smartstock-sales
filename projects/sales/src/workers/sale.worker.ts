@@ -25,9 +25,10 @@ export class SaleWorker {
 
   constructor(shop: ShopModel) {
     init(shop);
+    this.stocksListening(shop);
   }
 
-  private static async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
+  private async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
     const hashesMap = {};
     if (Array.isArray(localCustomers)) {
       for (const localC of localCustomers) {
@@ -37,17 +38,35 @@ export class SaleWorker {
     return hashesMap;
   }
 
-  private static async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
+  async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
     return bfast.cache({database: shop.projectId, collection: 'stocks'}, shop.projectId).get('all');
   }
 
-  // private static async setProductLocal(customer: StockModel, shop: ShopModel) {
-  //   return bfast.cache({database: shop.projectId, collection: 'stocks'}, shop.projectId).set(customer.id, customer);
-  // }
+  async removeProductLocal(product: StockModel, shop: ShopModel) {
+    const stocks = await this.getProductsLocal(shop);
+    return this.setProductsLocal(stocks.filter(x => x.id !== product.id), shop);
+  }
 
-  private static async setProductsLocal(products: StockModel[], shop: ShopModel) {
-    // for (const customer of customers) {
-    //   await SaleWorker.setProductLocal(customer, shop);
+  async setProductLocal(product: StockModel, shop: ShopModel) {
+    let stocks = await this.getProductsLocal(shop);
+    let update = false;
+    stocks = stocks.map(x => {
+      if (x.id === product.id) {
+        update = true;
+        return product;
+      } else {
+        return x;
+      }
+    });
+    if (update === false) {
+      stocks.push(product);
+    }
+    return this.setProductsLocal(stocks, shop);
+  }
+
+  async setProductsLocal(products: StockModel[], shop: ShopModel) {
+    // for (const product of products) {
+    //   await this.setProductLocal(product, shop);
     // }
     return bfast.cache({database: shop.projectId, collection: 'stocks'}, shop.projectId).set('all', products);
   }
@@ -76,13 +95,25 @@ export class SaleWorker {
     return products;
   }
 
+  private stocksListening(shop: ShopModel) {
+
+  }
+
+  stocksListeningStop(shop) {
+    // for (const client of wss.clients) {
+    // client.close();
+    // console.log(client);
+    // }
+    // self.stop();
+  }
+
   async getProducts(shop: ShopModel): Promise<StockModel[]> {
-    const localProducts: any[] = await SaleWorker.getProductsLocal(shop);
-    if (localProducts && localProducts?.length !== 0) {
-      return localProducts;
-    } else {
-      return this.getProductsRemote(shop);
-    }
+    return await this.getProductsLocal(shop);
+    // if (localProducts && localProducts?.length !== 0) {
+    //   return localProducts.filter(x => x.saleable);
+    // } else {
+    //   return this.getProductsRemote(shop);
+    // }
   }
 
   async saveSale(batchs: BatchModel[], shop: ShopModel): Promise<any> {
@@ -90,9 +121,9 @@ export class SaleWorker {
   }
 
   async getProductsRemote(shop: ShopModel): Promise<StockModel[]> {
-    const localProducts = await SaleWorker.getProductsLocal(shop);
-    const hashesMap = await SaleWorker.productsLocalHashMap(localProducts);
-    let products;
+    const localProducts = await this.getProductsLocal(shop);
+    const hashesMap = await this.productsLocalHashMap(localProducts);
+    let products: StockModel[];
     try {
       products = await this.remoteAllProducts(shop, Object.keys(hashesMap));
       products = this.remoteProductsMapping(products, hashesMap);
@@ -100,12 +131,13 @@ export class SaleWorker {
       console.log(e);
       products = localProducts;
     }
-    await SaleWorker.setProductsLocal(products, shop);
-    return products;
+    await this.setProductsLocal(products, shop);
+    return products.filter(x => x.saleable);
   }
 
   async search(query: string, shop: ShopModel): Promise<StockModel[]> {
-    return [];
+    const stocks = await this.getProductsLocal(shop);
+    return stocks.filter(x => x?.product?.toLowerCase().includes(query.toLowerCase()));
   }
 }
 

@@ -12,11 +12,20 @@ export class SalesState {
 
   fetchProductsProgress = new BehaviorSubject(false);
   saveSaleProgress = new BehaviorSubject(false);
+  searchProgress = new BehaviorSubject(false);
   products = new BehaviorSubject([]);
 
   constructor(private readonly storageService: StorageService,
               private readonly snack: MatSnackBar,
               private readonly saleService: SaleService) {
+  }
+
+  stockListening() {
+    this.saleService.listeningStocks().catch(console.log);
+  }
+
+  stockListingStop() {
+    this.saleService.listeningStocksStop().catch(console.log);
   }
 
   saveSales(sales: SalesModel[]): void {
@@ -37,15 +46,17 @@ export class SalesState {
   }
 
   getProducts(): void {
-    this.fetchProductsProgress.next(true);
+    this.searchProgress.next(true);
     this.saleService.getProducts().then(products => {
-      if (Array.isArray(products)) {
+      if (Array.isArray(products) && products?.length > 0) {
         this.products.next(products);
+      } else {
+        return this.getProductsRemote();
       }
     }).catch(reason => {
       this.message(reason);
     }).finally(() => {
-      this.fetchProductsProgress.next(false);
+      this.searchProgress.next(false);
     });
   }
 
@@ -63,7 +74,7 @@ export class SalesState {
   }
 
   search(query: string): void {
-    this.fetchProductsProgress.next(true);
+    this.searchProgress.next(true);
     this.saleService.search(query).then(products => {
       if (Array.isArray(products)) {
         this.products.next(products);
@@ -71,7 +82,7 @@ export class SalesState {
     }).catch(reason => {
       this.message(reason);
     }).finally(() => {
-      this.fetchProductsProgress.next(false);
+      this.searchProgress.next(false);
     });
   }
 }

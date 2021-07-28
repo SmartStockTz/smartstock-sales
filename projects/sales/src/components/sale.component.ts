@@ -2,8 +2,7 @@ import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, V
 import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {FormControl} from '@angular/forms';
-import {StockModel} from '../models/stock.model';
+import {FormControl, Validators} from '@angular/forms';
 import {DeviceState, LogService, StorageService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import {Subject} from 'rxjs';
@@ -29,16 +28,18 @@ import {takeUntil} from 'rxjs/operators';
                      [hasBackRoute]="true" [backLink]="'/sale/'"
                      searchPlaceholder="Filter product"
                      [searchInputControl]="searchInputControl"
-                     [searchProgressFlag]="salesState.fetchProductsProgress | async"
+                     [searchProgressFlag]="salesState.searchProgress | async"
                      [heading]="isViewedInInvoice ? 'Invoice' :isViewedInWholesale?'WholeSale':'Retail'"
                      [sidenav]="sidenav"
                      [cartDrawer]="cartdrawer"
-                     [showProgress]="salesState.fetchProductsProgress | async">
+                     [showProgress]="salesState.searchProgress | async">
         </app-toolbar>
-        <app-on-fetch [isLoading]="salesState.fetchProductsProgress | async"
+        <app-on-fetch [isLoading]="(salesState.fetchProductsProgress | async)==true"
+                      *ngIf="(salesState.fetchProductsProgress | async)==true"
                       (refreshCallback)="getProductsRemote()">
         </app-on-fetch>
         <cdk-virtual-scroll-viewport style="flex-grow: 1"
+                                     *ngIf="(salesState.fetchProductsProgress | async)===false"
                                      itemSize="{{(deviceState.isSmallScreen | async) ===true?'80': '30'}}">
           <mat-nav-list>
             <app-product-card style="margin: 0 3px; display: inline-block"
@@ -55,7 +56,7 @@ import {takeUntil} from 'rxjs/operators';
         <div class="bottom-actions-container">
           <button mat-button color="primary"
                   style="margin: 16px"
-                  *ngIf="(salesState.fetchProductsProgress | async) === false"
+                  *ngIf="(salesState.fetchProductsProgress | async) === false && showRefreshCart === true"
                   (click)="getProductsRemote()"
                   matTooltip="Refresh products from server"
                   class="mat-fab">
@@ -74,7 +75,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('cartdrawer') cartDrawer: MatDrawer;
   @Input() isViewedInWholesale = true;
   @Input() isViewedInInvoice = false;
-  searchInputControl = new FormControl('');
+  searchInputControl = new FormControl('', [Validators.nullValidator, Validators.required]);
   showRefreshCart = false;
   destroyer = new Subject<any>();
 
@@ -88,10 +89,12 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async ngOnDestroy(): Promise<void> {
+    this.salesState.stockListingStop();
     this.destroyer.next('done');
   }
 
   async ngOnInit(): Promise<void> {
+    this.salesState.stockListening();
     this.salesState.getProducts();
     this.cartState.carts.pipe(
       takeUntil(this.destroyer)
@@ -101,6 +104,8 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getProductsRemote(): void {
+    // this.searchInputControl.reset();
+    // this.salesState.products.next([]);
     this.salesState.getProductsRemote();
   }
 
