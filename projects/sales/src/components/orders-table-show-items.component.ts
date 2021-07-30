@@ -19,7 +19,7 @@ import {OrderModel} from '../models/order.model';
       </mat-list>
       <mat-divider></mat-divider>
       <div style="padding: 8px 0 16px 0">
-        <h3>{{data.order.total | currency:'TZS '}}</h3>
+        <h3>{{data.order.total | fedha | async}}</h3>
       </div>
     </div>
   `

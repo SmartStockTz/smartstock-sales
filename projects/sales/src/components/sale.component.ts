@@ -20,7 +20,7 @@ import {takeUntil} from 'rxjs/operators';
       <mat-sidenav #cartdrawer [fixedInViewport]="false" position="end"
                    [mode]="(deviceState.enoughWidth | async)===true?'side':'over'"
                    [opened]="false">
-        <app-cart [isViewedInWholesale]="isViewedInWholesale" [cartdrawer]="cartdrawer"></app-cart>
+        <app-cart [channel]="isViewedInWholesale?'whole':'retail'" [cartdrawer]="cartdrawer"></app-cart>
       </mat-sidenav>
       <mat-sidenav-content style="display:flex; flex-direction: column">
         <app-toolbar (searchCallback)="filterProduct($event)"

@@ -70,6 +70,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DeleteConfirmDialogComponent} from './components/delete-confirm-dialog.component';
 import {DialogCreateCustomerComponent} from './components/dialog-create-customer.component';
 import {SheetCreateCustomerComponent} from './components/sheet-create-customer.component';
+import { FedhaPipe } from './pipes/fedha.pipe';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -168,7 +169,8 @@ const routes: Routes = [
     CartPreviewComponent,
     DeleteConfirmDialogComponent,
     DialogCreateCustomerComponent,
-    SheetCreateCustomerComponent
+    SheetCreateCustomerComponent,
+    FedhaPipe
   ],
   entryComponents: []
 })

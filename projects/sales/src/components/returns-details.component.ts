@@ -58,7 +58,7 @@ import {MatDialog} from '@angular/material/dialog';
         <div class="d-flex pt-4 align-items-center justify-content-between">
           <h3 class="text-center col-4 ">Total</h3>
           <h2 class="text-white py-3 col-7 col-md-5 col-lg-6 text-center" style="background: #1b5e20;">
-            {{data.amount | currency: ' '}}/=
+            {{data.amount | fedha | async}}/=
           </h2>
         </div>
       </div>

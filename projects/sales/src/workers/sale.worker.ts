@@ -65,9 +65,6 @@ export class SaleWorker {
   }
 
   async setProductsLocal(products: StockModel[], shop: ShopModel) {
-    // for (const product of products) {
-    //   await this.setProductLocal(product, shop);
-    // }
     return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).set('all', products);
   }
 
@@ -96,24 +93,14 @@ export class SaleWorker {
   }
 
   private stocksListening(shop: ShopModel) {
-
   }
 
   stocksListeningStop(shop) {
-    // for (const client of wss.clients) {
-    // client.close();
-    // console.log(client);
-    // }
-    // self.stop();
   }
 
   async getProducts(shop: ShopModel): Promise<StockModel[]> {
-    return await this.getProductsLocal(shop);
-    // if (localProducts && localProducts?.length !== 0) {
-    //   return localProducts.filter(x => x.saleable);
-    // } else {
-    //   return this.getProductsRemote(shop);
-    // }
+    const products = await this.getProductsLocal(shop);
+    return products.filter(x => x.saleable);
   }
 
   async saveSale(batchs: BatchModel[], shop: ShopModel): Promise<any> {
@@ -137,7 +124,9 @@ export class SaleWorker {
 
   async search(query: string, shop: ShopModel): Promise<StockModel[]> {
     const stocks = await this.getProductsLocal(shop);
-    return stocks.filter(x => x?.product?.toLowerCase().includes(query.toLowerCase()));
+    return stocks.filter(x => {
+      return x.saleable && x?.product?.toLowerCase().includes(query.toLowerCase());
+    });
   }
 }
 

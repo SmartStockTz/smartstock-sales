@@ -32,7 +32,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
        </div>
         <div>
           <p class="mb-0">Amount Due</p>
-          <p>{{data.amountDue | currency: ' '}}</p>
+          <p>{{data.amountDue | fedha | async}}</p>
         </div>
       </div>
       <hr class="my-0">

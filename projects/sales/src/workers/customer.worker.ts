@@ -26,7 +26,7 @@ export class CustomerWorker {
       .table('customers')
       .query()
       .changes(() => {
-        // console.log('customer changes connected');
+        console.log('customer changes connected');
         this.syncCustomers(shop).catch(console.log);
         if (this.remoteAllCustomerRunning === false) {
           this.getCustomersRemote(shop)
@@ -35,7 +35,7 @@ export class CustomerWorker {
           // console.log('already fetched');
         }
       }, () => {
-        // console.log('customer changes disconnected');
+        console.log('customer changes disconnected');
       });
     changes.addListener(async response => {
       if (response && response.body && response.body.change) {

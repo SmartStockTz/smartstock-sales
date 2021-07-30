@@ -25,7 +25,7 @@ import {OrdersTableOptionsComponent} from './orders-table-options.component';
         </ng-container>
         <ng-container matColumnDef="amount">
           <th mat-header-cell *cdkHeaderCellDef>Amount</th>
-          <td mat-cell *cdkCellDef="let order">{{order.total | currency:'TZS '}}</td>
+          <td mat-cell *cdkCellDef="let order">{{order.total | fedha | async}}</td>
         </ng-container>
         <!-- <ng-container matColumnDef="paid">
           <th mat-header-cell *cdkHeaderCellDef>Payment</th>
