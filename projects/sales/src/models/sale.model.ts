@@ -32,11 +32,5 @@ export interface SalesModel {
   stock: StockModel;
   batch?: string;
   stockId: string;
-  customerObject: {
-    firstName: string;
-    displayName: string;
-    lastName: string;
-    mobile: string;
-    email: string;
-  };
+  customerObject: CustomerModel;
 }

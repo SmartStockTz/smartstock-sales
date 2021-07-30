@@ -1,6 +1,11 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {CartItemModel} from '../models/cart-item.model';
+import {CartService} from '../services/cart.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {PrintService} from '@smartstocktz/core-libs';
+import {CustomerModel} from '../models/customer.model';
+import {SalesState} from './sales.state';
 
 @Injectable({
   providedIn: 'any'
@@ -8,44 +13,42 @@ import {CartItemModel} from '../models/cart-item.model';
 export class CartState {
   carts = new BehaviorSubject<CartItemModel[]>([]);
   cartTotal = new BehaviorSubject(0);
+  cartTotalItems = new BehaviorSubject(0);
+  checkoutProgress = new BehaviorSubject(false);
+  selectedCustomer = new BehaviorSubject<CustomerModel>(null);
 
-  addToCart(cart: CartItemModel): void {
-    let update = false;
-    this.carts.value.map(x => {
-      if (x.product.id === cart.product.id) {
-        x.quantity += x.quantity + cart.quantity;
-        update = true;
-      }
-      return x;
-    });
-    if (update === false) {
-      this.carts.value.push(cart);
-    }
-    this.carts.next(this.carts.value);
+  constructor(private readonly cartService: CartService,
+              private readonly printService: PrintService,
+              private readonly salesState: SalesState,
+              private readonly snack: MatSnackBar) {
   }
 
-  findTotal(channel: 'retail' | 'whole' | 'credit', discount: any = 0) {
-    const total = this.carts.value.map<number>(value => {
-      let quantity;
-      let price;
-      if (channel === 'retail') {
-        quantity = value.quantity;
-        price = value.product.retailPrice;
-      } else if (channel === 'whole') {
-        quantity = value.quantity;
-        price = value.product.wholesalePrice;
-      } else if (channel === 'credit') {
-        quantity = value.quantity;
-        price = value.product.creditPrice;
-      } else {
-        quantity = value.quantity;
-        price = value.product.retailPrice;
-      }
-      return quantity * price;
-    }).reduce((a, b) => {
-      return a + b;
-    }, discount && !isNaN(discount) ? -Number(discount) : 0);
-    this.cartTotal.next(total);
+  private message(reason) {
+    this.snack.open(reason && reason.message ? reason.message : reason.toString(), 'Ok', {
+      duration: 2000
+    });
+  }
+
+  addToCart(cart: CartItemModel): void {
+    this.cartService.addToCart(this.carts.value, cart).then(value => {
+      this.carts.next(value);
+    }).catch(reason => {
+      this.message(reason);
+    });
+  }
+
+  findTotal(channel: string, discount: any = 0) {
+    this.cartService.findTotal(this.carts.value, channel, discount).then(value => {
+      this.cartTotal.next(value);
+    }).catch(reason => {
+      this.message(reason);
+    });
+  }
+
+  totalItems(): void {
+    this.cartTotalItems.next(
+      this.carts.value.map(cartItem => cartItem.quantity).reduce((a, b) => a + b, 0)
+    );
   }
 
   incrementCartItemQuantity(indexOfProductInCart: number): void {
@@ -67,5 +70,28 @@ export class CartState {
 
   clearCart(): void {
     this.carts.next([]);
+  }
+
+  async checkout(channel: string, discount: number, user: any): Promise<any> {
+    this.checkoutProgress.next(true);
+    this.cartService.checkout(
+      this.carts.value,
+      this.selectedCustomer.value,
+      channel,
+      discount,
+      user
+    ).then(_ => {
+      this.message('Done save sales');
+    }).catch(reason => {
+      this.message(reason);
+      throw reason;
+    }).finally(() => {
+      this.selectedCustomer.next(null);
+      this.checkoutProgress.next(false);
+    });
+  }
+
+  dispose() {
+    this.cartService.stopWorker();
   }
 }

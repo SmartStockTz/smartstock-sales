@@ -4,6 +4,8 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {StockModel} from '../models/stock.model';
 import {BatchModel} from '../models/batch.model';
 import {sha256} from 'crypto-hash';
+import {SecurityUtil} from '@smartstocktz/core-libs';
+import {SalesModel} from '../models/sale.model';
 
 function init(shop: ShopModel) {
   bfast.init({
@@ -25,10 +27,10 @@ export class SaleWorker {
 
   constructor(shop: ShopModel) {
     init(shop);
-    this.stocksListening(shop);
+    // this.stocksListening(shop);
   }
 
-  private async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
+  private static async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
     const hashesMap = {};
     if (Array.isArray(localCustomers)) {
       for (const localC of localCustomers) {
@@ -68,6 +70,18 @@ export class SaleWorker {
     return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).set('all', products);
   }
 
+  async setSalesLocal(batchs: BatchModel[], shop: ShopModel, cartId: string) {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).set(cartId, batchs);
+  }
+
+  async removeSalesLocal(cartId: string, shop: ShopModel) {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId);
+  }
+
+  async getSalesLocal(cartId: string, shop: ShopModel) {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId, true);
+  }
+
   private async remoteAllProducts(shop: ShopModel, hashes: any[] = []): Promise<StockModel[]> {
     this.remoteAllProductsRunning = true;
     return bfast.database(shop.projectId)
@@ -92,9 +106,6 @@ export class SaleWorker {
     return products;
   }
 
-  private stocksListening(shop: ShopModel) {
-  }
-
   stocksListeningStop(shop) {
   }
 
@@ -103,13 +114,27 @@ export class SaleWorker {
     return products.filter(x => x.saleable);
   }
 
-  async saveSale(batchs: BatchModel[], shop: ShopModel): Promise<any> {
-    return Promise.resolve(undefined);
+  async saveSale(sales: SalesModel[], shop: ShopModel, cartId: string): Promise<any> {
+    const batchs = sales.map<BatchModel>(sale => {
+      sale.cartId = cartId;
+      sale.createdAt = new Date();
+      sale.batch = SecurityUtil.generateUUID();
+      return {
+        method: 'POST',
+        body: sale,
+        path: '/classes/sales'
+      };
+    });
+    await this.setSalesLocal(batchs, shop, cartId);
+  }
+
+  private async syncSales(shop: ShopModel) {
+
   }
 
   async getProductsRemote(shop: ShopModel): Promise<StockModel[]> {
     const localProducts = await this.getProductsLocal(shop);
-    const hashesMap = await this.productsLocalHashMap(localProducts);
+    const hashesMap = await SaleWorker.productsLocalHashMap(localProducts);
     let products: StockModel[];
     try {
       products = await this.remoteAllProducts(shop, Object.keys(hashesMap));

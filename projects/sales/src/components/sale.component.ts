@@ -104,58 +104,12 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getProductsRemote(): void {
-    // this.searchInputControl.reset();
-    // this.salesState.products.next([]);
     this.salesState.getProductsRemote();
   }
 
   async filterProduct(query: string): Promise<void> {
     query = query ? query.trim() : '';
     this.salesState.search(query);
-    // if (query === '') {
-    //   this.getProducts();
-    //   this.searchProgressFlag = false;
-    //   return;
-    // }
-    // this.storage.getStocks().then(allStocks => {
-    //   this.searchProgressFlag = false;
-    //   if (allStocks) {
-    //     // get index of stock by barcode
-    //     const index = allStocks.findIndex((x: any) => {
-    //       const barcode = x.barcode ? x.barcode : '';
-    //       return query.trim() === barcode.trim();
-    //     });
-    //     if (index >= 0) {
-    //       this.cartState.addToCart({
-    //         // @ts-ignore
-    //         product: allStocks[index],
-    //         quantity: 1
-    //       });
-    //       this.searchInputControl.setValue('');
-    //       if (this.deviceState.enoughWidth.value === true) {
-    //         this.cartDrawer.open().catch();
-    //       }
-    //     } else {
-    //       // @ts-ignore
-    //       this.products = allStocks.filter((stock: StockModel) => {
-    //           const barcode = stock.barcode ? stock.barcode : '';
-    //           const productName = stock.product ? stock.product : '';
-    //           const resembleProductName = productName.toString().trim().toLowerCase().includes(query.trim().toLowerCase());
-    //           const equalToBarcode = query.trim() === barcode.trim();
-    //           return (resembleProductName || equalToBarcode) && stock.saleable === true;
-    //         }
-    //       );
-    //     }
-    //   } else {
-    //     this.snack.open('No products found, try again or refresh products', 'Ok', {
-    //       duration: 3000
-    //     });
-    //   }
-    // }).catch(reason => {
-    //   this.searchProgressFlag = false;
-    //   this.logger.i(reason);
-    //   this.snack.open(reason, 'Ok');
-    // });
   }
 
   afterAddToCart($event: any): void {
