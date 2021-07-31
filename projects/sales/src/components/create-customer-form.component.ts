@@ -15,8 +15,8 @@ import {CustomerModel} from '../models/customer.model';
         </mat-form-field>
         <mat-form-field appearance="" style="width:100%">
           <mat-label>Phone Number</mat-label>
-          <input type="tel" matInput formControlName="phone" placeholder="Phone Number">
-          <mat-error>Phone Number required</mat-error>
+          <input type="number" minlength="9" matInput formControlName="phone" placeholder="Phone Number">
+          <mat-error>Phone Number required, must be at least 9 digits</mat-error>
         </mat-form-field>
         <mat-form-field appearance="" style="width:100%">
           <mat-label>Email</mat-label>
@@ -68,7 +68,7 @@ export class CreateCustomerComponent implements OnInit {
   ngOnInit() {
     this.createCustomerForm = this.formBuilder.group({
       displayName: [this.customer?.displayName, [Validators.nullValidator, Validators.required]],
-      phone: [this.customer?.phone, [Validators.nullValidator, Validators.required]],
+      phone: [this.customer?.phone, [Validators.nullValidator, Validators.required, Validators.minLength(9)]],
       email: [this.customer?.email],
       company: [this.customer?.company],
       tin: [this.customer?.tin],

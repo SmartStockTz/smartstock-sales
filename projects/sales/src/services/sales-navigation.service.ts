@@ -25,11 +25,11 @@ export class SalesNavigationService {
           roles: ['*'],
           link: '/sale/whole'
         },
-        // {
-        //   name: 'Orders',
-        //   roles: ['*'],
-        //   link: '/sale/order'
-        // },
+        {
+          name: 'Orders',
+          roles: ['*'],
+          link: '/sale/order'
+        },
         // {
         //   name: 'Credit sale',
         //   roles: ['*'],

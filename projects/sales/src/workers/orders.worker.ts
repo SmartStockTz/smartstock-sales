@@ -48,8 +48,8 @@ export class OrdersWorker {
     return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).set(order.order.id, order);
   }
 
-  private static async removeOrderLocalSync(order: OrderModel, shop: ShopModel) {
-    return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).remove(order.id, true);
+  private static async removeOrderLocalSync(order: OrderSyncModel, shop: ShopModel) {
+    return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).remove(order.order.id, true);
   }
 
   private static async getOrdersLocalSync(shop: ShopModel): Promise<OrderSyncModel[]> {
@@ -203,7 +203,7 @@ export class OrdersWorker {
                 .delete();
             }
             // console.log(order);
-            await OrdersWorker.removeOrderLocalSync(order.order, shop);
+            await OrdersWorker.removeOrderLocalSync(order, shop);
           } catch (e) {
             console.log(e);
           }
@@ -214,6 +214,7 @@ export class OrdersWorker {
   }
 
   async saveOrder(
+    id: string,
     carts: CartItemModel[],
     customer: CustomerModel,
     channel: string,
@@ -223,7 +224,7 @@ export class OrdersWorker {
     const orderSync: OrderSyncModel = {
       action: 'upsert',
       order: {
-        id: SecurityUtil.generateUUID(),
+        id: id ? id : SecurityUtil.generateUUID(),
         createdAt: new Date(),
         channel: channel ? channel : 'retail',
         customer,
@@ -262,18 +263,50 @@ export class OrdersWorker {
       orders = localOrders;
     }
     await this.setOrdersLocal(orders, shop);
-    return orders;
+    return orders.sort((a, b) => {
+      if (a.createdAt > b.createdAt) {
+        return -1;
+      } else if (a.createdAt < b.createdAt) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   async getOrders(shop: ShopModel): Promise<CustomerModel[]> {
-    const models: any[] = await this.getOrdersLocal(shop);
-    if (Array.isArray(models) && models.length !== 0) {
-      return models;
+    const orders: any[] = await this.getOrdersLocal(shop);
+    if (Array.isArray(orders) && orders.length !== 0) {
+      return orders.sort((a, b) => {
+        if (a.createdAt > b.createdAt) {
+          return -1;
+        } else if (a.createdAt < b.createdAt) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     } else {
       return this.getOrdersRemote(shop);
     }
   }
 
+  async search(query: string, shop: ShopModel): Promise<any> {
+    const localOrders: any[] = await this.getOrdersLocal(shop);
+    if (Array.isArray(localOrders)) {
+      return localOrders.filter(y => JSON.stringify(y).toLowerCase().includes(query.toLowerCase()));
+    } else {
+      return [];
+    }
+  }
+
+  async deleteOrder(order: OrderModel, shop: ShopModel): Promise<any> {
+    await OrdersWorker.setOrderSyncLocal({
+      order,
+      action: 'delete'
+    }, shop);
+    await this.removeOrderLocal(order.id, shop);
+  }
 }
 
 expose(OrdersWorker);

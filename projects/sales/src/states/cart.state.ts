@@ -7,6 +7,8 @@ import {PrintService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {SalesState} from './sales.state';
 import {OrderService} from '../services/order.service';
+import {OrderModel} from '../models/order.model';
+
 
 @Injectable({
   providedIn: 'any'
@@ -17,6 +19,7 @@ export class CartState {
   cartTotalItems = new BehaviorSubject(0);
   checkoutProgress = new BehaviorSubject(false);
   selectedCustomer = new BehaviorSubject<CustomerModel>(null);
+  cartOrder = new BehaviorSubject<OrderModel>(null);
 
   constructor(private readonly cartService: CartService,
               private readonly printService: PrintService,
@@ -82,7 +85,14 @@ export class CartState {
       channel,
       discount,
       user
-    ).then(_ => {
+    ).then(_12 => {
+      if (this.cartOrder.value?.id) {
+        return this.orderService.deleteOrder(this.cartOrder.value);
+      } else {
+        return _12;
+      }
+    }).then(_ => {
+      this.cartOrder.next(null);
       this.message('Done save sales');
     }).catch(reason => {
       this.message(reason);
@@ -95,16 +105,22 @@ export class CartState {
 
   dispose() {
     this.cartService.stopWorker();
+    if (this.cartOrder.value?.id) {
+      this.carts.next([]);
+      this.cartOrder.next(null);
+    }
   }
 
   saveOrder(channel: string, user: any): Promise<any> {
     this.checkoutProgress.next(true);
     return this.orderService.saveOrder(
+      this.cartOrder.value?.id,
       this.carts.value,
       channel,
       this.selectedCustomer.value,
       user
     ).then(_ => {
+      this.cartOrder.next(null);
       this.message('Done save order');
     }).catch(reason => {
       // console.log(reason);
