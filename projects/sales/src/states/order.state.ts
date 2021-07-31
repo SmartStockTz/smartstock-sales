@@ -19,11 +19,13 @@ export class OrderState {
               private readonly messageService: MessageService) {
   }
 
-  getOrder(size = 20, skip = 0): void {
+  getOrder(): void {
     this.getOrderFlag.next(true);
-    this.orderService.getOrders(size, skip).then(value => {
-      this.orders.value.push(...value);
-      this.orders.next(this.orders.value);
+    this.orderService.getOrders().then(value => {
+      if (value && Array.isArray(value)) {
+        this.orders.value.push(...value);
+        this.orders.next(this.orders.value);
+      }
     }).catch(_ => {
       this.logger.i(_);
       this.messageService.showMobileInfoMessage('Fails to fetch orders', 2000, 'bottom');

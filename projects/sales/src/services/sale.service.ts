@@ -20,50 +20,49 @@ export class SaleService {
 
   }
 
-  private async initClass(shop: ShopModel) {
+  async startWorker(shop: ShopModel) {
     if (!this.saleWorker) {
-      this.saleWorkerNative = new Worker(new URL('../workers/sale.worker', import.meta.url));
+      this.saleWorkerNative = new Worker(new URL('../workers/sale.worker', import .meta.url));
       const SW = wrap(this.saleWorkerNative) as unknown as any;
       this.saleWorker = await new SW(shop);
     }
   }
 
   stopWorker() {
-    // if (this.saleWorkerNative) {
-    //   this.saleWorkerNative.terminate();
-    //   this.saleWorker = undefined;
-    //   this.saleWorkerNative = undefined;
-    // }
+    if (this.saleWorkerNative) {
+      this.saleWorkerNative.terminate();
+      this.saleWorker = undefined;
+      this.saleWorkerNative = undefined;
+    }
   }
 
   async getProducts(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     return this.saleWorker.getProducts(shop);
   }
 
   async saveSale(sales: SalesModel[]) {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     const cartId = SecurityUtil.generateUUID();
     return this.saleWorker.saveSale(sales, shop, cartId);
   }
 
   async getProductsRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     return this.saleWorker.getProductsRemote(shop);
   }
 
   async search(query: string): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     return this.saleWorker.search(query, shop);
   }
 
   async listeningStocks(): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    // await this.initClass(shop);
     this.changes = bfast.database(shop.projectId)
       .table('stocks')
       .query()
@@ -94,13 +93,13 @@ export class SaleService {
 
   private async setProductLocal(product: StockModel) {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     await this.saleWorker.setProductLocal(product, shop);
   }
 
   private async removeProductLocal(product: StockModel) {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
+    await this.startWorker(shop);
     await this.saleWorker.removeProductLocal(product, shop);
   }
 }

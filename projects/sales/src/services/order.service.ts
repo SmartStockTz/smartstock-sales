@@ -1,28 +1,64 @@
 import {Injectable} from '@angular/core';
-import {SecurityUtil, StorageService, toSqlDate} from '@smartstocktz/core-libs';
-import {BFast} from 'bfastjs';
+import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {bfast, BFast} from 'bfastjs';
 import {OrderModel} from '../models/order.model';
+import {CustomerModel} from '../models/customer.model';
+import {OrdersWorker} from '../workers/orders.worker';
+import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
+import {wrap} from 'comlink';
+import {CartItemModel} from '../models/cart-item.model';
 
 @Injectable({
-  providedIn: 'any'
+  providedIn: 'root'
 })
 export class OrderService {
+  private ordersWorker: OrdersWorker;
+  private ordersWorkerNative;
 
-  constructor(private readonly storageService: StorageService) {
+  constructor(private readonly userService: UserService) {
   }
 
-  async getOrders(size = 20, skip = 0): Promise<OrderModel[]> {
-    const shop = await this.storageService.getActiveShop();
-    const orders = await BFast.database(shop.projectId).collection('orders')
-      .query()
-      .skip(skip)
-      .size(size)
-      .orderBy('_created_at', -1)
-      .find<OrderModel[]>();
-    return orders.map<OrderModel>(x => {
-      x.displayName = x.user.displayName;
-      return x;
-    });
+  async startWorker(shop: ShopModel) {
+    if (!this.ordersWorker) {
+      this.ordersWorkerNative = new Worker(new URL('../workers/orders.worker', import .meta.url));
+      const SW = wrap(this.ordersWorkerNative) as unknown as any;
+      this.ordersWorker = await new SW(shop);
+    }
+  }
+
+  stopWorker() {
+    if (this.ordersWorkerNative) {
+      this.ordersWorkerNative.terminate();
+      this.ordersWorker = undefined;
+      this.ordersWorkerNative = undefined;
+    }
+  }
+
+  async saveOrder(carts: CartItemModel[], channel: string, selectedCustomer: CustomerModel, user: any): Promise<any> {
+    if (!selectedCustomer || !selectedCustomer?.displayName) {
+      throw {message: 'Please select a customer to save the order'};
+    }
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.saveOrder(
+      carts,
+      selectedCustomer,
+      channel,
+      user,
+      shop
+    );
+  }
+
+  async getOrders(): Promise<CustomerModel[]> {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.getOrders(shop);
+  }
+
+  async getRemoteOrders(): Promise<CustomerModel[]> {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.getOrdersRemote(shop);
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
@@ -35,7 +71,7 @@ export class OrderService {
   }
 
   async markAsCompleted(order: OrderModel): Promise<any> {
-    const shop = await this.storageService.getActiveShop();
+    const shop = await this.userService.getCurrentShop();
     return BFast.database(shop.projectId).transaction()
       .update('orders', {
         query: {
@@ -48,7 +84,7 @@ export class OrderService {
           }
         }
       })
-      .create('sales', order.carts.map(x => {
+      .create('sales', order.items.map(x => {
         const quantity = x.quantity;
         return {
           amount: quantity * x.product.retailPrice,
@@ -65,7 +101,7 @@ export class OrderService {
           stockId: x.product.id
         };
       }))
-      .update('stocks', order.carts
+      .update('stocks', order.items
         .filter(x => x.product.stockable === true)
         .map(y => {
           return {
@@ -89,7 +125,7 @@ export class OrderService {
   }
 
   async markOrderAsCancelled(order: OrderModel): Promise<any> {
-    const shop = await this.storageService.getActiveShop();
+    const shop = await this.userService.getCurrentShop();
 
     return BFast.database(shop.projectId).collection('orders')
       .query()
@@ -100,7 +136,7 @@ export class OrderService {
   }
 
   async markAsProcessed(order: OrderModel): Promise<any> {
-    const shop = await this.storageService.getActiveShop();
+    const shop = await this.userService.getCurrentShop();
 
     return BFast.database(shop.projectId).collection('orders')
       .query()
@@ -108,5 +144,17 @@ export class OrderService {
       .updateBuilder()
       .set('status', 'PROCESSED')
       .update();
+  }
+
+  private async setOrderLocal(snapshot: OrderModel) {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.setOrderLocal(snapshot, shop);
+  }
+
+  private async removeOrderLocal(snapshot: OrderModel) {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.removeOrderLocal(snapshot.id, shop);
   }
 }

@@ -1,9 +1,8 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {MatSidenav} from '@angular/material/sidenav';
-import {SalesState} from '../states/sales.state';
 import {CustomerState} from '../states/customer.state';
-import {DeviceState, PrintService, SettingsService, UserService} from '@smartstocktz/core-libs';
+import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import {CustomerModel} from '../models/customer.model';
 import {MatDialog} from '@angular/material/dialog';
@@ -13,6 +12,7 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {DialogCashSaleCartOptionsComponent} from './dialog-cash-sale-cart-options.component';
 
 @Component({
   selector: 'app-cart',
@@ -45,7 +45,7 @@ import {takeUntil} from 'rxjs/operators';
           </button>
         </div>
       </div>
-      <div style="margin-bottom: 300px">
+      <div style="padding-bottom: 500px">
         <mat-list>
           <div *ngFor="let cart of cartState.carts | async; let i=index">
             <mat-list-item>
@@ -86,14 +86,23 @@ import {takeUntil} from 'rxjs/operators';
                    type="number" min="0" [formControl]="discountFormControl">
           </p>
         </div>
-        <button [disabled]="cartState.checkoutProgress | async" (click)="checkout()"
-                style="width: 100%;text-align:left;height: 48px;font-size: 18px" color="primary"
-                mat-raised-button>
-          <span style="float: left;">{{cartState.cartTotal | async | fedha | async}}</span>
-          <mat-progress-spinner color="primary" *ngIf="cartState.checkoutProgress | async" mode="indeterminate" diameter="25"
-                                style="display: inline-block"></mat-progress-spinner>
-          <span style="float: right" *ngIf="(cartState.checkoutProgress | async)===false">Checkout</span>
-        </button>
+        <div class="checkout-container">
+          <button [disabled]="(cartState.checkoutProgress | async)===true" (click)="checkout()"
+                  style="width: 100%;text-align:left;height: 48px;font-size: 18px" color="primary"
+                  mat-flat-button>
+            <span style="float: left;">{{cartState.cartTotal | async | fedha | async}}</span>
+            <mat-progress-spinner *ngIf="(cartState.checkoutProgress | async)===true"
+                                  mode="indeterminate"
+                                  diameter="25"
+                                  style="display: inline-block; float: right">
+            </mat-progress-spinner>
+            <span style="float: right" *ngIf="(cartState.checkoutProgress | async)===false">Checkout</span>
+          </button>
+          <button *ngIf="(cartState.checkoutProgress | async)===false"
+                  (click)="openOptions()" mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </div>
       </div>
     </div>
   `,
@@ -113,10 +122,7 @@ export class CartComponent implements OnInit, OnDestroy {
   destroyer = new Subject();
   currentUser: any;
 
-  constructor(private readonly salesState: SalesState,
-              private readonly settingsService: SettingsService,
-              private readonly printService: PrintService,
-              private readonly userService: UserService,
+  constructor(public readonly userService: UserService,
               public readonly customerState: CustomerState,
               public readonly cartState: CartState,
               public readonly deviceState: DeviceState,
@@ -194,6 +200,7 @@ export class CartComponent implements OnInit, OnDestroy {
       .then(() => {
         this.discountFormControl.setValue(null);
         this.customerFormControl.setValue(null);
+        this.setSelectedCustomer(null);
         this.cartState.carts.next([]);
       })
       .catch(console.log);
@@ -211,5 +218,26 @@ export class CartComponent implements OnInit, OnDestroy {
 
   setSelectedCustomer(customer: CustomerModel) {
     this.cartState.selectedCustomer.next(customer);
+  }
+
+  openOptions() {
+    this.dialog.open(DialogCashSaleCartOptionsComponent, {
+      closeOnNavigation: true
+    }).afterClosed().subscribe(value => {
+      switch (value) {
+        case 'order':
+          this.cartState.saveOrder(this.channel, this.currentUser)
+            .then(_3 => {
+              this.cartState.clearCart();
+              this.discountFormControl.setValue(0);
+              this.customerFormControl.reset(null);
+              this.setSelectedCustomer(null);
+            }).catch(console.log);
+          return;
+        case 'print':
+          this.cartState.printOnly(this.channel, this.discountFormControl.value).catch(console.log);
+          return;
+      }
+    });
   }
 }

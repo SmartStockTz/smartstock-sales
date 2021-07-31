@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {PrintService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {SalesState} from './sales.state';
+import {OrderService} from '../services/order.service';
 
 @Injectable({
   providedIn: 'any'
@@ -19,6 +20,7 @@ export class CartState {
 
   constructor(private readonly cartService: CartService,
               private readonly printService: PrintService,
+              private readonly orderService: OrderService,
               private readonly salesState: SalesState,
               private readonly snack: MatSnackBar) {
   }
@@ -93,5 +95,41 @@ export class CartState {
 
   dispose() {
     this.cartService.stopWorker();
+  }
+
+  saveOrder(channel: string, user: any): Promise<any> {
+    this.checkoutProgress.next(true);
+    return this.orderService.saveOrder(
+      this.carts.value,
+      channel,
+      this.selectedCustomer.value,
+      user
+    ).then(_ => {
+      this.message('Done save order');
+    }).catch(reason => {
+      // console.log(reason);
+      this.message(reason);
+      throw reason;
+    }).finally(() => {
+      this.checkoutProgress.next(false);
+    });
+  }
+
+  async printOnly(channel: string, discount: number): Promise<any> {
+    this.checkoutProgress.next(true);
+    return this.cartService.printCart(
+      this.carts.value,
+      channel,
+      discount,
+      this.selectedCustomer.value
+    ).then(_ => {
+      this.message('Done print cart');
+    }).catch(reason => {
+      this.message(reason);
+      throw reason;
+    }).finally(() => {
+      // this.selectedCustomer.next(null);
+      this.checkoutProgress.next(false);
+    });
   }
 }

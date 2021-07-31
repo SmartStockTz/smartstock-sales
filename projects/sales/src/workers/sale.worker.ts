@@ -22,13 +22,15 @@ function init(shop: ShopModel) {
 }
 
 export class SaleWorker {
-
-  remoteAllProductsRunning = false;
+  private static shouldSaleSyncInit;
 
   constructor(shop: ShopModel) {
     init(shop);
-    // this.stocksListening(shop);
+    this.syncSales();
   }
+
+  remoteAllProductsRunning = false;
+  shouldSaleSync = true;
 
   private static async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
     const hashesMap = {};
@@ -38,6 +40,33 @@ export class SaleWorker {
       }
     }
     return hashesMap;
+  }
+
+  private static async getShops() {
+    try {
+      const user = await bfast.auth().currentUser();
+      if (user && user.shops && Array.isArray(user.shops)) {
+        const shops: ShopModel[] = [...user.shops];
+        shops.push({
+          applicationId: user.applicationId,
+          projectId: user.projectId,
+          settings: user.settings,
+          category: user.category,
+          businessName: user.businessName,
+          country: user.country,
+          ecommerce: user.ecommerce,
+          rsa: user.rsa,
+          masterKey: user.masterKey,
+          region: user.region,
+          street: user.street
+        });
+        return shops;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
   }
 
   async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
@@ -71,14 +100,25 @@ export class SaleWorker {
   }
 
   async setSalesLocal(batchs: BatchModel[], shop: ShopModel, cartId: string) {
+    if (batchs?.length === 0) {
+      return;
+    }
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).set(cartId, batchs);
   }
 
-  async removeSalesLocal(cartId: string, shop: ShopModel) {
-    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId);
+  async getSalesLocal(shop: ShopModel) {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).getAll();
   }
 
-  async getSalesLocal(cartId: string, shop: ShopModel) {
+  async getSaleLocal(id: string, shop: ShopModel): Promise<any[]> {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).get(id);
+  }
+
+  async getSalesLocalKeys(shop: ShopModel) {
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).keys();
+  }
+
+  async removeSalesLocal(cartId: string, shop: ShopModel) {
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId, true);
   }
 
@@ -128,8 +168,65 @@ export class SaleWorker {
     await this.setSalesLocal(batchs, shop, cartId);
   }
 
-  private async syncSales(shop: ShopModel) {
+  private async saveSaleRemote(): Promise<string> {
+    const shops = await SaleWorker.getShops();
+    for (const shop of shops) {
+      bfast.init({
+        applicationId: shop.applicationId,
+        projectId: shop.projectId,
+        adapters: {
+          auth: 'DEFAULT'
+        }
+      }, shop.projectId);
+      const salesKeys: string[] = await this.getSalesLocalKeys(shop);
+      // const sales: Array<BatchModel[]> = await this.getSalesLocal(shop); // bfast.cache({database: 'sales', collection: shop.projectId});
+      // console.log(sales);
+      if (salesKeys && Array.isArray(salesKeys) && salesKeys.length > 0) {
+        for (const key of salesKeys) {
+          const sale: BatchModel[] = await this.getSaleLocal(key, shop);
+          if (sale && Array.isArray(sale) && sale.length > 0) {
+            // console.log(sale);
+            await bfast.functions(shop.projectId)
+              .request(`https://${shop.projectId}-daas.bfast.fahamutech.com/functions/sales`)
+              .post({
+                requests: sale
+              });
+            await this.removeSalesLocal(key, shop);
+          }
+          // else {
+          //   await this.removeSalesLocal(sale[0].cartId, shop);
+          // }
+        }
+      }
+    }
+    return 'Done';
+  }
 
+  private syncSales() {
+    // if (SaleWorker.shouldSaleSyncInit) {
+    //   // console.log('order sync running');
+    //   return;
+    // }
+    // const id = Math.random();
+    // this.shouldSaleSyncInit = false;
+    console.log('sales sync started');
+    setInterval(_ => {
+      // console.log(id, '******');
+      if (this.shouldSaleSync === true) {
+        this.shouldSaleSync = false;
+        this.saveSaleRemote()
+          .then(_1 => {
+          })
+          .catch(_2 => {
+            console.log(_2);
+          })
+          .finally(() => {
+            this.shouldSaleSync = true;
+          });
+      } else {
+        // console.log('another save sales routine run');
+      }
+    }, 3000);
   }
 
   async getProductsRemote(shop: ShopModel): Promise<StockModel[]> {
@@ -153,6 +250,7 @@ export class SaleWorker {
       return x.saleable && x?.product?.toLowerCase().includes(query.toLowerCase());
     });
   }
+
 }
 
 expose(SaleWorker);

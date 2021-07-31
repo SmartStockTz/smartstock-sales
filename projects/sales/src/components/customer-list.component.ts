@@ -96,7 +96,7 @@ import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
 
     <app-data-not-ready *ngIf="noData"></app-data-not-ready>
   `,
-  styleUrls: ['../styles/customers-table.style.scss']
+  styleUrls: ['../styles/customers-table.style.css']
 })
 export class CustomerListComponent implements OnInit, OnDestroy, AfterViewInit {
   noData = false;

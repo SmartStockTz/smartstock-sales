@@ -44,7 +44,7 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
       </ng-template>
     </app-layout-sidenav>
   `,
-  styleUrls: ['../styles/customers-page.style.scss']
+  styleUrls: ['../styles/customers-page.style.css']
 })
 export class CustomersPage implements OnInit {
   constructor(private readonly dialog: MatDialog,

@@ -84,17 +84,17 @@ export class CustomerWorker {
   }
 
   private static async setCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
-    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).set(customer.id, customer);
+    return bfast.cache({database: 'customers', collection: 'customers_sync'}, shop.projectId).set(customer.id, customer);
   }
 
   private static async getCustomersLocalSync(shop: ShopModel) {
     // console.log('******');
-    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).getAll();
+    return bfast.cache({database: 'customers', collection: 'customers_sync'}, shop.projectId).getAll();
   }
 
   private static async removeCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
     // console.log(customer);
-    return bfast.cache({database: 'customersSync', collection: 'customersSync'}, shop.projectId).remove(customer.id, true);
+    return bfast.cache({database: 'customers', collection: 'customers_sync'}, shop.projectId).remove(customer.id, true);
   }
 
   private static async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {

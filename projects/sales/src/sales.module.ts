@@ -29,7 +29,7 @@ import {SaleComponent} from './components/sale.component';
 import {CartPreviewComponent} from './components/cart-preview.component';
 import {RouterModule, ROUTES, Routes} from '@angular/router';
 import {WholePageComponent} from './pages/whole.page';
-import {LibModule} from '@smartstocktz/core-libs';
+import {LibModule, UserService} from '@smartstocktz/core-libs';
 import {IndexPage} from './pages/index.page';
 import {OrderPage} from './pages/order.page';
 import {OrdersTableComponent} from './components/orders-table.component';
@@ -70,7 +70,11 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {DeleteConfirmDialogComponent} from './components/delete-confirm-dialog.component';
 import {DialogCreateCustomerComponent} from './components/dialog-create-customer.component';
 import {SheetCreateCustomerComponent} from './components/sheet-create-customer.component';
-import { FedhaPipe } from './pipes/fedha.pipe';
+import {FedhaPipe} from './pipes/fedha.pipe';
+import {DialogCashSaleCartOptionsComponent} from './components/dialog-cash-sale-cart-options.component';
+import {CashSaleCartOptionsComponent} from './components/cash-sale-cart-options.component';
+import {OrderService} from './services/order.service';
+import {SaleService} from './services/sale.service';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -170,13 +174,22 @@ const routes: Routes = [
     DeleteConfirmDialogComponent,
     DialogCreateCustomerComponent,
     SheetCreateCustomerComponent,
-    FedhaPipe
+    FedhaPipe,
+    DialogCashSaleCartOptionsComponent,
+    CashSaleCartOptionsComponent
   ],
   entryComponents: []
 })
 export class SalesModule {
-  constructor(private readonly salesNav: SalesNavigationService) {
+  constructor(private readonly salesNav: SalesNavigationService,
+              private readonly ordersService: OrderService,
+              private readonly userService: UserService,
+              private readonly salesService: SaleService) {
     this.salesNav.init();
     this.salesNav.selected();
+    this.userService.getCurrentShop().then(async shop => {
+      // await salesService.startWorker(shop);
+      await this.ordersService.startWorker(shop);
+    }).catch(console.log);
   }
 }

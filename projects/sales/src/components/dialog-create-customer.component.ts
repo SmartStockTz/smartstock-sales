@@ -13,7 +13,7 @@ import {CustomerModel} from '../models/customer.model';
       </app-create-customer-form>
     </div>
   `,
-  styleUrls: ['../styles/customers-table.style.scss']
+  styleUrls: ['../styles/customers-table.style.css']
 })
 
 export class DialogCreateCustomerComponent {
