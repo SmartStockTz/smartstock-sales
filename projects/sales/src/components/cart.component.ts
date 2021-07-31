@@ -138,6 +138,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.customerFormControl.setValue(this.cartState.cartOrder.value?.customer?.displayName);
     this.customerState.fetchCustomers();
     this.getUser();
     this.cartListener();

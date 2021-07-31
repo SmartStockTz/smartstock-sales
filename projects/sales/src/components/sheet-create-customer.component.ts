@@ -2,6 +2,7 @@ import {Component, Inject} from '@angular/core';
 import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {CustomerModel} from '../models/customer.model';
 
+// @dynamic
 @Component({
   selector: 'app-sheet-create-customer',
   template: `
@@ -10,7 +11,7 @@ import {CustomerModel} from '../models/customer.model';
                               [customer]="data?.customer">
     </app-create-customer-form>
   `,
-  styleUrls: ['']
+  styleUrls: []
 })
 
 export class SheetCreateCustomerComponent {

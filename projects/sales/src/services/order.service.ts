@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
-import {bfast, BFast} from 'bfastjs';
+import {BFast} from 'bfastjs';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrdersWorker} from '../workers/orders.worker';
@@ -34,13 +34,20 @@ export class OrderService {
     }
   }
 
-  async saveOrder(carts: CartItemModel[], channel: string, selectedCustomer: CustomerModel, user: any): Promise<any> {
+  async saveOrder(
+    id: string,
+    carts: CartItemModel[],
+    channel: string,
+    selectedCustomer: CustomerModel,
+    user: any
+  ): Promise<any> {
     if (!selectedCustomer || !selectedCustomer?.displayName) {
       throw {message: 'Please select a customer to save the order'};
     }
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
     return this.ordersWorker.saveOrder(
+      id,
       carts,
       selectedCustomer,
       channel,
@@ -156,5 +163,17 @@ export class OrderService {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
     return this.ordersWorker.removeOrderLocal(snapshot.id, shop);
+  }
+
+  async search(query: string): Promise<any> {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.search(query, shop);
+  }
+
+  async deleteOrder(order: OrderModel): Promise<any> {
+    const shop = await this.userService.getCurrentShop();
+    await this.startWorker(shop);
+    return this.ordersWorker.deleteOrder(order, shop);
   }
 }

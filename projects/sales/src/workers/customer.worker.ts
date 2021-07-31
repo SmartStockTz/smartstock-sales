@@ -71,16 +71,36 @@ export class CustomerWorker {
   }
 
   private static async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).getAll();
+    const customers = await bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).get('all');
     // const localCustomers: any[] = await this.customersCache.get('_all');
+    if (Array.isArray(customers)) {
+      return customers;
+    } else {
+      return [];
+    }
   }
 
   private static async removeCustomerLocal(id: string, shop: ShopModel) {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).remove(id, true);
+    // return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).remove(id, true);
+    const customers = await this.getCustomersLocal(shop);
+    return this.setCustomersLocal(customers.filter(x => x.id !== id), shop);
   }
 
   private static async setCustomerLocal(customer: CustomerModel, shop: ShopModel) {
-    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).set(customer.id, customer);
+    let customers = await this.getCustomersLocal(shop);
+    let update = false;
+    customers = customers.map(x => {
+      if (x.id === customer.id) {
+        update = true;
+        return customer;
+      } else {
+        return x;
+      }
+    });
+    if (update === false) {
+      customers.push(customer);
+    }
+    return this.setCustomersLocal(customers, shop);
   }
 
   private static async setCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
@@ -98,9 +118,10 @@ export class CustomerWorker {
   }
 
   private static async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {
-    for (const customer of customers) {
-      await CustomerWorker.setCustomerLocal(customer, shop);
-    }
+    return bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).set('all', customers);
+    // for (const customer of customers) {
+    //   await CustomerWorker.setCustomerLocal(customer, shop);
+    // }
   }
 
   private async syncCustomers(shop: ShopModel) {

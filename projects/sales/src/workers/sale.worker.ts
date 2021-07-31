@@ -22,7 +22,6 @@ function init(shop: ShopModel) {
 }
 
 export class SaleWorker {
-  private static shouldSaleSyncInit;
 
   constructor(shop: ShopModel) {
     init(shop);

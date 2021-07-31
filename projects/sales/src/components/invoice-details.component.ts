@@ -1,7 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MatBottomSheetRef, MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 import {MatTableDataSource} from '@angular/material/table';
-import {InvoiceModel} from '../models/invoice.model';
 
 @Component({
   selector: 'app-invoice-details',

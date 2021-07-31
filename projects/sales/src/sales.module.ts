@@ -32,15 +32,12 @@ import {WholePageComponent} from './pages/whole.page';
 import {LibModule, UserService} from '@smartstocktz/core-libs';
 import {IndexPage} from './pages/index.page';
 import {OrderPage} from './pages/order.page';
-import {OrdersTableComponent} from './components/orders-table.component';
 import {CdkTableModule} from '@angular/cdk/table';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatChipsModule} from '@angular/material/chips';
-import {OrdersTableActionsComponent} from './components/orders-table-actions.component';
 import {OrderPaymentStatusComponent} from './components/order-payment-status.component';
-import {OrdersTableOptionsComponent} from './components/orders-table-options.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
-import {OrdersTableShowItemsComponent} from './components/orders-table-show-items.component';
+import {OrdersItemsComponent} from './components/orders-items.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
@@ -75,6 +72,8 @@ import {DialogCashSaleCartOptionsComponent} from './components/dialog-cash-sale-
 import {CashSaleCartOptionsComponent} from './components/cash-sale-cart-options.component';
 import {OrderService} from './services/order.service';
 import {SaleService} from './services/sale.service';
+import {OrderListComponent} from './components/order-list.component';
+import {DialogNewOrderComponent} from './components/dialog-new-order.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -158,13 +157,10 @@ const routes: Routes = [
     CreateCreditorComponent,
     PayByInvoicesComponent,
     InvoiceIndexPage,
-    OrdersTableShowItemsComponent,
-    OrdersTableOptionsComponent,
+    OrdersItemsComponent,
     OrderPaymentStatusComponent,
-    OrdersTableActionsComponent,
     IndexPage,
     OrderPage,
-    OrdersTableComponent,
     WholePageComponent,
     CartComponent,
     ProductComponent,
@@ -176,7 +172,9 @@ const routes: Routes = [
     SheetCreateCustomerComponent,
     FedhaPipe,
     DialogCashSaleCartOptionsComponent,
-    CashSaleCartOptionsComponent
+    CashSaleCartOptionsComponent,
+    OrderListComponent,
+    DialogNewOrderComponent
   ],
   entryComponents: []
 })
