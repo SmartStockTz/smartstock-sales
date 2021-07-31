@@ -1,12 +1,25 @@
+import {CartItemModel} from './cart-item.model';
+import {CustomerModel} from './customer.model';
+
 export interface OrderModel {
   paid?: boolean;
-  displayName?: string;
   id?: string;
+  createdAt?: any;
+  updatedAt?: any;
   total?: number;
-  mobile?: number;
-  date?: string;
-  carts?: {quantity: number, product: any}[];
-  user?: any;
+  date?: any;
+  orderRef?: string;
+  channel?: string;
+  items?: CartItemModel[];
+  customer?: CustomerModel;
+  shipping?: {
+    mobile?: string;
+    location?: any;
+  };
+  placedBy?: {
+    username: string;
+    firstname: string;
+    lastname: string
+  };
   status?: 'PROCESSED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED' ;
-  complete?: boolean;
 }

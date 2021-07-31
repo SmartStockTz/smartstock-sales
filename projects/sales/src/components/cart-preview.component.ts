@@ -10,7 +10,7 @@ import {CartState} from '../states/cart.state';
     <div style="padding: 16px" [ngClass]="isMobile?'fixed-bottom':!enoughWidth()?'fixed-bottom-web-enough-width':'fixed-bottom-web'"
          *ngIf="(cartState.carts | async).length  > 0">
       <button (click)="showMainCart()" mat-flat-button class="ft-button" color="primary">
-        {{totalItems | number}} Items = {{totalCost | currency: 'TZS '}}
+        {{totalItems | number}} Items = {{totalCost | fedha | async}}
       </button>
     </div>
   `,

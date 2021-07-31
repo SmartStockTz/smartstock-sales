@@ -16,7 +16,8 @@ export interface StockModel {
     url: any;
   }[];
   retailPrice: number;
-  wholesalePrice: any;
+  wholesalePrice: number;
+  creditPrice?: number;
   catalog?: any[];
   saleable: boolean;
   canExpire: boolean;

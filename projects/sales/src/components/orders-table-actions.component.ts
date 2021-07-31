@@ -27,7 +27,7 @@ export class OrdersTableActionsComponent implements OnInit {
   }
 
   loadMore() {
-    this.orderState.getOrder(20, this.orderState.orders.value.length);
+    this.orderState.getOrder();
   }
 
   clearFilter() {

@@ -1,0 +1,18 @@
+.handler-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  width: 100%;
+}
+
+.handler{
+  background-color: #DFDFDF;
+  height: 7px;
+  width: 100px;
+  border-radius: 12px;
+}
+
+.cash-container{
+  /*//margin-bottom: 20px;*/
+}

@@ -32,7 +32,7 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
                 {{stock.product}}
               </p>
               <p class="text-wrap" style="font-weight: 500;">
-                Tsh {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
+                {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | fedha | async}}
               </p>
             </mat-card-content>
           </mat-card>
@@ -83,7 +83,7 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
             | <span [ngClass]="instock ? 'text-success' : 'text-danger'">{{instock ? 'IN' : 'OUT'}}</span>
           </p>
           <p matLine class="text-wrap" style="font-weight: 500;">
-            Tsh {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | number}}
+            {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | fedha | async}}
           </p>
         </mat-list-item>
       </div>
@@ -163,7 +163,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.afterAddToCart.emit();
     this.quantityFormControl.reset(1);
     this.detailView = false;
-    this.flipped = null;
+    this.flipped = -1;
   }
 
   async openSheet(_12: number): Promise<any> {

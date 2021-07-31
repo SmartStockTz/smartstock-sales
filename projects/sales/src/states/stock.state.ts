@@ -3,7 +3,6 @@ import {BehaviorSubject} from 'rxjs';
 import {StockModel} from '../models/stock.model';
 import {StockService} from '../services/stock.service';
 import {MessageService, StorageService} from '@smartstocktz/core-libs';
-import {MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 
 @Injectable({
@@ -61,51 +60,6 @@ export class StockState {
     });
   }
 
-  exportToExcel(): void {
-    this.isExportToExcel.next(true);
-    this.stockService.exportToExcel().then(value => {
-      this.messageService.showMobileInfoMessage(
-        'Stocks sent to your email, visit your email to download it', 1000, 'bottom');
-    }).catch(reason => {
-      this.messageService.showMobileInfoMessage(
-        reason && reason.message ? reason.message : reason, 1000, 'bottom');
-    }).finally(() => {
-      this.isExportToExcel.next(false);
-    });
-  }
-
-  importProducts(stocks: StockModel[], dialog: MatDialogRef<any>): void {
-    this.isImportProducts.next(true);
-    this.stockService.importStocks(stocks).then(_ => {
-      this.getStocksFromRemote();
-      dialog.close(true);
-      this.messageService.showMobileInfoMessage('Products imported', 2000, 'bottom');
-    }).catch(reason => {
-      this.messageService.showMobileInfoMessage(
-        reason && reason.message ? reason.message : 'Stocks not imported try again', 2000, 'bottom');
-    }).finally(() => {
-      this.isImportProducts.next(false);
-    });
-  }
-
-  deleteStock(stock: StockModel): void {
-    this.isFetchStocks.next(true);
-    this.stockService.deleteStock(stock).then(_ => {
-      return this.storageService.getStocks();
-    }).then(async stocks => {
-      await this.storageService.saveStock(stocks.filter(x => x.id !== stock.id) as any);
-      return stocks;
-    }).then(stocks => {
-      this.stocks.next(stocks.filter(x => x.id !== stock.id));
-      this.messageService.showMobileInfoMessage('Stocks updated', 1000, 'bottom');
-    }).catch(reason => {
-      this.messageService.showMobileInfoMessage(
-        reason && reason.message ? reason.message : reason, 1000, 'bottom');
-    }).finally(() => {
-      this.isFetchStocks.next(false);
-    });
-  }
-
   filter(query: string): void {
     this.storageService.getStocks().then(stocks => {
       if (query) {
@@ -115,20 +69,6 @@ export class StockState {
       } else {
         this.getStocks();
       }
-    });
-  }
-
-  deleteManyStocks(selectionModel: SelectionModel<StockModel>): void {
-    this.isDeleteStocks.next(true);
-    this.stockService.deleteMany(selectionModel.selected.map(x => x.id)).then(_ => {
-      this.messageService.showMobileInfoMessage('Products deleted', 2000, 'bottom');
-      this.stocks.next(this.stocks.value.filter(x => selectionModel.selected.findIndex(y => y.id === x.id) === -1));
-      selectionModel.clear();
-    }).catch(reason => {
-      this.messageService.showMobileInfoMessage(
-        reason && reason.message ? reason.message : reason, 2000, 'bottom');
-    }).finally(() => {
-      this.isDeleteStocks.next(false);
     });
   }
 }

@@ -51,7 +51,10 @@ export class LoginPageComponent implements OnInit {
           this.router.navigateByUrl('/sale').catch(console.log);
           BFast.init({
             applicationId: user.applicationId,
-            projectId: user.projectId
+            projectId: user.projectId,
+            adapters: {
+              auth: 'DEFAULT'
+            }
           }, user.projectId);
           await this.storageService.saveCurrentProjectId('0UTYLQKeifrk');
           await this.storageService.saveActiveShop(user as any);

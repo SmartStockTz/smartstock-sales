@@ -12,14 +12,14 @@ import {OrderModel} from '../models/order.model';
       </div>
       <mat-divider></mat-divider>
       <mat-list>
-        <mat-list-item *ngFor="let cart of data.order.carts">
+        <mat-list-item *ngFor="let cart of data.order.items">
           <h1 matLine>{{cart.product.product}}</h1>
           <mat-card-subtitle matLine>Quantity : {{cart.quantity}}</mat-card-subtitle>
         </mat-list-item>
       </mat-list>
       <mat-divider></mat-divider>
       <div style="padding: 8px 0 16px 0">
-        <h3>{{data.order.total | currency:'TZS '}}</h3>
+        <h3>{{data.order.total | fedha | async}}</h3>
       </div>
     </div>
   `

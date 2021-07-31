@@ -6,6 +6,7 @@ export interface CustomerModel {
   createdAt?: any;
   _created_at?: any;
   updatedAt?: any;
+  _updated_at?: any;
   displayName: string;
   tin?: string;
   id?: string;

@@ -17,7 +17,10 @@ export class AuthGuard implements CanActivate {
       if (user && user.role) {
         BFast.init({
           applicationId: user.applicationId,
-          projectId: user.projectId
+          projectId: user.projectId,
+          adapters: {
+            auth: 'DEFAULT'
+          }
         }, user.projectId);
         resolve(true);
       } else {

@@ -91,3 +91,10 @@ mat-toolbar {
   top: 5px;
   margin-right: -5px;
 }
+
+.checkout-container{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+}

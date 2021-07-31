@@ -1,72 +1,89 @@
 import {Injectable} from '@angular/core';
 import {SalesModel} from '../models/sale.model';
-import {OrderModel} from '../models/order.model';
-import {BatchModel} from '../models/batch.model';
-import {StockModel} from '../models/stock.model';
-import {BFast} from 'bfastjs';
-import {SecurityUtil, StorageService} from '@smartstocktz/core-libs';
+import {StorageService} from '@smartstocktz/core-libs';
+import {BehaviorSubject} from 'rxjs';
+import {SaleService} from '../services/sale.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'any'
 })
 export class SalesState {
 
-  constructor(private readonly storageService: StorageService) {
+  fetchProductsProgress = new BehaviorSubject(false);
+  saveSaleProgress = new BehaviorSubject(false);
+  searchProgress = new BehaviorSubject(false);
+  products = new BehaviorSubject([]);
+
+  constructor(private readonly storageService: StorageService,
+              private readonly snack: MatSnackBar,
+              private readonly saleService: SaleService) {
   }
 
-  async getSalesByUser(userId: string, channel: string): Promise<SalesModel[]> {
-    return Promise.reject('not implemented');
+  stockListening() {
+    this.saleService.listeningStocks().catch(console.log);
   }
 
-  async saveOrder(order: OrderModel): Promise<OrderModel> {
-    return Promise.reject('not implemented');
+  stockListingStop() {
+    this.saleService.listeningStocksStop().catch(console.log);
+    // this.saleService.stopWorker();
   }
 
-  async saveOrders(orders: OrderModel[]): Promise<any> {
-    return Promise.reject('not implemented');
-  }
-
-  async deleteOrder(orderId: string): Promise<any> {
-    return Promise.reject('not implemented');
-  }
-
-  async getOrders(): Promise<OrderModel[]> {
-    return Promise.reject('not implemented');
-  }
-
-  async getOrder(id: string): Promise<OrderModel> {
-    return Promise.reject('not implemented');
-  }
-
-  async updateOrder(orderId: string, order: OrderModel): Promise<OrderModel> {
-    return Promise.reject('not implemented');
-  }
-
-  async saveSales(sales: SalesModel[], cartId: string): Promise<any> {
-    const batchs: BatchModel[] = [];
-    sales.forEach(sale => {
-      sale.cartId = cartId;
-      sale.batch = SecurityUtil.generateUUID();
-      batchs.push({
-        method: 'POST',
-        body: sale,
-        path: '/classes/sales'
-      });
+  saveSales(sales: SalesModel[]): void {
+    this.saveSaleProgress.next(false);
+    this.saleService.saveSale(sales).then(value => {
+      this.message('Products saved');
+    }).catch(reason => {
+      this.message(reason);
+    }).finally(() => {
+      this.saveSaleProgress.next(false);
     });
-    // @ts-ignore
-    return await this.storageService.saveSales(batchs);
   }
 
-  async getAllStock(): Promise<StockModel[]> {
-    const shop = await this.storageService.getActiveShop();
-    const stocks: StockModel[] = await BFast.database(shop.projectId)
-      .collection<StockModel>('stocks')
-      .getAll<StockModel>(undefined, {
-        cacheEnable: false,
-        dtl: 0
-      });
-    await this.storageService.saveStocks(stocks);
-    return stocks;
+  private message(reason: any): void {
+    this.snack.open(reason && reason.message ? reason.message : reason.toString(), 'Ok', {
+      duration: 2000
+    });
   }
 
+  getProducts(): void {
+    this.searchProgress.next(true);
+    this.saleService.getProducts().then(products => {
+      if (Array.isArray(products) && products?.length > 0) {
+        this.products.next(products);
+      } else {
+        return this.getProductsRemote();
+      }
+    }).catch(reason => {
+      this.message(reason);
+    }).finally(() => {
+      this.searchProgress.next(false);
+    });
+  }
+
+  getProductsRemote(): void {
+    this.fetchProductsProgress.next(true);
+    this.saleService.getProductsRemote().then(products => {
+      if (Array.isArray(products)) {
+        this.products.next(products);
+      }
+    }).catch(reason => {
+      this.message(reason);
+    }).finally(() => {
+      this.fetchProductsProgress.next(false);
+    });
+  }
+
+  search(query: string): void {
+    this.searchProgress.next(true);
+    this.saleService.search(query).then(products => {
+      if (Array.isArray(products)) {
+        this.products.next(products);
+      }
+    }).catch(reason => {
+      this.message(reason);
+    }).finally(() => {
+      this.searchProgress.next(false);
+    });
+  }
 }
