@@ -1,6 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
+// @dynamic
 @Component({
   selector: 'app-delete-confirm-dialog',
   template: `
@@ -16,7 +17,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
       </div>
     </div>
   `,
-  styleUrls: ['']
+  styleUrls: []
 })
 
 export class DeleteConfirmDialogComponent {

@@ -9,7 +9,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
       <app-cash-sale-cart-options (done)="dialogRef.close($event)"></app-cash-sale-cart-options>
     </div>
   `,
-  styleUrls: ['']
+  styleUrls: []
 })
 
 export class DialogCashSaleCartOptionsComponent{

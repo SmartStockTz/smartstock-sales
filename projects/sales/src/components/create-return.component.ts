@@ -1,6 +1,6 @@
-import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CustomerState} from '../states/customer.state';
 import {MatTableDataSource} from '@angular/material/table';
@@ -9,11 +9,8 @@ import {MatSort} from '@angular/material/sort';
 import {ReturnsState} from '../states/returns.state';
 import {SalesReportsState} from '../states/sales-reports.state';
 import {SalesModel} from '../models/sale.model';
-import bfast from 'bfastjs';
 import {StorageService, toSqlDate} from '@smartstocktz/core-libs';
 import {PeriodState} from '../states/period.state';
-import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
 
 @Component({
   template: `
