@@ -7,7 +7,6 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {ReturnsState} from '../states/returns.state';
-import {SalesReportsState} from '../states/sales-reports.state';
 import {SalesModel} from '../models/sale.model';
 import {StorageService, toSqlDate} from '@smartstocktz/core-libs';
 import {PeriodState} from '../states/period.state';
@@ -118,7 +117,6 @@ export class CreateReturnComponent implements OnInit {
               private readonly snack: MatSnackBar,
               private readonly customerState: CustomerState,
               private returnsState: ReturnsState,
-              private salesReportsState: SalesReportsState,
               private storage: StorageService,
               private periodState: PeriodState) {
 
@@ -126,30 +124,30 @@ export class CreateReturnComponent implements OnInit {
 
 
   async initializeVariables() {
-    this.sales = await this.salesReportsState.getSalesFromSource();
-    this.dateRange$.subscribe(async dateRange => {
-      this.date = dateRange;
-      this.salesReportsState.getSalesFromDateRange(this.date);
-      // this.sales = await this.salesReportsState.getSalesFromSource(this.date);
-    });
-
-    this.salesReportsState.sales$.subscribe(value => {
-      // @ts-ignore
-      this.sales = value.filter(value1 => value1 && !value1.isReturned);
-      this.noData = (0 === this.sales.length);
-      this.configureDataSource(this.sales);
-    });
-
-    this.salesReportsState.loadingSales$.subscribe(
-      loading => {
-        this.isLoading = loading;
-      }
-    );
-
-    this.configureDataSource(this.sales);
-    this.filterFormControl.valueChanges.subscribe(filterValue => {
-      this.sales.filter = filterValue.trim().toLowerCase();
-    });
+    // this.sales = await this.salesReportsState.getSalesFromSource();
+    // this.dateRange$.subscribe(async dateRange => {
+    //   this.date = dateRange;
+    //   this.salesReportsState.getSalesFromDateRange(this.date);
+    //   // this.sales = await this.salesReportsState.getSalesFromSource(this.date);
+    // });
+    //
+    // this.salesReportsState.sales$.subscribe(value => {
+    //   // @ts-ignore
+    //   this.sales = value.filter(value1 => value1 && !value1.isReturned);
+    //   this.noData = (0 === this.sales.length);
+    //   this.configureDataSource(this.sales);
+    // });
+    //
+    // this.salesReportsState.loadingSales$.subscribe(
+    //   loading => {
+    //     this.isLoading = loading;
+    //   }
+    // );
+    //
+    // this.configureDataSource(this.sales);
+    // this.filterFormControl.valueChanges.subscribe(filterValue => {
+    //   this.sales.filter = filterValue.trim().toLowerCase();
+    // });
   }
 
   configureDataSource(allSales) {
@@ -169,19 +167,19 @@ export class CreateReturnComponent implements OnInit {
   }
 
   async returnSale(row) {
-    // console.log(row);
-    // change sale channel to return
-    const returns = row;
-    // returns.isReturned = true;
-    // this.salesReportsState.saleToReturn(returns);
-    // returns.items
-    // get user
-    const user = await this.storage.getActiveUser();
-    returns.returnedBy = user;
-    returns.returnedDate = toSqlDate(new Date());
-    this.salesReportsState.removeSale(returns);
-
-    // save in returns
-    this.returnsState.saveReturn(returns);
+    // // console.log(row);
+    // // change sale channel to return
+    // const returns = row;
+    // // returns.isReturned = true;
+    // // this.salesReportsState.saleToReturn(returns);
+    // // returns.items
+    // // get user
+    // const user = await this.storage.getActiveUser();
+    // returns.returnedBy = user;
+    // returns.returnedDate = toSqlDate(new Date());
+    // this.salesReportsState.removeSale(returns);
+    //
+    // // save in returns
+    // this.returnsState.saveReturn(returns);
   }
 }

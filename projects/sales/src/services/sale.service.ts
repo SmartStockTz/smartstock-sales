@@ -5,7 +5,6 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
-import {bfast} from 'bfastjs';
 
 @Injectable({
   providedIn: 'root'
@@ -62,33 +61,33 @@ export class SaleService {
   }
 
   async listeningStocks(): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    this.changes = bfast.database(shop.projectId)
-      .table('stocks')
-      .query()
-      .changes(() => {
-        console.log('stocks-sales changes connected');
-        this.getProductsRemote().catch(console.log);
-      }, () => {
-        console.log('stocks-sales changes disconnected');
-      });
-    this.changes.addListener(async response => {
-      if (response && response.body && response.body.change) {
-        // console.log(response.body.change);
-        if (response.body.change.name === 'create') {
-          this.setProductLocal(response.body.change.snapshot).catch(console.log);
-        } else if (response.body.change.name === 'update') {
-          this.setProductLocal(response.body.change.snapshot).catch(console.log);
-        } else if (response.body.change.name === 'delete') {
-          await this.removeProductLocal(response.body.change.snapshot);
-        } else {
-        }
-      }
-    });
+    // const shop = await this.userService.getCurrentShop();
+    // this.changes = bfast.database(shop.projectId)
+    //   .table('stocks')
+    //   .query()
+    //   .changes(() => {
+    //     console.log('stocks-sales changes connected');
+    //     this.getProductsRemote().catch(console.log);
+    //   }, () => {
+    //     console.log('stocks-sales changes disconnected');
+    //   });
+    // this.changes.addListener(async response => {
+    //   if (response && response.body && response.body.change) {
+    //     // console.log(response.body.change);
+    //     if (response.body.change.name === 'create') {
+    //       this.setProductLocal(response.body.change.snapshot).catch(console.log);
+    //     } else if (response.body.change.name === 'update') {
+    //       this.setProductLocal(response.body.change.snapshot).catch(console.log);
+    //     } else if (response.body.change.name === 'delete') {
+    //       await this.removeProductLocal(response.body.change.snapshot);
+    //     } else {
+    //     }
+    //   }
+    // });
   }
 
   async listeningStocksStop() {
-    this.changes?.close();
+    // this.changes?.close();
   }
 
   private async setProductLocal(product: StockModel) {
