@@ -6,6 +6,7 @@ import {BatchModel} from '../models/batch.model';
 import {sha256} from 'crypto-hash';
 import {SecurityUtil} from '@smartstocktz/core-libs';
 import {SalesModel} from '../models/sale.model';
+import {StockSyncModel} from '../models/stock-sync.model';
 
 function init(shop: ShopModel) {
   bfast.init({
@@ -68,34 +69,100 @@ export class SaleWorker {
     }
   }
 
-  async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
-    return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).get('all');
-  }
-
-  async removeProductLocal(product: StockModel, shop: ShopModel) {
-    const stocks = await this.getProductsLocal(shop);
-    return this.setProductsLocal(stocks.filter(x => x.id !== product.id), shop);
-  }
-
-  async setProductLocal(product: StockModel, shop: ShopModel) {
-    let stocks = await this.getProductsLocal(shop);
-    let update = false;
-    stocks = stocks.map(x => {
-      if (x.id === product.id) {
-        update = true;
-        return product;
-      } else {
-        return x;
-      }
-    });
-    if (update === false) {
-      stocks.push(product);
+  private async productsLocalSyncMap(shop: ShopModel): Promise<{ [key: string]: StockSyncModel }> {
+    init(shop);
+    const productsMap: { [key: string]: StockSyncModel } = await bfast
+      .cache({database: 'stocks', collection: 'stocks_sync'}, shop.projectId)
+      .get('all');
+    if (
+      productsMap &&
+      !Array.isArray(productsMap) &&
+      Array.isArray(Object.values(productsMap))
+    ) {
+      return productsMap;
+    } else {
+      return {};
     }
-    return this.setProductsLocal(stocks, shop);
   }
 
-  async setProductsLocal(products: StockModel[], shop: ShopModel) {
-    return bfast.cache({database: 'stocks', collection: 'stocks'}, shop.projectId).set('all', products);
+
+  private async productsLocalMap(shop: ShopModel): Promise<{ [key: string]: StockModel }> {
+    init(shop);
+    const productsSyncMap = await this.productsLocalSyncMap(shop);
+    const productsMap: { [key: string]: StockModel } = await bfast
+      .cache({database: 'stocks', collection: 'stocks'}, shop.projectId)
+      .get('all');
+    if (
+      productsMap &&
+      !Array.isArray(productsMap) &&
+      Array.isArray(Object.values(productsMap))
+    ) {
+      Object.keys(productsMap).forEach(k => {
+        if (productsSyncMap[k]?.action === 'delete') {
+          delete productsMap[k];
+        }
+      });
+      return productsMap;
+    } else {
+      return {};
+    }
+  }
+
+  async getProductLocal(id: string, shop: ShopModel): Promise<StockModel> {
+    init(shop);
+    const productsMap = await this.productsLocalMap(shop);
+    return productsMap[id];
+  }
+
+  async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
+    init(shop);
+    const productsMap = await this.productsLocalMap(shop);
+    return Object.values(productsMap);
+  }
+
+  async removeProductLocal(product: StockModel, shop: ShopModel): Promise<string> {
+    init(shop);
+    const productsMap = await this.productsLocalMap(shop);
+    delete productsMap[product.id];
+    await bfast
+      .cache({database: 'stocks', collection: 'stocks'}, shop.projectId)
+      .set('all', productsMap);
+    return product.id;
+  }
+
+  async removeProductsLocal(products: StockModel[], shop: ShopModel): Promise<string[]> {
+    init(shop);
+    const productsMap = await this.productsLocalMap(shop);
+    products.forEach(x => {
+      delete productsMap[x.id];
+    });
+    await bfast
+      .cache({database: 'stocks', collection: 'stocks'}, shop.projectId)
+      .set('all', productsMap);
+    return products.map(x => x.id);
+  }
+
+  async setProductLocal(product: StockModel, shop: ShopModel): Promise<StockModel> {
+    init(shop);
+    const productsMap = await this.productsLocalMap(shop);
+    productsMap[product.id] = product;
+    await bfast
+      .cache({database: 'stocks', collection: 'stocks'}, shop.projectId)
+      .set('all', productsMap);
+    return product;
+  }
+
+  async setProductsLocal(products: StockModel[], shop: ShopModel): Promise<StockModel[]> {
+    init(shop);
+    let productsMap = await this.productsLocalMap(shop);
+    productsMap = products.reduce((a, b) => {
+      a[b.id] = b;
+      return a;
+    }, productsMap);
+    await bfast
+      .cache({database: 'stocks', collection: 'stocks'}, shop.projectId)
+      .set('all', productsMap);
+    return products;
   }
 
   async setSalesLocal(batchs: BatchModel[], shop: ShopModel, cartId: string) {
@@ -106,22 +173,27 @@ export class SaleWorker {
   }
 
   async getSalesLocal(shop: ShopModel) {
+    init(shop);
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).getAll();
   }
 
   async getSaleLocal(id: string, shop: ShopModel): Promise<any[]> {
+    init(shop);
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).get(id);
   }
 
   async getSalesLocalKeys(shop: ShopModel) {
+    init(shop);
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).keys();
   }
 
   async removeSalesLocal(cartId: string, shop: ShopModel) {
+    init(shop);
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId, true);
   }
 
   private async remoteAllProducts(shop: ShopModel, hashes: any[] = []): Promise<StockModel[]> {
+    init(shop);
     this.remoteAllProductsRunning = true;
     return bfast.database(shop.projectId)
       .collection('stocks')
@@ -149,11 +221,13 @@ export class SaleWorker {
   }
 
   async getProducts(shop: ShopModel): Promise<StockModel[]> {
+    init(shop);
     const products = await this.getProductsLocal(shop);
     return products.filter(x => x.saleable);
   }
 
   async saveSale(sales: SalesModel[], shop: ShopModel, cartId: string): Promise<any> {
+    init(shop);
     const batchs = sales.map<BatchModel>(sale => {
       sale.cartId = cartId;
       sale.createdAt = new Date();
@@ -229,6 +303,7 @@ export class SaleWorker {
   }
 
   async getProductsRemote(shop: ShopModel): Promise<StockModel[]> {
+    init(shop);
     const localProducts = await this.getProductsLocal(shop);
     const hashesMap = await SaleWorker.productsLocalHashMap(localProducts);
     let products: StockModel[];
@@ -244,6 +319,7 @@ export class SaleWorker {
   }
 
   async search(query: string, shop: ShopModel): Promise<StockModel[]> {
+    init(shop);
     const stocks = await this.getProductsLocal(shop);
     return stocks.filter(x => {
       return x.saleable && x?.product?.toLowerCase().includes(query.toLowerCase());
