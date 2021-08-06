@@ -165,7 +165,7 @@ SUB TOTAL : ${cart.amount}
       '--------------------------------\n' +
       'TOTAL AMOUNT : ' + totalBill +
       '\nDISCOUNT : ' + (discount ? discount.toString() : '0') +
-      '\nNET AMOUNT : ' + (totalBill - discount ? discount : 0) +
+      '\nNET AMOUNT : ' + (totalBill - (discount ? discount : 0)) +
       '\n--------------------------------\n'
     );
     return data;
