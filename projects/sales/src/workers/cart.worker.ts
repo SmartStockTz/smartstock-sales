@@ -143,8 +143,9 @@ export class CartWorker {
     });
   }
 
-  async cartItemsToPrinterData(carts: CartModel[], customer: CustomerModel, channel: string, discount: number): Promise<string> {
-    let data = '';
+  async cartItemsToPrinterData(carts: CartModel[], customer: CustomerModel, channel: string,
+                               discount: number, printOnly: boolean): Promise<string> {
+    let data = printOnly === true ? 'NOTE: THIS IS PRINT ONLY RECEIPT CAN NOT BE USED AS SAKE RECEIPT' : '';
     data = data.concat('-------------------------------\n');
     data = data.concat(new Date().toDateString() + '\n');
     if (customer && customer.displayName) {

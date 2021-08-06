@@ -137,7 +137,8 @@ export class CartState {
       this.carts.value,
       channel,
       discount,
-      this.selectedCustomer.value
+      this.selectedCustomer.value,
+      true
     ).then(_ => {
       this.message('Done print cart');
     }).catch(reason => {

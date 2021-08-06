@@ -58,15 +58,15 @@ export class CartService {
     discount = isNaN(discount) ? 0 : discount;
     const shop = await this.userService.getCurrentShop();
     await this.initWorker(shop);
-    await this.printCart(carts, channel, discount, customer);
+    await this.printCart(carts, channel, discount, customer, false);
     const salesToSave: SalesModel[] = await this.cartWorker.getSalesBatch(carts, channel, discount, customer, user);
     return this.salesService.saveSale(salesToSave);
   }
 
-  async printCart(carts: CartItemModel[], channel: string, discount: number, customer: CustomerModel): Promise<any> {
+  async printCart(carts: CartItemModel[], channel: string, discount: number, customer: CustomerModel, printOnly: boolean): Promise<any> {
     discount = isNaN(discount) ? 0 : discount;
     const saleItems = await this.cartWorker.cartItemsToSaleItems(carts, discount, channel);
-    const salesItemForPrint = await this.cartWorker.cartItemsToPrinterData(saleItems, customer, channel, discount);
+    const salesItemForPrint = await this.cartWorker.cartItemsToPrinterData(saleItems, customer, channel, discount, printOnly);
     // console.log(salesItemForPrint);
     await this.printService.print({
       data: salesItemForPrint,
