@@ -17,7 +17,7 @@ export class CartWorker {
       case 'retail':
         return cart.quantity;
       case 'whole':
-        return `${cart.quantity} x ${cart.stock.wholesaleQuantity}`;
+        return cart.quantity * cart.stock.wholesaleQuantity; // `${cart.quantity} x ${cart.stock.wholesaleQuantity}`;
       case 'credit':
         return cart.quantity;
       default:
@@ -164,8 +164,8 @@ SUB TOTAL : ${cart.amount}
     data = data.concat(
       '--------------------------------\n' +
       'TOTAL AMOUNT : ' + totalBill +
-      '\nDISCOUNT : ' + discount +
-      '\nNET AMOUNT : ' + (totalBill - discount) +
+      '\nDISCOUNT : ' + (discount ? discount.toString() : '0') +
+      '\nNET AMOUNT : ' + (totalBill - discount ? discount : 0) +
       '\n--------------------------------\n'
     );
     return data;
