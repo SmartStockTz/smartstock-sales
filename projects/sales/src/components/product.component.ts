@@ -163,7 +163,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.afterAddToCart.emit();
     this.quantityFormControl.reset(1);
     this.detailView = false;
-    this.flipped = -1;
+    this.productState.flipped.next(-1);
   }
 
   async openSheet(_12: number): Promise<any> {

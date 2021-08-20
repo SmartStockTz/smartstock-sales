@@ -117,7 +117,15 @@ export class SaleWorker {
   async getProductsLocal(shop: ShopModel): Promise<StockModel[]> {
     init(shop);
     const productsMap = await this.productsLocalMap(shop);
-    return Object.values(productsMap);
+    return Object.values(productsMap).sort((a, b) => {
+      if (a?.product?.toString() > b?.product?.toString()) {
+        return 1;
+      } else if (a?.product?.toString() < b?.product?.toString()) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   async removeProductLocal(product: StockModel, shop: ShopModel): Promise<string> {
@@ -315,14 +323,14 @@ export class SaleWorker {
       products = localProducts;
     }
     await this.setProductsLocal(products, shop);
-    return products.filter(x => x.saleable);
+    return await this.getProductsLocal(shop);
   }
 
   async search(query: string, shop: ShopModel): Promise<StockModel[]> {
     init(shop);
     const stocks = await this.getProductsLocal(shop);
     return stocks.filter(x => {
-      return x.saleable && x?.product?.toLowerCase().includes(query.toLowerCase());
+      return (x?.saleable === true) && (x?.product?.toString()?.toLowerCase().includes(query?.toLowerCase()));
     });
   }
 
