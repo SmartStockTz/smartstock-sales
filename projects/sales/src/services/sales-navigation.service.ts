@@ -40,11 +40,11 @@ export class SalesNavigationService {
           roles: ['*'],
           link: '/sale/customers'
         },
-        // {
-        //   name: 'Sale returns',
-        //   roles: ['*'],
-        //   link: '/sale/refund'
-        // }
+        {
+          name: 'Refunds',
+          roles: ['*'],
+          link: '/sale/refund'
+        }
       ]
     });
   }

@@ -1,5 +1,5 @@
 import {expose} from 'comlink';
-import {bfast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {StockModel} from '../models/stock.model';
 import {BatchModel} from '../models/batch.model';

@@ -1,0 +1,37 @@
+.refund-container {
+  padding: 14px 16px;
+}
+
+.actions-container {
+  display: flex;
+  align-items: center;
+  //flex-wrap: nowrap;
+  //flex-direction: row;
+}
+
+.actions-container-wrapper{
+  background: white;
+  z-index: 10000;
+  padding-top: 4px;
+  position: sticky;
+  top: 64px;
+}
+
+.actions-spacer {
+  flex: 1 1 auto;
+}
+
+.table-header{
+  background: #F0F0F0;
+  border-radius: 5px!important;
+}
+
+.table-column-title{
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 16px;
+
+  color: #000000;
+}

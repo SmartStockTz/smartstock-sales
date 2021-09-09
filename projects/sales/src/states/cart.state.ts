@@ -11,7 +11,7 @@ import {OrderModel} from '../models/order.model';
 
 
 @Injectable({
-  providedIn: 'any'
+  providedIn: 'root'
 })
 export class CartState {
   carts = new BehaviorSubject<CartItemModel[]>([]);

@@ -22,6 +22,15 @@ export interface SalesModel {
   cartId?: string;
   discount: number;
   user: string;
+  refund?: {
+    amount: number,
+    quantity: number,
+    user: {
+      firstname: string,
+      lastname: string,
+      username: string
+    }
+  };
   sellerObject: {
     username: string;
     lastname: string;

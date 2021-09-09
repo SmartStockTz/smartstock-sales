@@ -6,7 +6,7 @@ import {LogService} from '@smartstocktz/core-libs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
-  providedIn: 'any'
+  providedIn: 'root'
 })
 export class OrderState {
 

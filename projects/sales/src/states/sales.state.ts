@@ -6,7 +6,7 @@ import {SaleService} from '../services/sale.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
-  providedIn: 'any'
+  providedIn: 'root'
 })
 export class SalesState {
 

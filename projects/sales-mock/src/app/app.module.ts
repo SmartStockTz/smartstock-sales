@@ -15,7 +15,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from './guards/auth.guard';
-import {bfast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {SalesNavigationService} from '../../../sales/src/services/sales-navigation.service';
 
 const routes: Routes = [

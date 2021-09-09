@@ -1,5 +1,5 @@
 import {expose} from 'comlink';
-import {bfast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {CustomerModel} from '../models/customer.model';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {sha256} from 'crypto-hash';

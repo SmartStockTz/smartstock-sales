@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
-import {BFast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrdersWorker} from '../workers/orders.worker';
@@ -69,7 +69,7 @@ export class OrderService {
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
-    return BFast.database().collection('orders')
+    return bfast.database().collection('orders')
       .query()
       .byId(orderId)
       .updateBuilder()
@@ -79,7 +79,7 @@ export class OrderService {
 
   async markAsCompleted(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    return BFast.database(shop.projectId).transaction()
+    return bfast.database(shop.projectId).bulk()
       .update('orders', {
         query: {
           id: order.id,
@@ -125,7 +125,7 @@ export class OrderService {
   }
 
   async checkOrderIsPaid(order: string): Promise<any> {
-    const payments = await BFast.functions('fahamupay')
+    const payments = await bfast.functions('fahamupay')
       .request(`/functions/pay/check/${order}`)
       .get<any[]>();
     return payments.map(x => Math.round(Number(x.amount))).reduce((a, b) => a + b, 0);
@@ -134,7 +134,7 @@ export class OrderService {
   async markOrderAsCancelled(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
 
-    return BFast.database(shop.projectId).collection('orders')
+    return bfast.database(shop.projectId).collection('orders')
       .query()
       .byId(order.id)
       .updateBuilder()
@@ -145,7 +145,7 @@ export class OrderService {
   async markAsProcessed(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
 
-    return BFast.database(shop.projectId).collection('orders')
+    return bfast.database(shop.projectId).collection('orders')
       .query()
       .byId(order.id)
       .updateBuilder()

@@ -21,10 +21,11 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
           <mat-card class='front' style="text-align: center; width: 150px; height: 160px;" (click)='flip(productIndex)'>
             <mat-card-content>
               <p class="text-truncate" style="color: gray;">
-                <b [ngClass]="instock ? 'text-success' : 'text-danger'">
-                  {{instock ? 'IN' : 'OUT'}}
-                </b>
-                | {{stock.category}}
+<!--                <b [ngClass]="instock ? 'text-success' : 'text-danger'">-->
+<!--                  {{instock ? 'IN' : 'OUT'}}-->
+<!--                </b>-->
+<!--                | -->
+                {{stock.category}}
               </p>
               <p class="text-wrap"
                  matTooltip="{{stock.product}}"

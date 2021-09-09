@@ -1,6 +1,6 @@
 import {expose} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
-import {bfast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {CartItemModel} from '../models/cart-item.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrderSyncModel} from '../models/order-sync.model';
@@ -44,15 +44,15 @@ export class OrdersWorker {
     return hashesMap;
   }
 
-  private static setOrderSyncLocal(order: OrderSyncModel, shop): Promise<OrderSyncModel> {
+  private setOrderSyncLocal(order: OrderSyncModel, shop): Promise<OrderSyncModel> {
     return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).set(order.order.id, order);
   }
 
-  private static async removeOrderLocalSync(order: OrderSyncModel, shop: ShopModel) {
+  private async removeOrderLocalSync(order: OrderSyncModel, shop: ShopModel) {
     return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).remove(order.order.id, true);
   }
 
-  private static async getOrdersLocalSync(shop: ShopModel): Promise<OrderSyncModel[]> {
+  private async getOrdersLocalSync(shop: ShopModel): Promise<OrderSyncModel[]> {
     return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).getAll();
   }
 
@@ -112,9 +112,16 @@ export class OrdersWorker {
   }
 
   async getOrdersLocal(shop): Promise<OrderModel[]> {
-    const order: OrderModel[] = await bfast.cache({database: 'orders', collection: 'orders'}, shop.projectId).get('all');
-    if (Array.isArray(order)) {
-      return order;
+    const orders: OrderModel[] = await bfast
+      .cache({database: 'orders', collection: 'orders'}, shop.projectId)
+      .get('all');
+    const ordersInSync = await this.getOrdersLocalSync(shop);
+    if (Array.isArray(orders)) {
+      return orders.filter(x => {
+        return ordersInSync.findIndex(value => {
+          return value.order.id === x.id && value.action === 'delete';
+        }) === -1;
+      });
     } else {
       return [];
     }
@@ -176,7 +183,7 @@ export class OrdersWorker {
         return;
       }
       isRunn = true;
-      const orders: OrderSyncModel[] = await OrdersWorker.getOrdersLocalSync(shop);
+      const orders: OrderSyncModel[] = await this.getOrdersLocalSync(shop);
       // console.log(orders, '*****');
       if (Array.isArray(orders) && orders.length === 0) {
         isRunn = false;
@@ -203,7 +210,7 @@ export class OrdersWorker {
                 .delete();
             }
             // console.log(order);
-            await OrdersWorker.removeOrderLocalSync(order, shop);
+            await this.removeOrderLocalSync(order, shop);
           } catch (e) {
             console.log(e);
           }
@@ -246,7 +253,7 @@ export class OrdersWorker {
       }
     };
     await this.setOrderLocal(orderSync.order, shop);
-    const order = await OrdersWorker.setOrderSyncLocal(orderSync, shop);
+    const order = await this.setOrderSyncLocal(orderSync, shop);
     this.syncOrders(shop).catch(console.log);
     return order.order;
   }
@@ -301,11 +308,12 @@ export class OrdersWorker {
   }
 
   async deleteOrder(order: OrderModel, shop: ShopModel): Promise<any> {
-    await OrdersWorker.setOrderSyncLocal({
+    await this.setOrderSyncLocal({
       order,
       action: 'delete'
     }, shop);
     await this.removeOrderLocal(order.id, shop);
+    this.syncOrders(shop).catch(console.log);
   }
 }
 

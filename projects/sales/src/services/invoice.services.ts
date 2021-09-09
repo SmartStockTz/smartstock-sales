@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SettingsService, StorageService} from '@smartstocktz/core-libs';
-import {BFast} from 'bfastjs';
+import * as bfast from 'bfast';
 import {InvoiceModel} from '../models/invoice.model';
 
 @Injectable({
@@ -16,10 +16,10 @@ export class InvoiceService {
 
   async getInvoices(pagination: { size: number, skip: number }): Promise<InvoiceModel[]> {
     const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId)
+    return await bfast.database(shop.projectId)
       .collection('invoices')
       .query()
-      .orderBy('_created_at', -1)
+      // .orderBy('_created_at', -1)
       .size(pagination.size)
       .skip(pagination.skip)
       .find();
@@ -27,7 +27,7 @@ export class InvoiceService {
 
   async invoicesCount(): Promise<number> {
     const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId)
+    return await bfast.database(shop.projectId)
       .collection('invoices')
       .query()
       .count(true)
@@ -36,7 +36,7 @@ export class InvoiceService {
 
   async saveInvoice(invoice: InvoiceModel) {
     const shop = await this.storageService.getActiveShop();
-    return await BFast.database(shop.projectId).transaction()
+    return await bfast.database(shop.projectId).bulk()
       .create('invoices', invoice)
       .update('stocks', invoice.items.map(item => {
         return {
@@ -54,7 +54,7 @@ export class InvoiceService {
 
   async addReturn(id: string, value: any) {
     const shop = await this.storageService.getActiveShop();
-    const invoice: InvoiceModel = await BFast.database(shop.projectId)
+    const invoice: InvoiceModel = await bfast.database(shop.projectId)
       .collection('invoices')
       .get(id);
 
@@ -65,7 +65,7 @@ export class InvoiceService {
     }
     delete invoice.updatedAt;
 
-    return await BFast.database(shop.projectId)
+    return await bfast.database(shop.projectId)
       .collection('invoices')
       .query()
       .byId(id)

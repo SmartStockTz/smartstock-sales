@@ -5,7 +5,7 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
-import {bfast} from 'bfastjs';
+import * as bfast from 'bfast';
 
 @Injectable({
   providedIn: 'root'

@@ -15,3 +15,8 @@
 
 .cash-container{
 }
+
+.refund-form{
+  display: flex;
+  flex-direction: column;
+}

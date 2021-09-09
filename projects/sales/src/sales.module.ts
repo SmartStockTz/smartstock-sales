@@ -41,11 +41,7 @@ import {OrdersItemsComponent} from './components/orders-items.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {InvoiceIndexPage} from './pages/invoice-index.page';
-import {PayByInvoicesComponent} from './pages/pay_by_invoices.page';
 import {CreateCreditorComponent} from './components/create-creditor.component';
-import {SaleByCreditCreateFormComponent} from './components/create-sale-by-credit-form.component';
-import {ProductSearchDialogComponent} from './components/product-search.component';
 import {InfoDialogComponent} from './components/info-dialog.component';
 import {MatSelectModule} from '@angular/material/select';
 import {CreateCustomerComponent} from './components/create-customer-form.component';
@@ -55,12 +51,10 @@ import {InvoiceDetailsComponent} from './components/invoice-details.component';
 import {AddReturnSheetComponent} from './components/add-returns-sheet.component';
 import {CustomersPage} from './pages/customers.page';
 import {CustomerListComponent} from './components/customer-list.component';
-import {ReturnsPage} from './pages/returns.page';
-import {ReturnsListComponent} from './components/returns-list.component';
+import {RefundsPage} from './pages/refunds.page';
 import {ReturnsDetailsComponent} from './components/returns-details.component';
-import {CreateReturnComponent} from './components/create-return.component';
+import {CreateRefundDialogComponent} from './components/create-refund-dialog.component';
 import {PeriodDateRangeComponent} from './components/period-range.component';
-import {InvoiceListPage} from './pages/invoice-list.page';
 import {AddToCartSheetComponent} from './components/add-to-cart-sheet.component';
 import {SalesNavigationService} from './services/sales-navigation.service';
 import {MatCheckboxModule} from '@angular/material/checkbox';
@@ -74,6 +68,11 @@ import {OrderService} from './services/order.service';
 import {SaleService} from './services/sale.service';
 import {OrderListComponent} from './components/order-list.component';
 import {DialogNewOrderComponent} from './components/dialog-new-order.component';
+import {RefundBodyComponent} from './components/refund-body.component';
+import {RefundBodyMobileComponent} from './components/refund-body.mobile.component';
+import {RefundBodyHeaderComponent} from './components/refund-body-header.component';
+import {RefundBodyTableComponent} from './components/refund-body-table.component';
+import {MudaPipe} from './pipes/muda.pipe';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -81,10 +80,10 @@ const routes: Routes = [
   {path: 'customers', component: CustomersPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  {path: 'invoices', component: InvoiceIndexPage},
-  {path: 'invoices/create', component: PayByInvoicesComponent},
-  {path: 'invoices/list', component: InvoiceListPage},
-  {path: 'refund', component: ReturnsPage},
+  // {path: 'invoices', component: InvoiceIndexPage},
+  // {path: 'invoices/create', component: },
+  // {path: 'invoices/list', component: InvoiceListPage},
+  {path: 'refund', component: RefundsPage},
 ];
 
 @NgModule({
@@ -140,23 +139,17 @@ const routes: Routes = [
   declarations: [
     AddToCartSheetComponent,
     PeriodDateRangeComponent,
-    CreateReturnComponent,
+    CreateRefundDialogComponent,
     ReturnsDetailsComponent,
-    ReturnsListComponent,
-    ReturnsPage,
+    RefundsPage,
     CustomerListComponent,
     CustomersPage,
     AddReturnSheetComponent,
     IncompleteInvoicesTableComponent,
     CreateCustomerComponent,
-    InvoiceListPage,
     InvoiceDetailsComponent,
     InfoDialogComponent,
-    ProductSearchDialogComponent,
-    SaleByCreditCreateFormComponent,
     CreateCreditorComponent,
-    PayByInvoicesComponent,
-    InvoiceIndexPage,
     OrdersItemsComponent,
     OrderPaymentStatusComponent,
     IndexPage,
@@ -171,10 +164,15 @@ const routes: Routes = [
     DialogCreateCustomerComponent,
     SheetCreateCustomerComponent,
     FedhaPipe,
+    MudaPipe,
     DialogCashSaleCartOptionsComponent,
     CashSaleCartOptionsComponent,
     OrderListComponent,
-    DialogNewOrderComponent
+    DialogNewOrderComponent,
+    RefundBodyComponent,
+    RefundBodyMobileComponent,
+    RefundBodyHeaderComponent,
+    RefundBodyTableComponent,
   ],
   entryComponents: []
 })

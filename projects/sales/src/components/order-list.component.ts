@@ -61,11 +61,11 @@ import {OrdersItemsComponent} from './orders-items.component';
         <td class="table-body-text" mat-cell *matCellDef="let row"> {{dateT(row.date)}} </td>
         <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
       </ng-container>
-<!--      <ng-container matColumnDef="Status">-->
-<!--        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Status</th>-->
-<!--        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.paid === true?'PAID':''}} </td>-->
-<!--        &lt;!&ndash;<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>&ndash;&gt;-->
-<!--      </ng-container>-->
+      <!--      <ng-container matColumnDef="Status">-->
+      <!--        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Status</th>-->
+      <!--        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.paid === true?'PAID':''}} </td>-->
+      <!--        &lt;!&ndash;<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>&ndash;&gt;-->
+      <!--      </ng-container>-->
       <ng-container matColumnDef="Action">
         <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Actions</th>
         <td class="table-body-text" mat-cell *matCellDef="let row">
@@ -74,11 +74,11 @@ import {OrdersItemsComponent} from './orders-items.component';
           </button>
           <mat-menu #menu>
             <mat-nav-list>
-              <mat-list-item (click)="updateCustomer(row)">
+              <mat-list-item (click)="processOrder(row)">
                 <p matLine>Process Order</p>
                 <mat-icon matListIcon>shopping_cart</mat-icon>
               </mat-list-item>
-              <mat-list-item (click)="deleteCustomer(row)">
+              <mat-list-item (click)="deleteOrder(row)">
                 <p matLine>Delete Order</p>
                 <mat-icon matListIcon>cancel</mat-icon>
               </mat-list-item>
@@ -106,11 +106,11 @@ import {OrdersItemsComponent} from './orders-items.component';
             <mat-icon matSuffix>more_horiz</mat-icon>
             <mat-menu xPosition="before" #menu>
               <mat-nav-list>
-                <mat-list-item (click)="updateCustomer(order)">
+                <mat-list-item (click)="processOrder(order)">
                   <p matLine>Process Order</p>
                   <mat-icon matListIcon>shopping_cart</mat-icon>
                 </mat-list-item>
-                <mat-list-item (click)="deleteCustomer(order)">
+                <mat-list-item (click)="deleteOrder(order)">
                   <p matLine>Delete Order</p>
                   <mat-icon matListIcon>cancel</mat-icon>
                 </mat-list-item>
@@ -172,7 +172,7 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  updateCustomer(row: OrderModel): void {
+  processOrder(row: OrderModel): void {
     switch (row?.channel) {
       case 'retail':
         this.cartState.carts.next(row.items);
@@ -189,7 +189,7 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  deleteCustomer(row: OrderModel): void {
+  deleteOrder(row: OrderModel): void {
     this.matDialog.open(DeleteConfirmDialogComponent, {
       data: {
         title: 'Hello!',

@@ -1,7 +1,9 @@
 import {Injectable} from '@angular/core';
 import {StockModel} from '../models/stock.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UtilsService {
   findTotalCartCost(cartItems: { quantity: number, product: StockModel }[], isWholeSale: boolean): number {
     let totalCost: number;

@@ -3,7 +3,7 @@ import {BehaviorSubject} from 'rxjs';
 import {toSqlDate} from '@smartstocktz/core-libs';
 
 @Injectable({
-  providedIn: 'any'
+  providedIn: 'root'
 })
 export class PeriodState {
 

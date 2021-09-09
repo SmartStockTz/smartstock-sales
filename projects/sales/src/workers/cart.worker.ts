@@ -91,7 +91,7 @@ export class CartWorker {
     let update = false;
     carts.map(x => {
       if (x.product.id === cart.product.id) {
-        x.quantity += x.quantity + cart.quantity;
+        x.quantity += cart.quantity;
         update = true;
       }
       return x;
