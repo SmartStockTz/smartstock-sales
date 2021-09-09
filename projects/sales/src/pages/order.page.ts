@@ -9,22 +9,35 @@ import {DialogNewOrderComponent} from '../components/dialog-new-order.component'
 @Component({
   selector: 'app-order-page',
   template: `
-    <app-layout-sidenav searchPlaceholder=""
-                        [heading]="'Orders'"
+    <app-layout-sidenav [heading]="'Orders'"
                         [leftDrawerOpened]="(deviceState.enoughWidth | async)===true"
                         [leftDrawerMode]="(deviceState.enoughWidth | async)===true?'side':'over'"
                         [body]="body"
                         backLink="/sale"
                         [hasBackRoute]="true"
                         [showSearch]="true"
+                        searchPlaceholder="Type to filter"
+                        [visibleMenu]="visibleMenu"
+                        [hiddenMenu]="hiddenMenu"
                         (searchCallback)="onOrderSearch($event)"
                         [leftDrawer]="side">
+      <ng-template #visibleMenu>
+        <button (click)="addOrder()" color="primary" mat-icon-button>
+          <mat-icon matPrefix>add</mat-icon>
+        </button>
+      </ng-template>
+      <ng-template #hiddenMenu>
+        <button (click)="hotReload()" mat-menu-item>
+          <mat-icon matPrefix>refresh</mat-icon>
+          Reload
+        </button>
+      </ng-template>
       <ng-template #side>
         <app-drawer></app-drawer>
       </ng-template>
       <ng-template #body>
         <div [class]="(deviceState.isSmallScreen | async)===true?'orders-container-mobile':'orders-container'">
-          <div class="actions-container">
+          <div class="actions-container" *ngIf="(deviceState.isSmallScreen | async)===false">
             <button (click)="addOrder()" color="primary" mat-button>
               <mat-icon matPrefix>add</mat-icon>
               Add
@@ -38,8 +51,7 @@ import {DialogNewOrderComponent} from '../components/dialog-new-order.component'
             <mat-paginator [ngStyle]="{display: (deviceState.isSmallScreen | async)===true?'none':''}" #c_paginator></mat-paginator>
             <!--            </div>-->
           </div>
-          <app-order-list
-            [paginator]="c_paginator"></app-order-list>
+          <app-order-list [paginator]="c_paginator"></app-order-list>
         </div>
       </ng-template>
     </app-layout-sidenav>

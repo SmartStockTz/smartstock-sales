@@ -9,7 +9,7 @@ import {MatPaginator} from '@angular/material/paginator';
   template: `
     <div class="actions-container-wrapper">
       <div class="actions-container">
-        <mat-form-field appearance="legacy">
+        <mat-form-field appearance="outline">
           <mat-label>Date</mat-label>
           <input [formControl]="dateControl" matInput [matDatepicker]="picker" [disabled]="true">
           <mat-datepicker-toggle matSuffix [for]="picker" [disabled]="false"></mat-datepicker-toggle>

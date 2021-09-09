@@ -9,7 +9,7 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 @Component({
   selector: 'app-customer-page',
   template: `
-    <app-layout-sidenav searchPlaceholder=""
+    <app-layout-sidenav searchPlaceholder="Type to filter"
                         [heading]="'Customers'"
                         [leftDrawerOpened]="(deviceState.enoughWidth | async)===true"
                         [leftDrawerMode]="(deviceState.enoughWidth | async)===true?'side':'over'"
@@ -17,14 +17,27 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
                         backLink="/sale"
                         [hasBackRoute]="true"
                         [showSearch]="true"
+                        [visibleMenu]="visibleMenu"
+                        [hiddenMenu]="hiddenMenu"
                         (searchCallback)="onCustomerSearch($event)"
                         [leftDrawer]="side">
+      <ng-template #visibleMenu>
+        <button (click)="addCustomer()" color="primary" mat-icon-button>
+          <mat-icon matPrefix>add</mat-icon>
+        </button>
+      </ng-template>
+      <ng-template #hiddenMenu>
+        <button (click)="hotReload()" mat-menu-item>
+          <mat-icon matPrefix>refresh</mat-icon>
+          Reload
+        </button>
+      </ng-template>
       <ng-template #side>
         <app-drawer></app-drawer>
       </ng-template>
       <ng-template #body>
         <div [class]="(deviceState.isSmallScreen | async)===true?'customers-container-mobile':'customers-container'">
-          <div class="actions-container">
+          <div *ngIf="(deviceState.isSmallScreen | async)===false" class="actions-container">
             <button (click)="addCustomer()" color="primary" mat-button>
               <mat-icon matPrefix>add</mat-icon>
               Add

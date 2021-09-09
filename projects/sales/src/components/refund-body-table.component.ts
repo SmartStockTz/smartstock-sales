@@ -30,7 +30,7 @@ import {CreateRefundDialogComponent} from './create-refund-dialog.component';
       </ng-container>
       <ng-container matColumnDef="time">
         <th mat-header-cell class="table-column-title" *matHeaderCellDef mat-sort-header>Time</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row | muda}} </td>
+        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.timer | muda}} </td>
         <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
       <ng-container matColumnDef="amount">
@@ -56,11 +56,11 @@ import {CreateRefundDialogComponent} from './create-refund-dialog.component';
           </button>
           <mat-menu #menu>
             <mat-nav-list>
-              <mat-list-item (click)="refund(row)">
+              <mat-list-item style="padding: 0 16px!important;" (click)="refund(row)">
                 <p matLine>Revert / Return</p>
                 <mat-icon matListIcon>history</mat-icon>
               </mat-list-item>
-              <mat-list-item (click)="clear(row)">
+              <mat-list-item style="padding: 0 16px!important;" (click)="clear(row)">
                 <p matLine>Clear revert</p>
                 <mat-icon matListIcon>clear</mat-icon>
               </mat-list-item>

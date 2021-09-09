@@ -71,21 +71,21 @@ import {AddToCartSheetComponent} from './add-to-cart-sheet.component';
 
       <div style="width: 95vw" *ngIf="(deviceState.isSmallScreen | async) === true">
         <mat-list-item style="width: 100%;" (click)='openSheet(productIndex)'>
-          <mat-icon [ngClass]="instock ? 'text-success' : 'text-danger'" matListIcon>
-            {{instock ? 'widgets' : 'widgets'}}
-          </mat-icon>
-          <p matLine class="text-wrap"
+<!--          <mat-icon [ngClass]="instock ? 'text-success' : 'text-danger'" matListIcon>-->
+<!--            {{instock ? 'widgets' : 'widgets'}}-->
+<!--          </mat-icon>-->
+          <span matLine class="text-wrap"
              matTooltip="{{stock.product}}"
              style="font-weight: bold;">
             {{stock.product}}
-          </p>
-          <p matLine class="text-truncate" style="color: gray;">
-            {{stock.category}}
-            | <span [ngClass]="instock ? 'text-success' : 'text-danger'">{{instock ? 'IN' : 'OUT'}}</span>
-          </p>
-          <p matLine class="text-wrap" style="font-weight: 500;">
-            {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | fedha | async}}
-          </p>
+          </span>
+<!--          <p matLine class="text-truncate" style="color: gray;">-->
+<!--            {{stock.category}}-->
+<!--            | <span [ngClass]="instock ? 'text-success' : 'text-danger'">{{instock ? 'IN' : 'OUT'}}</span>-->
+<!--          </p>-->
+          <mat-card-subtitle matLine class="text-wrap" style="font-weight: 500;">
+            Price : {{(isViewedInWholesale ? stock.wholesalePrice : stock.retailPrice)  | fedha | async}}
+          </mat-card-subtitle>
         </mat-list-item>
       </div>
     </div>

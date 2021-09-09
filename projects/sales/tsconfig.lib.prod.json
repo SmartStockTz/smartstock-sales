@@ -6,7 +6,6 @@
   },
   "angularCompilerOptions": {
     "enableIvy": true,
-    "compilationMode": "full"
   },
   "include": [
     "src/workers/**.worker.ts"

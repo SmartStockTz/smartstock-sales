@@ -1,15 +1,15 @@
 {
   "name": "smartstock-sales",
-  "version": "0.1.7",
+  "version": "0.1.19",
   "scripts": {
     "ng": "ng",
     "start": "ng serve sales-mock",
     "build": "ng build -c production sales && node copy-workers.js",
+    "publish": "npm run build && cd dist/sales && npm publish --ignore-script",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "~12.1.4",
     "@angular/cdk": "~12.1.4",

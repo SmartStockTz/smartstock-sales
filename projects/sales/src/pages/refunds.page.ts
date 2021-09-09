@@ -13,10 +13,20 @@ import {RefundState} from '../states/refund.state';
       [leftDrawerOpened]="(deviceState.enoughWidth | async)===true"
       [heading]="'Refunds'"
       [showSearch]="true"
+      [hiddenMenu]="hideOptions"
+      [visibleMenu]="showOptions"
       searchPlaceholder="Type to filter"
       (searchCallback)="filterSales($event)"
       [isMobile]="(deviceState.isSmallScreen | async)===true"
       backLink="/sale">
+      <ng-template #hideOptions>
+
+      </ng-template>
+      <ng-template #showOptions>
+<!--        <button (click)="hotReload()" color="primary" mat-icon-button>-->
+<!--          <mat-icon matPrefix>refresh</mat-icon>-->
+<!--        </button>-->
+      </ng-template>
       <ng-template #side>
         <app-drawer></app-drawer>
       </ng-template>
@@ -40,4 +50,8 @@ export class RefundsPage extends DeviceInfoUtil implements OnInit {
   filterSales(keyword: string) {
     this.refundState.filterKeyword.next(keyword);
   }
+
+  // hotReload() {
+  //   this.refundState.getSales()
+  // }
 }

@@ -38,7 +38,7 @@ import {DeviceState} from '@smartstocktz/core-libs';
                 <mat-icon color="primary" matListIcon>{{page.icon}}</mat-icon>
                 <h1 matLine>{{page.name}}</h1>
                 <mat-card-subtitle matLine>{{page.detail}}</mat-card-subtitle>
-<!--                <mat-icon matSuffix>chevron_right</mat-icon>-->
+                <mat-icon matSuffix>chevron_right</mat-icon>
               </mat-list-item>
               <mat-divider></mat-divider>
             </div>
@@ -48,7 +48,7 @@ import {DeviceState} from '@smartstocktz/core-libs';
       </ng-template>
     </app-layout-sidenav>
   `,
-  styleUrls: ['../styles/index.style.css']
+  styleUrls: ['../styles/index.style.scss']
 })
 
 export class IndexPage implements OnInit {

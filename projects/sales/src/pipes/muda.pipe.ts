@@ -12,8 +12,8 @@ export class MudaPipe implements PipeTransform {
   }
 
   transform(value: any, ...args: any[]): string {
-    if (value?.timer) {
-      return moment(value.timer).format('HH:MM');
+    if (value) {
+      return moment(value).format('HH:MM');
     } else {
       return 'N/A';
     }

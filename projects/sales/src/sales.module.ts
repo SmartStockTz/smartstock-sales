@@ -73,6 +73,8 @@ import {RefundBodyMobileComponent} from './components/refund-body.mobile.compone
 import {RefundBodyHeaderComponent} from './components/refund-body-header.component';
 import {RefundBodyTableComponent} from './components/refund-body-table.component';
 import {MudaPipe} from './pipes/muda.pipe';
+import {RefundBodyHeaderMobileComponent} from './components/refund-body-header.mobile.component';
+import {RefundBodyListMobileComponent} from './components/refund-body-list.mobile.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -150,6 +152,8 @@ const routes: Routes = [
     InvoiceDetailsComponent,
     InfoDialogComponent,
     CreateCreditorComponent,
+    RefundBodyHeaderMobileComponent,
+    RefundBodyListMobileComponent,
     OrdersItemsComponent,
     OrderPaymentStatusComponent,
     IndexPage,

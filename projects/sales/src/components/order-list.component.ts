@@ -21,7 +21,6 @@ import {OrdersItemsComponent} from './orders-items.component';
   template: `
     <mat-progress-bar *ngIf="orderState.getOrderFlag | async" mode="indeterminate" color="primary"></mat-progress-bar>
     <table *ngIf="(deviceState.isSmallScreen | async) ===false" mat-table [dataSource]="dataSource" matSort>
-
       <ng-container matColumnDef="details">
         <th class="table-title-text" mat-header-cell *matHeaderCellDef mat-sort-header>Details</th>
         <td class="table-body-text" mat-cell *matCellDef="let row">

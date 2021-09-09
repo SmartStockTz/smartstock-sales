@@ -2,6 +2,14 @@
   padding: 14px 16px;
 }
 
+.refund-container-mobile {
+  padding: 0 16px;
+}
+
+.date-input-mobile {
+  flex-grow: 1;
+}
+
 .actions-container {
   display: flex;
   align-items: center;
@@ -9,7 +17,28 @@
   //flex-direction: row;
 }
 
-.actions-container-wrapper{
+.actions-container-mobile {
+  display: flex;
+  align-items: center;
+  //flex-wrap: nowrap;
+  //flex-direction: row;
+}
+
+::ng-deep {
+  .mat-form-field-wrapper {
+    padding: 0 !important;
+  }
+}
+
+.progress-mobile {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.actions-container-wrapper {
   background: white;
   z-index: 10000;
   padding-top: 4px;
@@ -17,16 +46,27 @@
   top: 64px;
 }
 
+::ng-deep {
+  .mat-list-item-content {
+    padding: 0 !important;
+  }
+}
+
+mat-list-item {
+  padding: 0;
+  margin: 0;
+}
+
 .actions-spacer {
   flex: 1 1 auto;
 }
 
-.table-header{
+.table-header {
   background: #F0F0F0;
-  border-radius: 5px!important;
+  border-radius: 5px !important;
 }
 
-.table-column-title{
+.table-column-title {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   font-style: normal;
   font-weight: 300;
