@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {IpfsService, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import * as bfast from 'bfast';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
@@ -7,6 +7,7 @@ import {OrdersWorker} from '../workers/orders.worker';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {CartItemModel} from '../models/cart-item.model';
+import {CidService} from './cid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class OrderService {
   private ordersWorker: OrdersWorker;
   private ordersWorkerNative;
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly userService: UserService,
+              private readonly cidService: CidService) {
   }
 
   async startWorker(shop: ShopModel) {
@@ -32,6 +34,18 @@ export class OrderService {
       this.ordersWorker = undefined;
       this.ordersWorkerNative = undefined;
     }
+  }
+
+  private async remoteAllOrders(shop: ShopModel): Promise<OrderModel[]> {
+    // this.remoteAllOrdersRunning = true;
+    const cids = await bfast.database(shop.projectId)
+      .collection('orders')
+      .getAll<string>({
+        cids: true
+      }).finally(() => {
+        // this.remoteAllOrdersRunning = false;
+      });
+    return this.cidService.toDatas(cids);
   }
 
   async saveOrder(
@@ -56,16 +70,17 @@ export class OrderService {
     );
   }
 
-  async getOrders(): Promise<CustomerModel[]> {
+  async getOrders(): Promise<OrderModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
     return this.ordersWorker.getOrders(shop);
   }
 
-  async getRemoteOrders(): Promise<CustomerModel[]> {
+  async getRemoteOrders(): Promise<OrderModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    return this.ordersWorker.getOrdersRemote(shop);
+    const orders = await this.remoteAllOrders(shop);
+    return this.ordersWorker.getOrdersRemote(shop, orders);
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {

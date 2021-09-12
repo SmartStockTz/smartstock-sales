@@ -9,7 +9,7 @@ import {InvoiceDetailsComponent} from './invoice-details.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {AddReturnSheetComponent} from './add-returns-sheet.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
   template: `

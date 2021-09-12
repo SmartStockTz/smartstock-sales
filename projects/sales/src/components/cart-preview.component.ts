@@ -1,13 +1,13 @@
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UtilsService} from '../services/utils.service';
 import {MatSidenav} from '@angular/material/sidenav';
-import {DeviceInfoUtil} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
+import {DeviceState} from '@smartstocktz/core-libs';
 
 @Component({
   selector: 'app-cart-preview',
   template: `
-    <div style="padding: 16px" [ngClass]="isMobile?'fixed-bottom':!enoughWidth()?'fixed-bottom-web-enough-width':'fixed-bottom-web'"
+    <div style="padding: 16px" [ngClass]="isMobile?'fixed-bottom':!deviceState.enoughWidth.value?'fixed-bottom-web-enough-width':'fixed-bottom-web'"
          *ngIf="(cartState.carts | async).length  > 0">
       <button (click)="showMainCart()" mat-flat-button class="ft-button" color="primary">
         {{totalItems | number}} Items = {{totalCost | fedha | async}}
@@ -19,7 +19,7 @@ import {CartState} from '../states/cart.state';
     UtilsService
   ]
 })
-export class CartPreviewComponent extends DeviceInfoUtil implements OnInit {
+export class CartPreviewComponent implements OnInit {
   totalCost = 0;
   totalItems = 0;
   @Input() isWholeSale = false;
@@ -27,9 +27,9 @@ export class CartPreviewComponent extends DeviceInfoUtil implements OnInit {
   isMobile = false;
 
   constructor(public readonly cartState: CartState,
+              public readonly deviceState: DeviceState,
               private readonly changeDetectorRef: ChangeDetectorRef,
               private readonly utilsService: UtilsService) {
-    super();
   }
 
   ngOnInit(): void {

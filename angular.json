@@ -101,9 +101,17 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "dev": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
           },
-          "defaultConfiguration": ""
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -113,8 +121,12 @@
           "configurations": {
             "production": {
               "browserTarget": "sales-mock:build:production"
+            },
+            "dev": {
+              "browserTarget": "sales-mock:build:dev"
             }
-          }
+          },
+          "defaultConfiguration": "dev"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

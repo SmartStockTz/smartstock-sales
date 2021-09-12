@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {DeviceInfoUtil, DeviceState} from '@smartstocktz/core-libs';
+import {DeviceState} from '@smartstocktz/core-libs';
 import {RefundState} from '../states/refund.state';
 
 @Component({
@@ -23,9 +23,9 @@ import {RefundState} from '../states/refund.state';
 
       </ng-template>
       <ng-template #showOptions>
-<!--        <button (click)="hotReload()" color="primary" mat-icon-button>-->
-<!--          <mat-icon matPrefix>refresh</mat-icon>-->
-<!--        </button>-->
+        <!--        <button (click)="hotReload()" color="primary" mat-icon-button>-->
+        <!--          <mat-icon matPrefix>refresh</mat-icon>-->
+        <!--        </button>-->
       </ng-template>
       <ng-template #side>
         <app-drawer></app-drawer>
@@ -38,10 +38,9 @@ import {RefundState} from '../states/refund.state';
   `,
   styleUrls: []
 })
-export class RefundsPage extends DeviceInfoUtil implements OnInit {
+export class RefundsPage implements OnInit {
   constructor(public readonly deviceState: DeviceState,
               public readonly refundState: RefundState) {
-    super();
   }
 
   ngOnInit(): void {

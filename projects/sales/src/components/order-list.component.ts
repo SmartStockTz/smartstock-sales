@@ -13,7 +13,8 @@ import {OrderModel} from '../models/order.model';
 import {DeleteConfirmDialogComponent} from './delete-confirm-dialog.component';
 import {CartState} from '../states/cart.state';
 import {Router} from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
+
 import {OrdersItemsComponent} from './orders-items.component';
 
 @Component({

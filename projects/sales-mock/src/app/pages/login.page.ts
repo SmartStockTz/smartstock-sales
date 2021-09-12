@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import * as bfast from 'bfast';
-import {StorageService} from '@smartstocktz/core-libs';
+import {UserService} from '@smartstocktz/core-libs';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +37,7 @@ export class LoginPageComponent implements OnInit {
 
   constructor(private readonly formBuilder: FormBuilder,
               private readonly router: Router,
-              private readonly storageService: StorageService,
+              private readonly userService: UserService,
               private readonly snack: MatSnackBar) {
   }
 
@@ -56,8 +56,8 @@ export class LoginPageComponent implements OnInit {
               auth: 'DEFAULT'
             }
           }, user.projectId);
-          await this.storageService.saveCurrentProjectId('0UTYLQKeifrk');
-          await this.storageService.saveActiveShop(user as any);
+          // await this.userService.saveCurrentProjectId('0UTYLQKeifrk');
+          await this.userService.saveCurrentShop(user as any);
         })
         .catch(reason => {
           this.snack.open(reason && reason.message ? reason.message : reason, 'Ok');

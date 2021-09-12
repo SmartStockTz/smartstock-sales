@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {UserService} from '@smartstocktz/core-libs';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Pipe({
   name: 'muda'
@@ -13,7 +13,7 @@ export class MudaPipe implements PipeTransform {
 
   transform(value: any, ...args: any[]): string {
     if (value) {
-      return moment(value).format('HH:MM');
+      return moment(value).format('HH:mm');
     } else {
       return 'N/A';
     }

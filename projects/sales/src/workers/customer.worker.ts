@@ -2,7 +2,6 @@ import {expose} from 'comlink';
 import * as bfast from 'bfast';
 import {CustomerModel} from '../models/customer.model';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
-import {sha256} from 'crypto-hash';
 
 function init(shop: ShopModel) {
   bfast.init({
@@ -28,12 +27,6 @@ export class CustomerWorker {
       .changes(() => {
         console.log('customer changes connected');
         this.syncCustomers(shop).catch(console.log);
-        if (this.remoteAllCustomerRunning === false) {
-          this.getCustomersRemote(shop)
-            .catch(console.log);
-        } else {
-          // console.log('already fetched');
-        }
       }, () => {
         console.log('customer changes disconnected');
       });
@@ -58,17 +51,6 @@ export class CustomerWorker {
   }
 
   private syncInterval;
-  private remoteAllCustomerRunning = false;
-
-  private static async customerLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
-    const hashesMap = {};
-    if (Array.isArray(localCustomers)) {
-      for (const localC of localCustomers) {
-        hashesMap[await sha256(JSON.stringify(localC))] = localC;
-      }
-    }
-    return hashesMap;
-  }
 
   private static async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
     const customers = await bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).get('all');
@@ -109,7 +91,8 @@ export class CustomerWorker {
 
   private static async getCustomersLocalSync(shop: ShopModel) {
     // console.log('******');
-    return bfast.cache({database: 'customers', collection: 'customers_sync'}, shop.projectId).getAll();
+    return bfast.cache({database: 'customers', collection: 'customers_sync'}, shop.projectId)
+      .getAll();
   }
 
   private static async removeCustomerLocalSync(customer: CustomerModel, shop: ShopModel) {
@@ -164,43 +147,13 @@ export class CustomerWorker {
     }, 2000);
   }
 
-  private async remoteAllCustomers(shop: ShopModel, hashes: any[] = []): Promise<CustomerModel[]> {
-    this.remoteAllCustomerRunning = true;
-    return bfast.database(shop.projectId)
-      .collection('customers')
-      .getAll<CustomerModel>({
-        hashes
-      }).finally(() => {
-        this.remoteAllCustomerRunning = false;
-      });
-  }
-
-  private remoteCustomerMapping(customers: CustomerModel[], hashesMap): CustomerModel[] {
-    if (Array.isArray(customers)) {
-      customers = customers.map(x => {
-        if (hashesMap[x.toString()]) {
-          return hashesMap[x.toString()];
-        } else {
-          return x;
-        }
-      });
-    }
-    return customers;
-  }
-
-  async getCustomersRemote(shop: ShopModel): Promise<CustomerModel[]> {
+  async getCustomersRemote(shop: ShopModel, rCustomers: CustomerModel[]): Promise<CustomerModel[]> {
     const localCustomers = await CustomerWorker.getCustomersLocal(shop);
-    const hashesMap = await CustomerWorker.customerLocalHashMap(localCustomers);
-    let customers = [];
-    try {
-      customers = await this.remoteAllCustomers(shop, Object.keys(hashesMap));
-      customers = this.remoteCustomerMapping(customers, hashesMap);
-    } catch (e) {
-      console.log(e);
-      customers = localCustomers;
+    if (!rCustomers){
+      rCustomers = localCustomers;
     }
-    await CustomerWorker.setCustomersLocal(customers, shop);
-    return customers;
+    await CustomerWorker.setCustomersLocal(rCustomers, shop);
+    return rCustomers;
   }
 
   async getCustomers(shop: ShopModel): Promise<CustomerModel[]> {
@@ -208,7 +161,7 @@ export class CustomerWorker {
     if (Array.isArray(localCustomers) && localCustomers.length !== 0) {
       return localCustomers;
     } else {
-      return this.getCustomersRemote(shop);
+      return [];
     }
   }
 

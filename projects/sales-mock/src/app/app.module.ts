@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {LibModule} from '@smartstocktz/core-libs';
+import {IpfsService, LibModule} from '@smartstocktz/core-libs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
 import {LoginPageComponent} from './pages/login.page';
@@ -43,11 +43,13 @@ const routes: Routes = [
     MatCardModule,
     MatSnackBarModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(private readonly navigationState: SalesNavigationService) {
+    IpfsService.getVersion().then(value => {
+      console.log('ipfs version : ', value?.version);
+    }).catch(console.log);
     bfast.init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',

@@ -3,7 +3,6 @@ import * as bfast from 'bfast';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {StockModel} from '../models/stock.model';
 import {BatchModel} from '../models/batch.model';
-import {sha256} from 'crypto-hash';
 import {SecurityUtil} from '@smartstocktz/core-libs';
 import {SalesModel} from '../models/sale.model';
 import {StockSyncModel} from '../models/stock-sync.model';
@@ -29,18 +28,7 @@ export class SaleWorker {
     this.syncSales();
   }
 
-  remoteAllProductsRunning = false;
   shouldSaleSync = true;
-
-  private static async productsLocalHashMap(localCustomers: any[]): Promise<{ [key: string]: any }> {
-    const hashesMap = {};
-    if (Array.isArray(localCustomers)) {
-      for (const localC of localCustomers) {
-        hashesMap[await sha256(JSON.stringify(localC))] = localC;
-      }
-    }
-    return hashesMap;
-  }
 
   private static async getShops() {
     try {
@@ -173,7 +161,7 @@ export class SaleWorker {
     return products;
   }
 
-  async setSalesLocal(batchs: BatchModel[], shop: ShopModel, cartId: string) {
+  async setSalesLocal(batchs: BatchModel[], shop: ShopModel, cartId: string): Promise<any> {
     if (batchs?.length === 0) {
       return;
     }
@@ -182,7 +170,8 @@ export class SaleWorker {
 
   async getSalesLocal(shop: ShopModel) {
     init(shop);
-    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).getAll();
+    return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId)
+      .getAll();
   }
 
   async getSaleLocal(id: string, shop: ShopModel): Promise<any[]> {
@@ -198,18 +187,6 @@ export class SaleWorker {
   async removeSalesLocal(cartId: string, shop: ShopModel) {
     init(shop);
     return bfast.cache({database: 'sales', collection: 'sales'}, shop.projectId).remove(cartId, true);
-  }
-
-  private async remoteAllProducts(shop: ShopModel, hashes: any[] = []): Promise<StockModel[]> {
-    init(shop);
-    this.remoteAllProductsRunning = true;
-    return bfast.database(shop.projectId)
-      .collection('stocks')
-      .getAll<StockModel>({
-        hashes
-      }).finally(() => {
-        this.remoteAllProductsRunning = false;
-      });
   }
 
   private remoteProductsMapping(products: StockModel[], hashesMap): StockModel[] {
@@ -310,17 +287,12 @@ export class SaleWorker {
     }, 3000);
   }
 
-  async getProductsRemote(shop: ShopModel): Promise<StockModel[]> {
+  async getProductsRemote(shop: ShopModel, products: StockModel[]): Promise<StockModel[]> {
     init(shop);
     const localProducts = await this.getProductsLocal(shop);
-    const hashesMap = await SaleWorker.productsLocalHashMap(localProducts);
-    let products: StockModel[];
-    try {
-      products = await this.remoteAllProducts(shop, Object.keys(hashesMap));
-      products = this.remoteProductsMapping(products, hashesMap);
-    } catch (e) {
-      console.log(e);
+    if (!products) {
       products = localProducts;
+      console.log('no remote hence use local products');
     }
     await this.setProductsLocal(products, shop);
     return await this.getProductsLocal(shop);

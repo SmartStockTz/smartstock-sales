@@ -3,7 +3,7 @@ import {CartItemModel} from '../models/cart-item.model';
 import {CartModel} from '../models/cart.model';
 import {SalesModel} from '../models/sale.model';
 import {toSqlDate} from '@smartstocktz/core-libs';
-import * as moment from 'moment';
+import moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
 
 export class CartWorker {

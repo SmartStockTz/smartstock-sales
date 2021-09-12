@@ -3,7 +3,7 @@ import {CartItemModel} from '../models/cart-item.model';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {CartWorker} from '../workers/cart.worker';
-import {PrintService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
+import {IpfsService, PrintService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {SaleService} from './sale.service';
 import {SalesModel} from '../models/sale.model';
 import {CustomerModel} from '../models/customer.model';

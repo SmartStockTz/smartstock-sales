@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
-import {UserService} from '@smartstocktz/core-libs';
+import {IpfsService, UserService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {wrap} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {CustomerWorker} from '../workers/customer.worker';
+import {database} from 'bfast';
+import {CidService} from './cid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +13,8 @@ import {CustomerWorker} from '../workers/customer.worker';
 export class CustomerService {
   private customerWorker: CustomerWorker;
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly userService: UserService,
+              private readonly cidsService: CidService) {
 
   }
 
@@ -28,10 +31,23 @@ export class CustomerService {
     return this.customerWorker.getCustomers(shop);
   }
 
+  private async remoteAllCustomers(shop: ShopModel): Promise<CustomerModel[]> {
+    // this.remoteAllCustomerRunning = true;
+    const cids = await database(shop.projectId)
+      .collection('customers')
+      .getAll<string>({
+        cids: true
+      }).finally(() => {
+        // this.remoteAllCustomerRunning = false;
+      });
+    return this.cidsService.toDatas(cids);
+  }
+
   async getRemoteCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.initClass(shop);
-    return this.customerWorker.getCustomersRemote(shop);
+    const customers = await this.remoteAllCustomers(shop);
+    return this.customerWorker.getCustomersRemote(shop, customers);
   }
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {

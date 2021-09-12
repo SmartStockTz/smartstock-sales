@@ -5,19 +5,32 @@
     "outDir": "../../out-tsc/lib",
     "target": "es2015",
     "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    //    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+//    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "module": "es2020",
+    //    "lib": ["esnext", "dom", "es2020"],
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "declarationMap": true,
     "inlineSources": true,
     "types": [],
     "lib": [
       "dom",
       "es2018"
-    ],
-
+    ]
   },
   "angularCompilerOptions": {
-    "skipTemplateCodegen": true,
-    "strictMetadataEmit": true,
-    "enableResourceInlining": true,
+//    "skipTemplateCodegen": true,
+//    "strictMetadataEmit": true,
+//    "enableResourceInlining": true,
   },
   "exclude": [
     "src/test.ts",

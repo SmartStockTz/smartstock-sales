@@ -5,7 +5,6 @@ import {CartItemModel} from '../models/cart-item.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrderSyncModel} from '../models/order-sync.model';
 import {OrderModel} from '../models/order.model';
-import {sha256} from 'crypto-hash';
 import {SecurityUtil} from '@smartstocktz/core-libs';
 
 function init(shop: ShopModel) {
@@ -24,25 +23,14 @@ function init(shop: ShopModel) {
 
 export class OrdersWorker {
 
-  constructor(shop: ShopModel) {
-    init(shop);
-    this.syncOrders(shop).catch(console.log);
-    this.listeningOrders(shop).catch(console.log);
+  constructor(private readonly shop: ShopModel) {
+    init(this.shop);
+    this.syncOrders(this.shop).catch(console.log);
+    this.listeningOrders(this.shop).catch(console.log);
   }
 
   private syncInterval;
-  private remoteAllOrdersRunning = false;
   private changes;
-
-  private static async orderLocalHashMap(localOrders: any[]): Promise<{ [key: string]: any }> {
-    const hashesMap = {};
-    if (Array.isArray(localOrders)) {
-      for (const localC of localOrders) {
-        hashesMap[await sha256(JSON.stringify(localC))] = localC;
-      }
-    }
-    return hashesMap;
-  }
 
   private setOrderSyncLocal(order: OrderSyncModel, shop): Promise<OrderSyncModel> {
     return bfast.cache({database: 'orders', collection: 'orders_sync'}, shop.projectId).set(order.order.id, order);
@@ -62,7 +50,6 @@ export class OrdersWorker {
       .query()
       .changes(() => {
         console.log('orders changes connected');
-        this.getOrdersRemote(shop).catch(console.log);
       }, () => {
         console.log('orders changes disconnected');
       });
@@ -125,17 +112,6 @@ export class OrdersWorker {
     } else {
       return [];
     }
-  }
-
-  private async remoteAllOrders(shop: ShopModel, hashes: any[] = []): Promise<OrderModel[]> {
-    this.remoteAllOrdersRunning = true;
-    return bfast.database(shop.projectId)
-      .collection('orders')
-      .getAll<CustomerModel>({
-        hashes
-      }).finally(() => {
-        this.remoteAllOrdersRunning = false;
-      });
   }
 
   private remoteOrdersMapping(orders: OrderModel[], hashesMap): OrderModel[] {
@@ -258,19 +234,13 @@ export class OrdersWorker {
     return order.order;
   }
 
-  async getOrdersRemote(shop: ShopModel): Promise<CustomerModel[]> {
+  async getOrdersRemote(shop: ShopModel, rOrders: OrderModel[]): Promise<OrderModel[]> {
     const localOrders = await this.getOrdersLocal(shop);
-    const hashesMap = await OrdersWorker.orderLocalHashMap(localOrders);
-    let orders = [];
-    try {
-      orders = await this.remoteAllOrders(shop, Object.keys(hashesMap));
-      orders = this.remoteOrdersMapping(orders, hashesMap);
-    } catch (e) {
-      console.log(e);
-      orders = localOrders;
+    if (!rOrders) {
+      rOrders = localOrders;
     }
-    await this.setOrdersLocal(orders, shop);
-    return orders.sort((a, b) => {
+    await this.setOrdersLocal(rOrders, shop);
+    return rOrders.sort((a, b) => {
       if (a.createdAt > b.createdAt) {
         return -1;
       } else if (a.createdAt < b.createdAt) {
@@ -294,7 +264,7 @@ export class OrdersWorker {
         }
       });
     } else {
-      return this.getOrdersRemote(shop);
+      return [];
     }
   }
 

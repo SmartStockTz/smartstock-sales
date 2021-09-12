@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {SaleWorker} from '../workers/sale.worker';
-import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
+import {IpfsService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
 import * as bfast from 'bfast';
+import {CidService} from './cid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,10 @@ export class SaleService {
   private saleWorker: SaleWorker;
   private saleWorkerNative;
   private changes;
+  private remoteAllProductsRunning: boolean;
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly userService: UserService,
+              private readonly cidService: CidService) {
 
   }
 
@@ -49,10 +52,25 @@ export class SaleService {
     return this.saleWorker.saveSale(sales, shop, cartId);
   }
 
+  private async remoteAllProducts(shop: ShopModel): Promise<StockModel[]> {
+    this.remoteAllProductsRunning = true;
+    const cids = await bfast.database(shop.projectId)
+      .collection('stocks')
+      .getAll<string>({
+        cids: true
+      }).finally(() => {
+        this.remoteAllProductsRunning = false;
+      });
+    // console.log(cids.length, 'total cids');
+    return this.cidService.toDatas(cids);
+  }
+
   async getProductsRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    return this.saleWorker.getProductsRemote(shop);
+    const products = await this.remoteAllProducts(shop);
+    // console.log(products?.length, 'total all products');
+    return this.saleWorker.getProductsRemote(shop, products);
   }
 
   async search(query: string): Promise<StockModel[]> {
@@ -68,7 +86,7 @@ export class SaleService {
       .query()
       .changes(() => {
         console.log('stocks-sales changes connected');
-        this.getProductsRemote().catch(console.log);
+        // this.getProductsRemote().catch(console.log);
       }, () => {
         console.log('stocks-sales changes disconnected');
       });
