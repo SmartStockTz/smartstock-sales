@@ -105,7 +105,6 @@ export class CustomersTableComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnInit(): void {
-    this.customerState.fetchCustomers();
   }
 
   configureDataSource() {

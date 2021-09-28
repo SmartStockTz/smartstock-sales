@@ -161,6 +161,15 @@ export class CustomerWorker {
     if (!rCustomers) {
       rCustomers = localCustomers;
     }
+    rCustomers.sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return 1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return -1;
+      }
+      return 0;
+    });
     await CustomerWorker.setCustomersLocal(rCustomers, shop);
     return rCustomers;
   }

@@ -41,6 +41,7 @@ export class CustomersTableOptionsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.customerState.fetchCustomers();
   }
 
   hotReload() {
