@@ -3,7 +3,7 @@ import {CartItemModel} from '../models/cart-item.model';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {CartWorker} from '../workers/cart.worker';
-import {IpfsService, PrintService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
+import {LibUserModel, PrintService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {SaleService} from './sale.service';
 import {SalesModel} from '../models/sale.model';
 import {CustomerModel} from '../models/customer.model';
@@ -53,13 +53,16 @@ export class CartService {
     customer: CustomerModel,
     channel: string,
     discount: number,
-    user: any
+    user: LibUserModel
   ): Promise<any> {
     discount = isNaN(discount) ? 0 : discount;
     const shop = await this.userService.getCurrentShop();
     await this.initWorker(shop);
     await this.printCart(carts, channel, discount, customer, false);
     const salesToSave: SalesModel[] = await this.cartWorker.getSalesBatch(carts, channel, discount, customer, user);
+    // console.log(customer);
+    console.log(salesToSave);
+    // return ;
     return this.salesService.saveSale(salesToSave);
   }
 

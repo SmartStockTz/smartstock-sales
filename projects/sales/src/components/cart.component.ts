@@ -134,6 +134,7 @@ export class CartComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.cartState.dispose();
     this.customerState.customers.next([]);
+    this.cartState.selectedCustomer.next(null);
     this.destroyer.next('done');
   }
 
@@ -184,6 +185,12 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   checkout(): void {
+    if (this.currentUser.id === 'smartstock-hq' && !this.cartState.selectedCustomer.value) {
+      this.snack.open('Please choose existing customer', 'Ok', {
+        duration: 2000
+      });
+      return;
+    }
     if (!this.cartState.selectedCustomer.value && this.customerFormControl.value && this.customerFormControl.value !== '') {
       this.cartState.selectedCustomer.next({
         displayName: this.customerFormControl.value,

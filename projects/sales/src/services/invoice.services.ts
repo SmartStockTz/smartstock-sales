@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {SettingsService, StorageService, UserService} from '@smartstocktz/core-libs';
+import {UserService} from '@smartstocktz/core-libs';
 import * as bfast from 'bfast';
 import {InvoiceModel} from '../models/invoice.model';
 

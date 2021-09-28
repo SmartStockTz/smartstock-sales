@@ -50,7 +50,7 @@ import {IncompleteInvoicesTableComponent} from './components/incomplete-invoices
 import {InvoiceDetailsComponent} from './components/invoice-details.component';
 import {AddReturnSheetComponent} from './components/add-returns-sheet.component';
 import {CustomersPage} from './pages/customers.page';
-import {CustomerListComponent} from './components/customer-list.component';
+import {CustomersListComponent} from './components/customers-list.component';
 import {RefundsPage} from './pages/refunds.page';
 import {ReturnsDetailsComponent} from './components/returns-details.component';
 import {CreateRefundDialogComponent} from './components/create-refund-dialog.component';
@@ -75,6 +75,9 @@ import {RefundBodyTableComponent} from './components/refund-body-table.component
 import {MudaPipe} from './pipes/muda.pipe';
 import {RefundBodyHeaderMobileComponent} from './components/refund-body-header.mobile.component';
 import {RefundBodyListMobileComponent} from './components/refund-body-list.mobile.component';
+import {CustomerActiveComponent} from './components/customer-active.component';
+import {CustomersTableComponent} from './components/customers-table.component';
+import {CustomersTableOptionsComponent} from './components/customers-table-options.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -139,12 +142,15 @@ const routes: Routes = [
     MatCheckboxModule
   ],
   declarations: [
+    CustomerActiveComponent,
+    CustomersTableComponent,
+    CustomersTableOptionsComponent,
     AddToCartSheetComponent,
     PeriodDateRangeComponent,
     CreateRefundDialogComponent,
     ReturnsDetailsComponent,
     RefundsPage,
-    CustomerListComponent,
+    CustomersListComponent,
     CustomersPage,
     AddReturnSheetComponent,
     IncompleteInvoicesTableComponent,

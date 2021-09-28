@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SaleWorker} from '../workers/sale.worker';
-import {IpfsService, SecurityUtil, UserService} from '@smartstocktz/core-libs';
+import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';

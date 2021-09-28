@@ -3,6 +3,8 @@ export interface CustomerModel {
   email?: string;
   company?: string;
   street?: string;
+  payNumber?: string;
+  payRef?: string;
   createdAt?: any;
   _created_at?: any;
   updatedAt?: any;

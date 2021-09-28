@@ -79,9 +79,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   showRefreshCart = false;
   destroyer = new Subject<any>();
 
-  constructor(public readonly storage: StorageService,
-              public readonly snack: MatSnackBar,
-              public readonly logger: LogService,
+  constructor(public readonly snack: MatSnackBar,
               public readonly changeDetect: ChangeDetectorRef,
               public readonly cartState: CartState,
               public readonly deviceState: DeviceState,

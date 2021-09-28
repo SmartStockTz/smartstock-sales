@@ -53,9 +53,18 @@ export class CustomerWorker {
   private syncInterval;
 
   private static async getCustomersLocal(shop: ShopModel): Promise<CustomerModel[]> {
-    const customers = await bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).get('all');
+    const customers: CustomerModel[] = await bfast.cache({database: 'customers', collection: 'customers'}, shop.projectId).get('all');
     // const localCustomers: any[] = await this.customersCache.get('_all');
     if (Array.isArray(customers)) {
+      customers.sort((a, b) => {
+        if (a.createdAt < b.createdAt) {
+          return 1;
+        }
+        if (a.createdAt > b.createdAt) {
+          return -1;
+        }
+        return 0;
+      });
       return customers;
     } else {
       return [];
@@ -149,7 +158,7 @@ export class CustomerWorker {
 
   async getCustomersRemote(shop: ShopModel, rCustomers: CustomerModel[]): Promise<CustomerModel[]> {
     const localCustomers = await CustomerWorker.getCustomersLocal(shop);
-    if (!rCustomers){
+    if (!rCustomers) {
       rCustomers = localCustomers;
     }
     await CustomerWorker.setCustomersLocal(rCustomers, shop);

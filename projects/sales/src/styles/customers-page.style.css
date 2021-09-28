@@ -1,5 +1,5 @@
 .customers-container {
-  padding: 0 24px;
+  padding: 8px 16px;
   background-color: transparent;
   min-height: 100vh;
 }
@@ -19,4 +19,8 @@
 
 .actions-spacer {
   flex: 1 1 auto;
+}
+
+table{
+  background: transparent;
 }

@@ -5,6 +5,7 @@ import {CustomerState} from '../states/customer.state';
 import {DialogCreateCustomerComponent} from '../components/dialog-create-customer.component';
 import {SheetCreateCustomerComponent} from '../components/sheet-create-customer.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {MatPaginator} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-customer-page',
@@ -36,30 +37,20 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
         <app-drawer></app-drawer>
       </ng-template>
       <ng-template #body>
-        <div [class]="(deviceState.isSmallScreen | async)===true?'customers-container-mobile':'customers-container'">
-          <div *ngIf="(deviceState.isSmallScreen | async)===false" class="actions-container">
-            <button (click)="addCustomer()" color="primary" mat-button>
-              <mat-icon matPrefix>add</mat-icon>
-              Add
-            </button>
-            <button (click)="hotReload()" color="primary" mat-button>
-              <mat-icon matPrefix>refresh</mat-icon>
-              Load
-            </button>
-            <span class="actions-spacer"></span>
-            <!--            <div *ngIf="(deviceState.isSmallScreen | async)===false">-->
-            <mat-paginator [ngStyle]="{display: (deviceState.isSmallScreen | async)===true?'none':''}" #c_paginator></mat-paginator>
-            <!--            </div>-->
-          </div>
-          <app-customer-list
-            [paginator]="c_paginator"></app-customer-list>
-        </div>
+        <app-customers-table-options *ngIf="(deviceState.isSmallScreen | async)===false"
+                                     (pag)="setPaginator($event)">
+        </app-customers-table-options>
+        <app-customers-list *ngIf="(deviceState.isSmallScreen | async)===true"></app-customers-list>
+        <app-customers-table *ngIf="(deviceState.isSmallScreen | async)===false && paginator" [paginator]="paginator">
+        </app-customers-table>
       </ng-template>
     </app-layout-sidenav>
   `,
   styleUrls: ['../styles/customers-page.style.css']
 })
 export class CustomersPage implements OnInit {
+  paginator: MatPaginator;
+
   constructor(private readonly dialog: MatDialog,
               public readonly customerState: CustomerState,
               public readonly matBottomSheet: MatBottomSheet,
@@ -95,5 +86,9 @@ export class CustomersPage implements OnInit {
 
   hotReload() {
     this.customerState.hotFetchCustomers();
+  }
+
+  setPaginator($event: MatPaginator) {
+    this.paginator = $event;
   }
 }

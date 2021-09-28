@@ -18,17 +18,20 @@ export class SalesNavigationService {
         {
           name: 'Retail',
           roles: ['*'],
-          link: '/sale/retail'
+          link: '/sale/retail',
+          click: null
         },
         {
           name: 'Wholesale',
           roles: ['*'],
-          link: '/sale/whole'
+          link: '/sale/whole',
+          click: null
         },
         {
           name: 'Orders',
           roles: ['*'],
-          link: '/sale/order'
+          link: '/sale/order',
+          click: null
         },
         // {
         //   name: 'Credit sale',
@@ -38,12 +41,14 @@ export class SalesNavigationService {
         {
           name: 'Customers',
           roles: ['*'],
-          link: '/sale/customers'
+          link: '/sale/customers',
+          click: null
         },
         {
           name: 'Refunds',
           roles: ['*'],
-          link: '/sale/refund'
+          link: '/sale/refund',
+          click: null
         }
       ]
     });

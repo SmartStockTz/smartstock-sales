@@ -2,7 +2,7 @@ import {expose} from 'comlink';
 import {CartItemModel} from '../models/cart-item.model';
 import {CartModel} from '../models/cart.model';
 import {SalesModel} from '../models/sale.model';
-import {toSqlDate} from '@smartstocktz/core-libs';
+import {LibUserModel, toSqlDate} from '@smartstocktz/core-libs';
 import moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
 
@@ -107,7 +107,7 @@ export class CartWorker {
     channel: string,
     discount: number,
     customer: CustomerModel,
-    user: any
+    user: LibUserModel
   ): Promise<SalesModel[]> {
     const stringDate = toSqlDate(new Date());
     const idTra = 'n';
@@ -124,8 +124,12 @@ export class CartWorker {
         channel,
         date: stringDate,
         idTra,
-        customer: customer && customer.displayName ? customer.displayName : '',
-        customerObject: customer,
+        customer: user.id === 'smartstock-hq' ? customer?.payRef : customer?.displayName,
+        customerObject: {
+          phone: 'SYSTEM',
+          email: customer.email,
+          displayName: customer.displayName,
+        },
         soldBy: {
           username: user?.username
         },

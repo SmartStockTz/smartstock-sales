@@ -46,19 +46,21 @@ export class LoginPageComponent implements OnInit {
       this.snack.open('Please fill all required fields', 'Ok', {duration: 3000});
     } else {
       this.isLogin = true;
-      bfast.auth().logIn(this.loginForm.value.username, this.loginForm.value.password)
-        .then(async user => {
-          this.router.navigateByUrl('/sale').catch(console.log);
-          bfast.init({
-            applicationId: user.applicationId,
-            projectId: user.projectId,
-            adapters: {
-              auth: 'DEFAULT'
-            }
-          }, user.projectId);
-          // await this.userService.saveCurrentProjectId('0UTYLQKeifrk');
-          await this.userService.saveCurrentShop(user as any);
-        })
+      bfast.functions().request('/users/login').post(
+        {username: this.loginForm.value.username, password: this.loginForm.value.password}
+      ).then(async (user: any) => {
+        this.router.navigateByUrl('/sale').catch(console.log);
+        bfast.init({
+          applicationId: user.applicationId,
+          projectId: user.projectId,
+          adapters: {
+            auth: 'DEFAULT'
+          }
+        }, user.projectId);
+        await this.userService.updateCurrentUser(user);
+        // await this.userService.saveCurrentProjectId('0UTYLQKeifrk');
+        await this.userService.saveCurrentShop(user as any);
+      })
         .catch(reason => {
           this.snack.open(reason && reason.message ? reason.message : reason, 'Ok');
         }).finally(() => {
