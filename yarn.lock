@@ -2126,10 +2126,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bfast@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/bfast/-/bfast-5.2.2.tgz#c914a9372bfc75ad68f926ab7bfe52751e136481"
-  integrity sha512-nmP2U+s1K66qbS0J4tz9/M0EFxS2qHoAxwft1GaGVHfyB/OkceGSOC6Z6gKVCMIUC8ponyW5qaMiTQTzQG0zQA==
+bfast@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/bfast/-/bfast-5.3.1.tgz#d463b0fbfe5d185bd9bc4a1920357c92add450bd"
+  integrity sha512-H/5m9EzjXyEHSLfqbGH5K/dCjozcVlUSKnbZhk42Vmwl9fuvXOOviKo6IczI12b+AJTkgJr1TFRsG2poCch9TQ==
   dependencies:
     axios "~0.21.4"
     bufferutil "^4.0.3"

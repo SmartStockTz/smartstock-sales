@@ -29,6 +29,7 @@ export class CartState {
   }
 
   private message(reason) {
+    console.log(reason);
     this.snack.open(reason && reason.message ? reason.message : reason.toString(), 'Ok', {
       duration: 2000
     });

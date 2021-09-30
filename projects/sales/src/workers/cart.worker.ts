@@ -127,8 +127,8 @@ export class CartWorker {
         customer: user.id === 'smartstock-hq' ? customer?.payRef : customer?.displayName,
         customerObject: {
           phone: 'SYSTEM',
-          email: customer.email,
-          displayName: customer.displayName,
+          email: customer?.email,
+          displayName: customer?.displayName,
         },
         soldBy: {
           username: user?.username
