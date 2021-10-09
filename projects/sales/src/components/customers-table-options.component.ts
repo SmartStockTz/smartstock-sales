@@ -1,11 +1,12 @@
-import {AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {DeviceState} from '@smartstocktz/core-libs';
+import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
 import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 import {CustomerState} from '../states/customer.state';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
+import {database} from 'bfast';
 
 @Component({
   selector: 'app-customers-table-options',
@@ -30,18 +31,36 @@ import {MatPaginator} from '@angular/material/paginator';
   `,
   styleUrls: ['../styles/customers-page.style.css']
 })
-export class CustomersTableOptionsComponent implements OnInit, AfterViewInit {
+export class CustomersTableOptionsComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() pag = new EventEmitter<MatPaginator>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  private sig = false;
+  private obfn;
 
   constructor(public readonly deviceState: DeviceState,
               public readonly customerState: CustomerState,
               private readonly matBottomSheet: MatBottomSheet,
+              private readonly userService: UserService,
               private readonly matDialog: MatDialog) {
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
     this.customerState.fetchCustomers();
+    this.obfn = database(shop.projectId).syncs('customers').changes().observe(_ => {
+      if (this?.sig === false) {
+        this.customerState.fetchCustomers();
+        this.sig = true;
+      } else {
+        return;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.obfn) {
+      this.obfn?.unobserve();
+    }
   }
 
   hotReload() {

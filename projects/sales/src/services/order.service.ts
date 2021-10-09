@@ -1,14 +1,12 @@
 import {Injectable} from '@angular/core';
 import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
-import * as bfast from 'bfast';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrdersWorker} from '../workers/orders.worker';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {CartItemModel} from '../models/cart-item.model';
-import {CidService} from './cid.service';
-import {OrderSyncModel} from '../models/order-sync.model';
+import {database, functions} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
@@ -28,26 +26,26 @@ export class OrderService {
     }
   }
 
-  stopWorker() {
-    if (this.ordersWorkerNative) {
-      this.ordersWorkerNative.terminate();
-      this.ordersWorker = undefined;
-      this.ordersWorkerNative = undefined;
-    }
-  }
+  // stopWorker() {
+  //   if (this.ordersWorkerNative) {
+  //     this.ordersWorkerNative.terminate();
+  //     this.ordersWorker = undefined;
+  //     this.ordersWorkerNative = undefined;
+  //   }
+  // }
 
   private async remoteAllOrders(shop: ShopModel): Promise<OrderModel[]> {
-    return bfast.database(shop.projectId).syncs('orders').upload();
+    return database(shop.projectId).syncs('orders').upload();
   }
 
-  async listeningOrders(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    bfast.database(shop.projectId).syncs('orders');
-  }
+  // async listeningOrders(): Promise<void> {
+  //   const shop = await this.userService.getCurrentShop();
+  //   database(shop.projectId).syncs('orders');
+  // }
 
   async stopListeningOrder(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    bfast.database(shop.projectId).syncs('orders').close();
+    // const shop = await this.userService.getCurrentShop();
+    // database(shop.projectId).syncs('orders').close();
   }
 
   async saveOrder(
@@ -83,7 +81,7 @@ export class OrderService {
         location: selectedCustomer?.street
       }
     };
-    bfast.database(shop.projectId)
+    database(shop.projectId)
       .syncs('orders')
       .changes()
       .set(order);
@@ -91,7 +89,7 @@ export class OrderService {
   }
 
   private ordersFromSyncs(shop: ShopModel) {
-    const v = bfast.database(shop.projectId)
+    const v = database(shop.projectId)
       .syncs('orders')
       .changes()
       .values();
@@ -113,7 +111,7 @@ export class OrderService {
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
-    return bfast.database().collection('orders')
+    return database().collection('orders')
       .query()
       .byId(orderId)
       .updateBuilder()
@@ -123,7 +121,7 @@ export class OrderService {
 
   async markAsCompleted(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    return bfast.database(shop.projectId).bulk()
+    return database(shop.projectId).bulk()
       .update('orders', {
         query: {
           id: order.id,
@@ -169,7 +167,7 @@ export class OrderService {
   }
 
   async checkOrderIsPaid(order: string): Promise<any> {
-    const payments = await bfast.functions('fahamupay')
+    const payments = await functions('fahamupay')
       .request(`/functions/pay/check/${order}`)
       .get<any[]>();
     return payments.map(x => Math.round(Number(x.amount))).reduce((a, b) => a + b, 0);
@@ -177,7 +175,7 @@ export class OrderService {
 
   async markOrderAsCancelled(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    return bfast.database(shop.projectId).collection('orders')
+    return database(shop.projectId).collection('orders')
       .query()
       .byId(order.id)
       .updateBuilder()
@@ -187,7 +185,7 @@ export class OrderService {
 
   async markAsProcessed(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    return bfast.database(shop.projectId).collection('orders')
+    return database(shop.projectId).collection('orders')
       .query()
       .byId(order.id)
       .updateBuilder()
@@ -217,7 +215,7 @@ export class OrderService {
   async deleteOrder(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    bfast.database(shop.projectId).syncs('orders').changes().delete(order.id);
+    database(shop.projectId).syncs('orders').changes().delete(order.id);
     return order;
     // return this.ordersWorker.deleteOrder(order, shop);
   }

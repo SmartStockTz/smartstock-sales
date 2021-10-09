@@ -15,7 +15,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from './guards/auth.guard';
-import * as bfast from 'bfast';
+import {init} from 'bfast';
 
 const routes: Routes = [
   {path: '', component: WelcomePage},
@@ -49,7 +49,7 @@ export class AppModule {
     // IpfsService.getVersion().then(value => {
     //   console.log('ipfs version : ', value?.version);
     // }).catch(console.log);
-    bfast.init({
+    init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
     });

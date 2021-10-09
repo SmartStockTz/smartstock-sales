@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core'
 import {MatTableDataSource} from '@angular/material/table';
 import {CustomerModel} from '../models/customer.model';
 import {CustomerState} from '../states/customer.state';
-import {DeviceState} from '@smartstocktz/core-libs';
+import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import {DeleteConfirmDialogComponent} from './delete-confirm-dialog.component';
 import {DialogCreateCustomerComponent} from './dialog-create-customer.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
+import {database} from 'bfast';
 
 @Component({
   selector: 'app-customers-list',
@@ -46,10 +47,13 @@ import {SheetCreateCustomerComponent} from './sheet-create-customer.component';
 export class CustomersListComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: MatTableDataSource<CustomerModel> = new MatTableDataSource([]);
   destroyer: Subject<any> = new Subject<any>();
+  private sig = false;
+  private obfn;
 
   constructor(public readonly customerState: CustomerState,
               public readonly matDialog: MatDialog,
               public readonly matBottomSheet: MatBottomSheet,
+              private readonly userService: UserService,
               public readonly deviceState: DeviceState) {
   }
 
@@ -57,14 +61,26 @@ export class CustomersListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.destroyer.next('done');
     this.dataSource = null;
     this.customerState.customers.next([]);
+    if (this.obfn) {
+      this.obfn?.unobserve();
+    }
   }
 
   ngAfterViewInit(): void {
     this.configureDataSource();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
     this.customerState.fetchCustomers();
+    this.obfn = database(shop.projectId).syncs('customers').changes().observe(_ => {
+      if (this?.sig === false) {
+        this.customerState.fetchCustomers();
+        this.sig = true;
+      } else {
+        return;
+      }
+    });
   }
 
   configureDataSource() {

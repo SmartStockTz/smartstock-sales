@@ -1,14 +1,14 @@
 import {expose} from 'comlink';
-import * as bfast from 'bfast';
 import {CustomerModel} from '../models/customer.model';
 import {ShopModel, getDaasAddress, getFaasAddress} from '@smartstocktz/core-libs';
+import {init} from 'bfast';
 
-function init(shop: ShopModel) {
-  bfast.init({
+function init_(shop: ShopModel) {
+  init({
     applicationId: 'smartstock_lb',
     projectId: 'smartstock'
   });
-  bfast.init({
+  init({
     applicationId: shop.applicationId,
     projectId: shop.projectId,
     adapters: {
@@ -22,7 +22,7 @@ function init(shop: ShopModel) {
 export class CustomerWorker {
 
   constructor(shop: ShopModel) {
-    init(shop);
+    init_(shop);
     // const changes =
     // .changes();
     // changes.observe(async response => {

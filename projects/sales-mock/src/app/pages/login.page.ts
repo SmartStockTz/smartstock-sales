@@ -2,8 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import * as bfast from 'bfast';
 import {UserService} from '@smartstocktz/core-libs';
+import {functions, init} from 'bfast';
 
 @Component({
   selector: 'app-login',
@@ -46,11 +46,11 @@ export class LoginPageComponent implements OnInit {
       this.snack.open('Please fill all required fields', 'Ok', {duration: 3000});
     } else {
       this.isLogin = true;
-      bfast.functions().request('/users/login').post(
+      functions().request('/users/login').post(
         {username: this.loginForm.value.username, password: this.loginForm.value.password}
       ).then(async (user: any) => {
         this.router.navigateByUrl('/sale').catch(console.log);
-        bfast.init({
+        init({
           applicationId: user.applicationId,
           projectId: user.projectId,
           adapters: {

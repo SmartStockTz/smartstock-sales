@@ -1366,7 +1366,7 @@
     "@angular-devkit/schematics" "12.1.4"
     jsonc-parser "3.0.0"
 
-"@smartstocktz/core-libs@~0.3.2":
+"@smartstocktz/core-libs@^0.3.2":
   version "0.3.2"
   resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.3.2/d3418c3c0e69feb7423666661add72b1d7ab416ffc40a01f0940f37df52999d8#4081d89d430e26a4accd1fa1fa370b563114d407"
   integrity sha512-LeVTo8pvq6rduzpdxEO3eIk2Sk8AN8C0m5JqEHvlj1DGXdaO/3iiGsvUUhlDvVNKODNoEl++L6OzqHOq9QhR2g==
@@ -2126,7 +2126,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bfast@~5.4.14:
+bfast@^5.4.14:
   version "5.4.14"
   resolved "https://registry.yarnpkg.com/bfast/-/bfast-5.4.14.tgz#3c787b13de906f7689217bf5c85ab6a82f1e6629"
   integrity sha512-m8X40TcrpXKcp4nHStRzJm1DIOOcib46hW+UCLk/BDaijv3LXVy6iRRWz7i43rfdr385LkNK5cLSts0q/AOeqA==

@@ -1,18 +1,16 @@
 import {expose} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
-import * as bfast from 'bfast';
 import {CartItemModel} from '../models/cart-item.model';
-import {CustomerModel} from '../models/customer.model';
-import {OrderSyncModel} from '../models/order-sync.model';
 import {OrderModel} from '../models/order.model';
-import {getDaasAddress, getFaasAddress, SecurityUtil} from '@smartstocktz/core-libs';
+import {getDaasAddress, getFaasAddress} from '@smartstocktz/core-libs';
+import {init} from 'bfast';
 
-function init(shop: ShopModel) {
-  bfast.init({
+function init_(shop: ShopModel) {
+  init({
     applicationId: 'smartstock_lb',
     projectId: 'smartstock'
   });
-  bfast.init({
+  init({
     applicationId: shop.applicationId,
     projectId: shop.projectId,
     adapters: {
@@ -26,7 +24,7 @@ function init(shop: ShopModel) {
 export class OrdersWorker {
 
   constructor(private readonly shop: ShopModel) {
-    init(this.shop);
+    init_(this.shop);
     // this.syncOrders(this.shop).catch(console.log);
     // this.listeningOrders(this.shop).catch(console.log);
   }

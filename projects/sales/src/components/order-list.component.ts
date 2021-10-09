@@ -3,7 +3,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {CustomerModel} from '../models/customer.model';
 import {MatSort} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
-import {DeviceState} from '@smartstocktz/core-libs';
+import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
@@ -16,6 +16,7 @@ import {Router} from '@angular/router';
 import moment from 'moment';
 
 import {OrdersItemsComponent} from './orders-items.component';
+import {database} from 'bfast';
 
 @Component({
   selector: 'app-order-list',
@@ -132,18 +133,21 @@ import {OrdersItemsComponent} from './orders-items.component';
 export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
   noData = false;
   customers: CustomerModel[];
-  dataSource: MatTableDataSource<OrderModel>;
+  dataSource: MatTableDataSource<OrderModel> = new MatTableDataSource<OrderModel>([]);
   displayColumns = ['check', 'Name', 'Mobile', 'Amount', 'Date', 'Action'];
   displayColumnsMobile = ['details'];
   @Input() paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   destroyer: Subject<any> = new Subject<any>();
+  private sig = false;
+  private obfn;
 
   constructor(public readonly orderState: OrderState,
               public readonly matDialog: MatDialog,
               public readonly matBottomSheet: MatBottomSheet,
               public readonly cartState: CartState,
               public readonly router: Router,
+              private readonly userService: UserService,
               public readonly deviceState: DeviceState) {
   }
 
@@ -151,15 +155,23 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyer.next('done');
     this.dataSource = null;
     this.orderState.orders.next([]);
+    this?.obfn?.unobserve();
   }
 
   ngAfterViewInit(): void {
     this.configureDataSource();
   }
 
-  ngOnInit(): void {
-    this.dataSource = new MatTableDataSource([]);
+  async ngOnInit(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
     this.orderState.getOrders();
+    this.obfn = database(shop.projectId).syncs('orders').changes().observe(_ => {
+      if (this.sig === true){
+        return;
+      }
+      this.orderState.getOrders();
+      this.sig = true;
+    });
   }
 
   configureDataSource() {

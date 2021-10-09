@@ -3,10 +3,11 @@ import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl, Validators} from '@angular/forms';
-import {DeviceState, LogService, StorageService} from '@smartstocktz/core-libs';
+import {DeviceState, LogService, StorageService, UserService} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {database} from 'bfast';
 
 @Component({
   selector: 'app-sale',
@@ -78,10 +79,13 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   searchInputControl = new FormControl('', [Validators.nullValidator, Validators.required]);
   showRefreshCart = false;
   destroyer = new Subject<any>();
+  private sig = false;
+  private obfn;
 
   constructor(public readonly snack: MatSnackBar,
               public readonly changeDetect: ChangeDetectorRef,
               public readonly cartState: CartState,
+              private readonly userService: UserService,
               public readonly deviceState: DeviceState,
               public readonly salesState: SalesState) {
   }
@@ -89,10 +93,21 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   async ngOnDestroy(): Promise<void> {
     this.salesState.stockListingStop();
     this.destroyer.next('done');
+    if (this.obfn) {
+      this?.obfn?.unobserve();
+    }
   }
 
   async ngOnInit(): Promise<void> {
-    this.salesState.stockListening();
+    const shop = await this.userService.getCurrentShop();
+    this.obfn = database(shop.projectId).syncs('stocks').changes().observe(_ => {
+      if (this.sig === false) {
+        this.salesState.getProducts();
+        this.sig = true;
+      } else {
+        return;
+      }
+    });
     this.salesState.getProducts();
     this.cartState.carts.pipe(
       takeUntil(this.destroyer)

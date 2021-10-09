@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {UserService} from '@smartstocktz/core-libs';
-import * as bfast from 'bfast';
 import {InvoiceModel} from '../models/invoice.model';
+import {database} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class InvoiceService {
 
   async saveInvoice(invoice: InvoiceModel) {
     const shop = await this.userService.getCurrentShop();
-    return await bfast.database(shop.projectId).bulk()
+    return await database(shop.projectId).bulk()
       .create('invoices', invoice)
       .update('stocks', invoice.items.map(item => {
         return {
@@ -54,7 +54,7 @@ export class InvoiceService {
 
   async addReturn(id: string, value: any) {
     const shop = await this.userService.getCurrentShop();
-    const invoice: InvoiceModel = await bfast.database(shop.projectId)
+    const invoice: InvoiceModel = await database(shop.projectId)
       .collection('invoices')
       .get(id);
 

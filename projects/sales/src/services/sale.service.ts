@@ -5,7 +5,7 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
-import * as bfast from 'bfast';
+import {database} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,6 @@ import * as bfast from 'bfast';
 export class SaleService {
   private saleWorker: SaleWorker;
   private saleWorkerNative;
-  private syncs;
   private remoteAllProductsRunning: boolean;
 
   constructor(private readonly userService: UserService) {
@@ -29,19 +28,20 @@ export class SaleService {
     }
   }
 
-  stopWorker() {
-    if (this.saleWorkerNative) {
-      this.saleWorkerNative.terminate();
-      this.saleWorker = undefined;
-      this.saleWorkerNative = undefined;
-    }
-  }
+  // stopWorker() {
+  //   if (this.saleWorkerNative) {
+  //     this.saleWorkerNative.terminate();
+  //     this.saleWorker = undefined;
+  //     this.saleWorkerNative = undefined;
+  //   }
+  // }
 
   async products(): Promise<StockModel[]> {
     await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const products: StockModel[] = Array.from(this.syncs.changes()?.values() ? this.syncs.changes().values() : []);
+    const p = database(shop.projectId).syncs('stocks').changes().values();
+    const products: StockModel[] = Array.from(p ? p : []);
     return this.saleWorker.filterSaleableProducts(products, shop);
     // return [];
   }
@@ -54,13 +54,13 @@ export class SaleService {
   }
 
   private async remoteAllProducts(): Promise<StockModel[]> {
+    const shop = await this.userService.getCurrentShop();
     try {
       this.remoteAllProductsRunning = true;
-      const changes = this.syncs.changes();
-      const status = await this.syncs.upload();
+      const status = await database(shop.projectId).syncs('stocks').upload();
       if (status) {
-        // console.log(Array.from(changes.keys()));
-        return Array.from(changes.values());
+        const p = database(shop.projectId).syncs('stocks').changes().values();
+        return Array.from(p);
       } else {
         throw {message: 'products load fail with false status'};
       }
@@ -83,49 +83,24 @@ export class SaleService {
     await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const products: StockModel[] = Array.from(this.syncs.changes()?.values() ? this.syncs.changes().values() : []);
+    const p = database(shop.projectId).syncs('stocks').changes().values();
+    const products: StockModel[] = Array.from(p ? p : []);
     return this.saleWorker.search(products, query, shop);
     // return [];
   }
 
   async listeningStocks(): Promise<any> {
-    if (this.syncs) {
-      return;
-    }
     const shop = await this.userService.getCurrentShop();
-    this.syncs = bfast.database(shop.projectId).syncs('stocks');
-    // this.observer = this.syncs.changes().observe(async response => {
-    //   if (response && response.snapshot) {
-        // console.log(response);
-        // if (response.name === 'create') {
-        //   this.setProductLocal(response.snapshot).catch(console.log);
-        // } else if (response.name === 'update') {
-        //   this.setProductLocal(response.snapshot).catch(console.log);
-        // } else if (response.name === 'delete') {
-        //   await this.removeProductLocal(response.snapshot);
-        // } else {
-        // }
-      // }
-    // });
+    database(shop.projectId).syncs('stocks');
   }
 
   async listeningStocksStop() {
-    try {
-      this.syncs?.close();
-    } catch (e) {
-      console.log(e, '********');
-    } finally {
-      this.syncs = undefined;
-    }
+    // try {
+    //   this.syncs?.close();
+    // } catch (e) {
+    //   console.log(e, '********');
+    // } finally {
+    //   this.syncs = undefined;
+    // }
   }
-
-  // private async setProductLocal(product: StockModel) {
-  //   await this.listeningStocks();
-  //   this.syncs.changes()?.set(product);
-  // }
-  //
-  // private async removeProductLocal(product: StockModel) {
-  //   await this.listeningStocks();
-  //   this.syncs.changes()?.delete(product.id);
-  // }
 }

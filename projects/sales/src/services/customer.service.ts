@@ -4,14 +4,13 @@ import {CustomerModel} from '../models/customer.model';
 import {wrap} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {CustomerWorker} from '../workers/customer.worker';
-import * as bfast from 'bfast';
+import {database} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
   private customerWorker: CustomerWorker;
-  private syncs;
 
   constructor(private readonly userService: UserService) {
 
@@ -19,22 +18,19 @@ export class CustomerService {
 
   async listeningChanges() {
     const shop = await this.userService.getCurrentShop();
-    if (!this.syncs) {
-      return;
-    }
-    this.syncs = bfast.database(shop.projectId).syncs('customers');
+    database(shop.projectId).syncs('customers');
   }
 
   async stopChanges() {
-    if (this.syncs) {
-      try {
-        this.syncs.close();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        this.syncs = undefined;
-      }
-    }
+    // if (this.syncs) {
+    //   try {
+    //     this.syncs.close();
+    //   } catch (e) {
+    //     console.log(e);
+    //   } finally {
+    //     this.syncs = undefined;
+    //   }
+    // }
   }
 
   private async initClass(shop: ShopModel) {
@@ -45,7 +41,7 @@ export class CustomerService {
   }
 
   private customersFromSyncs(shop: ShopModel): CustomerModel[] {
-    const customers: any = bfast.database(shop.projectId)
+    const customers: any = database(shop.projectId)
       .syncs('customers')
       .changes()
       .values();
@@ -67,14 +63,14 @@ export class CustomerService {
     const shop = await this.userService.getCurrentShop();
     await this.listeningChanges();
     await this.initClass(shop);
-    const c = await bfast.database(shop.projectId).syncs('customers').upload();
+    const c = await database(shop.projectId).syncs('customers').upload();
     return this.customerWorker.getCustomersRemote(shop, c);
   }
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.userService.getCurrentShop();
     // await this.initClass(shop);
-    bfast.database(shop.projectId).syncs('customers')
+    database(shop.projectId).syncs('customers')
       .changes()
       .set(customer as any);
     return customer;
@@ -90,7 +86,7 @@ export class CustomerService {
   async deleteCustomer(customer: CustomerModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     // await this.initClass(shop);
-    bfast.database(shop.projectId).syncs('customers')
+    database(shop.projectId).syncs('customers')
       .changes()
       .delete(customer.id);
     return customer;

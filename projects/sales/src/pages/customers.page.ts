@@ -52,6 +52,7 @@ import {database} from 'bfast';
 export class CustomersPage implements OnInit, OnDestroy {
   paginator: MatPaginator;
   private sig = false;
+  private obfn;
 
   constructor(private readonly dialog: MatDialog,
               public readonly customerState: CustomerState,
@@ -64,7 +65,7 @@ export class CustomersPage implements OnInit, OnDestroy {
     const shop = await this.userService.getCurrentShop();
     const changes = database(shop.projectId).syncs('customers')
       .changes();
-    changes.observe(_ => {
+    this.obfn = changes.observe(_ => {
       if (this.sig === true) {
         return;
       }
@@ -105,8 +106,9 @@ export class CustomersPage implements OnInit, OnDestroy {
     this.paginator = $event;
   }
 
-  async ngOnDestroy(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('customers').close();
+  ngOnDestroy(): void {
+    if (this.obfn) {
+      this.obfn?.unobserve();
+    }
   }
 }
