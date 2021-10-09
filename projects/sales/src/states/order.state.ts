@@ -23,6 +23,7 @@ export class OrderState {
   getOrders(): void {
     this.getOrderFlag.next(true);
     this.orderService.getOrders().then(value => {
+      // console.log(value);
       if (value && Array.isArray(value)) {
         // this.orders.value.push(...value);
         this.orders.next(value);

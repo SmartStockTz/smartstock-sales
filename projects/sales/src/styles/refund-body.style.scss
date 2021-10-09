@@ -24,11 +24,11 @@
   //flex-direction: row;
 }
 
-::ng-deep {
-  .mat-form-field-wrapper {
-    padding: 0 !important;
-  }
-}
+//::ng-deep {
+//  .mat-form-field-wrapper {
+//    padding: 0 !important;
+//  }
+//}
 
 .progress-mobile {
   width: 40px;
@@ -46,11 +46,11 @@
   top: 64px;
 }
 
-::ng-deep {
-  .mat-list-item-content {
-    padding: 0 !important;
-  }
-}
+//::ng-deep {
+//  .mat-list-item-content {
+//    padding: 0 !important;
+//  }
+//}
 
 mat-list-item {
   padding: 0;

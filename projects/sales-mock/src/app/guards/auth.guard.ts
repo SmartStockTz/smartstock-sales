@@ -20,7 +20,9 @@ export class AuthGuard implements CanActivate {
           projectId: user.projectId,
           adapters: {
             auth: 'DEFAULT'
-          }
+          },
+          databaseURL: `https://smartstock-faas.bfast.fahamutech.com/shop/${user.projectId}/${user.applicationId}`,
+          functionsURL: `https://smartstock-faas.bfast.fahamutech.com/shop/${user.projectId}/${user.applicationId}`,
         }, user.projectId);
         resolve(true);
       } else {

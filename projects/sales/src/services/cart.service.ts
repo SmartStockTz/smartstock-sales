@@ -61,7 +61,7 @@ export class CartService {
     await this.printCart(carts, channel, discount, customer, false);
     const salesToSave: SalesModel[] = await this.cartWorker.getSalesBatch(carts, channel, discount, customer, user);
     // console.log(customer);
-    console.log(salesToSave);
+    // console.log(salesToSave);
     // return ;
     return this.salesService.saveSale(salesToSave);
   }

@@ -113,7 +113,7 @@ export class CustomersTableComponent implements OnInit, OnDestroy, AfterViewInit
     this.customerState.customers.pipe(
       takeUntil(this.destroyer)
     ).subscribe(value => {
-      this.dataSource.data = value;
+      setTimeout(() => this.dataSource.data = value, 0);
     });
   }
 

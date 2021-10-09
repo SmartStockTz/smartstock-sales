@@ -17,6 +17,9 @@
       "dom"
     ],
     "paths": {
+//      "stream": [
+//        "./s.ts"
+//      ],
       "sales": [
         "dist/sales/sales",
         "dist/sales"

@@ -11,7 +11,7 @@ import {MatPaginator} from '@angular/material/paginator';
       <div class="actions-container">
         <mat-form-field appearance="outline">
           <mat-label>Date</mat-label>
-          <input [formControl]="dateControl" matInput [matDatepicker]="picker" [disabled]="true">
+          <input [formControl]="dateControl" matInput [matDatepicker]="picker">
           <mat-datepicker-toggle matSuffix [for]="picker" [disabled]="false"></mat-datepicker-toggle>
           <mat-datepicker [disabled]="false" [touchUi]="true" #picker></mat-datepicker>
         </mat-form-field>

@@ -51,16 +51,16 @@ export class CartWorker {
     }
   }
 
-  private static getCartItemAmount(cart: CartItemModel, channel: string): number {
+  private static getCartItemAmount(cart: CartItemModel, channel: string, discount: number): number {
     switch (channel) {
       case 'retail':
-        return cart.quantity * cart.product.retailPrice;
+        return (cart.quantity * cart.product.retailPrice) - discount;
       case 'whole':
-        return cart.quantity * cart.product.wholesalePrice;
+        return (cart.quantity * cart.product.wholesalePrice) - discount;
       case 'credit':
-        return cart.quantity * cart.product.creditPrice;
+        return (cart.quantity * cart.product.creditPrice) - discount;
       default:
-        return cart.quantity * cart.product.retailPrice;
+        return (cart.quantity * cart.product.retailPrice) - discount;
     }
   }
 
@@ -113,7 +113,7 @@ export class CartWorker {
     const idTra = 'n';
     return carts.map<SalesModel>(value => {
       return {
-        amount: CartWorker.getCartItemAmount(value, channel),
+        amount: CartWorker.getCartItemAmount(value, channel, discount),
         discount: CartWorker.getCartItemDiscount(
           {totalItems: carts.length, totalDiscount: discount}
         ),
@@ -141,6 +141,8 @@ export class CartWorker {
           firstname: user?.firstname,
           lastname: user?.lastname
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         stock: value.product,
         stockId: value.product.id
       };
@@ -179,7 +181,7 @@ SUB TOTAL : ${cart.amount}
   async cartItemsToSaleItems(carts: CartItemModel[], discount: number, channel: string): Promise<CartModel[]> {
     return carts.map<CartModel>(value => {
       return {
-        amount: CartWorker.getCartItemAmount(value, channel),
+        amount: CartWorker.getCartItemAmount(value, channel, 0),
         product: value.product.product,
         quantity: value.quantity,
         stock: value.product,

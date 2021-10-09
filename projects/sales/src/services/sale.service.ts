@@ -6,7 +6,6 @@ import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
 import * as bfast from 'bfast';
-import {CidService} from './cid.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +14,10 @@ import {CidService} from './cid.service';
 export class SaleService {
   private saleWorker: SaleWorker;
   private saleWorkerNative;
-  private changes;
+  private syncs;
   private remoteAllProductsRunning: boolean;
 
-  constructor(private readonly userService: UserService,
-              private readonly cidService: CidService) {
+  constructor(private readonly userService: UserService) {
 
   }
 
@@ -39,10 +37,13 @@ export class SaleService {
     }
   }
 
-  async getProducts(): Promise<StockModel[]> {
+  async products(): Promise<StockModel[]> {
+    await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    return this.saleWorker.getProducts(shop);
+    const products: StockModel[] = Array.from(this.syncs.changes()?.values() ? this.syncs.changes().values() : []);
+    return this.saleWorker.filterSaleableProducts(products, shop);
+    // return [];
   }
 
   async saveSale(sales: SalesModel[]) {
@@ -52,72 +53,79 @@ export class SaleService {
     return this.saleWorker.saveSale(sales, shop, cartId);
   }
 
-  private async remoteAllProducts(shop: ShopModel): Promise<StockModel[]> {
-    this.remoteAllProductsRunning = true;
-    const cids = await bfast.database(shop.projectId)
-      .collection('stocks')
-      .getAll<string>({
-        cids: true
-      }).finally(() => {
-        this.remoteAllProductsRunning = false;
-      });
-    // console.log(cids.length, 'total cids');
-    return this.cidService.toDatas(cids);
+  private async remoteAllProducts(): Promise<StockModel[]> {
+    try {
+      this.remoteAllProductsRunning = true;
+      const changes = this.syncs.changes();
+      const status = await this.syncs.upload();
+      if (status) {
+        // console.log(Array.from(changes.keys()));
+        return Array.from(changes.values());
+      } else {
+        throw {message: 'products load fail with false status'};
+      }
+    } finally {
+      this.remoteAllProductsRunning = false;
+    }
+    return [];
   }
 
   async getProductsRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const products = await this.remoteAllProducts(shop);
+    const products = await this.remoteAllProducts();
     // console.log(products?.length, 'total all products');
-    return this.saleWorker.getProductsRemote(shop, products);
+    return this.saleWorker.filterSaleableProducts(products, shop);
+    // return [];
   }
 
   async search(query: string): Promise<StockModel[]> {
+    await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    return this.saleWorker.search(query, shop);
+    const products: StockModel[] = Array.from(this.syncs.changes()?.values() ? this.syncs.changes().values() : []);
+    return this.saleWorker.search(products, query, shop);
+    // return [];
   }
 
   async listeningStocks(): Promise<any> {
+    if (this.syncs) {
+      return;
+    }
     const shop = await this.userService.getCurrentShop();
-    this.changes = bfast.database(shop.projectId)
-      .table('stocks')
-      .query()
-      .changes(() => {
-        console.log('stocks-sales changes connected');
-        // this.getProductsRemote().catch(console.log);
-      }, () => {
-        console.log('stocks-sales changes disconnected');
-      });
-    this.changes.addListener(async response => {
-      if (response && response.body && response.body.change) {
-        // console.log(response.body.change);
-        if (response.body.change.name === 'create') {
-          this.setProductLocal(response.body.change.snapshot).catch(console.log);
-        } else if (response.body.change.name === 'update') {
-          this.setProductLocal(response.body.change.snapshot).catch(console.log);
-        } else if (response.body.change.name === 'delete') {
-          await this.removeProductLocal(response.body.change.snapshot);
-        } else {
-        }
-      }
-    });
+    this.syncs = bfast.database(shop.projectId).syncs('stocks');
+    // this.observer = this.syncs.changes().observe(async response => {
+    //   if (response && response.snapshot) {
+        // console.log(response);
+        // if (response.name === 'create') {
+        //   this.setProductLocal(response.snapshot).catch(console.log);
+        // } else if (response.name === 'update') {
+        //   this.setProductLocal(response.snapshot).catch(console.log);
+        // } else if (response.name === 'delete') {
+        //   await this.removeProductLocal(response.snapshot);
+        // } else {
+        // }
+      // }
+    // });
   }
 
   async listeningStocksStop() {
-    this.changes?.close();
+    try {
+      this.syncs?.close();
+    } catch (e) {
+      console.log(e, '********');
+    } finally {
+      this.syncs = undefined;
+    }
   }
 
-  private async setProductLocal(product: StockModel) {
-    const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
-    await this.saleWorker.setProductLocal(product, shop);
-  }
-
-  private async removeProductLocal(product: StockModel) {
-    const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
-    await this.saleWorker.removeProductLocal(product, shop);
-  }
+  // private async setProductLocal(product: StockModel) {
+  //   await this.listeningStocks();
+  //   this.syncs.changes()?.set(product);
+  // }
+  //
+  // private async removeProductLocal(product: StockModel) {
+  //   await this.listeningStocks();
+  //   this.syncs.changes()?.delete(product.id);
+  // }
 }

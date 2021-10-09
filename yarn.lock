@@ -1366,10 +1366,10 @@
     "@angular-devkit/schematics" "12.1.4"
     jsonc-parser "3.0.0"
 
-"@smartstocktz/core-libs@^0.2.38":
-  version "0.2.38"
-  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.2.38/dbb55daa6f989eac235a54faa7015efb22b55c887bd82fe5ad00d9c6ca409920#0536c00ed4c05775cff76441e283f6e7c8ac5396"
-  integrity sha512-JLymPdIMJf1r4ZRoETj+dalNnyHHcaM/cb5XeOXNf/eVTk7y3q0UUUsgRURkSR0xo/AfDnOpJZPiBCksRvAj4w==
+"@smartstocktz/core-libs@~0.3.2":
+  version "0.3.2"
+  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.3.2/d3418c3c0e69feb7423666661add72b1d7ab416ffc40a01f0940f37df52999d8#4081d89d430e26a4accd1fa1fa370b563114d407"
+  integrity sha512-LeVTo8pvq6rduzpdxEO3eIk2Sk8AN8C0m5JqEHvlj1DGXdaO/3iiGsvUUhlDvVNKODNoEl++L6OzqHOq9QhR2g==
   dependencies:
     tslib "^2.0.0"
 
@@ -2021,12 +2021,12 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@~0.21.4:
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
-  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+axios@~0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.22.0.tgz#bf702c41fb50fbca4539589d839a077117b79b25"
+  integrity sha512-Z0U3uhqQeg1oNcihswf4ZD57O3NrR1+ZXhxaROaWpDmsDTx7T2HNBV2ulBtie2hwJptu8UvgnJoK+BIqdzh/1w==
   dependencies:
-    follow-redirects "^1.14.0"
+    follow-redirects "^1.14.4"
 
 axobject-query@2.0.2:
   version "2.0.2"
@@ -2126,21 +2126,22 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bfast@^5.3.1:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/bfast/-/bfast-5.3.1.tgz#d463b0fbfe5d185bd9bc4a1920357c92add450bd"
-  integrity sha512-H/5m9EzjXyEHSLfqbGH5K/dCjozcVlUSKnbZhk42Vmwl9fuvXOOviKo6IczI12b+AJTkgJr1TFRsG2poCch9TQ==
+bfast@~5.4.14:
+  version "5.4.14"
+  resolved "https://registry.yarnpkg.com/bfast/-/bfast-5.4.14.tgz#3c787b13de906f7689217bf5c85ab6a82f1e6629"
+  integrity sha512-m8X40TcrpXKcp4nHStRzJm1DIOOcib46hW+UCLk/BDaijv3LXVy6iRRWz7i43rfdr385LkNK5cLSts0q/AOeqA==
   dependencies:
-    axios "~0.21.4"
-    bufferutil "^4.0.3"
+    axios "~0.22.0"
+    bufferutil "~4.0.4"
+    crypto-hash "~1.3.0"
+    dexie "~3.0.3"
     form-data "~4.0.0"
-    localforage "~1.10.0"
     socket.io-client "~4.2.0"
-    utf-8-validate "^5.0.5"
-    y-indexeddb "^9.0.6"
-    y-webrtc "^10.2.0"
-    y-websocket "^1.3.16"
-    yjs "^13.5.12"
+    utf-8-validate "~5.0.6"
+    y-indexeddb "~9.0.6"
+    y-webrtc "~10.2.0"
+    y-websocket "~1.3.16"
+    yjs "~13.5.12"
 
 big.js@^5.2.2:
   version "5.2.2"
@@ -2288,10 +2289,10 @@ buffer@^6.0.3:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
-bufferutil@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/bufferutil/-/bufferutil-4.0.3.tgz#66724b756bed23cd7c28c4d306d7994f9943cc6b"
-  integrity sha512-yEYTwGndELGvfXsImMBLop58eaGW+YdONi1fNjTINSY98tmMmFijBG6WXgdkfuLNt4imzQNtIE+eBp1PVpMCSw==
+bufferutil@~4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/bufferutil/-/bufferutil-4.0.4.tgz#ab81373d313a6ead0d734e98c448c722734ae7bb"
+  integrity sha512-VNxjXUCrF3LvbLgwfkTb5LsFvk6pGIn7OBb9x+3o+iJ6mKw0JTUp4chBFc88hi1aspeZGeZG9jAIbpFYPQSLZw==
   dependencies:
     node-gyp-build "^4.2.0"
 
@@ -3269,6 +3270,11 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
+dexie@~3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.0.3.tgz#ede63849dfe5f07e13e99bb72a040e8ac1d29dab"
+  integrity sha512-BSFhGpngnCl1DOr+8YNwBDobRMH0ziJs2vts69VilwetHYOtEDcLqo7d/XiIphM0tJZ2rPPyAGd31lgH2Ln3nw==
+
 di@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
@@ -3850,7 +3856,7 @@ follow-redirects@^1.0.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.3.tgz#6ada78118d8d24caee595595accdc0ac6abd022e"
   integrity sha512-3MkHxknWMUtb23apkgz/83fDoe+y+qr0TdgacGIA7bew+QLBo3vdgEN2xEsuXNivpFy4CyDhBBZnNZOtalmenw==
 
-follow-redirects@^1.14.0:
+follow-redirects@^1.14.4:
   version "1.14.4"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.4.tgz#838fdf48a8bbdd79e52ee51fb1c94e3ed98b9379"
   integrity sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==
@@ -5232,13 +5238,6 @@ license-webpack-plugin@2.3.20:
     "@types/webpack-sources" "^0.1.5"
     webpack-sources "^1.2.0"
 
-lie@3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/lie/-/lie-3.1.1.tgz#9a436b2cc7746ca59de7a41fa469b3efb76bd87e"
-  integrity sha1-mkNrLMd0bKWd56QfpGmz77dr2H4=
-  dependencies:
-    immediate "~3.0.5"
-
 lie@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
@@ -5278,13 +5277,6 @@ loader-utils@^1.4.0:
     big.js "^5.2.2"
     emojis-list "^3.0.0"
     json5 "^1.0.1"
-
-localforage@~1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/localforage/-/localforage-1.10.0.tgz#5c465dc5f62b2807c3a84c0c6a1b1b3212781dd4"
-  integrity sha512-14/H1aX7hzBBmmh7sGPd+AOMkkIrHM3Z1PAyGgZigA1H1p5O5ANnMyWzvpAETtG68/dC4pC0ncy3+PPGzXZHPg==
-  dependencies:
-    lie "3.1.1"
 
 locate-path@^3.0.0:
   version "3.0.0"
@@ -8474,10 +8466,10 @@ use@^3.1.0:
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
   integrity sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==
 
-utf-8-validate@^5.0.5:
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-5.0.5.tgz#dd32c2e82c72002dc9f02eb67ba6761f43456ca1"
-  integrity sha512-+pnxRYsS/axEpkrrEpzYfNZGXp0IjC/9RIxwM5gntY4Koi8SHmUGSfxfWqxZdRxrtaoVstuOzUp/rbs3JSPELQ==
+utf-8-validate@~5.0.6:
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-5.0.6.tgz#e1b3e0a5cc8648a3b44c1799fbb170d1aaaffe80"
+  integrity sha512-hoY0gOf9EkCw+nimK21FVKHUIG1BMqSiRwxB/q3A9yKZOrOI99PP77BxmarDqWz6rG3vVYiBWfhG8z2Tl+7fZA==
   dependencies:
     node-gyp-build "^4.2.0"
 
@@ -8833,7 +8825,7 @@ xxhashjs@~0.2.2:
   dependencies:
     cuint "^0.2.2"
 
-y-indexeddb@^9.0.6:
+y-indexeddb@~9.0.6:
   version "9.0.6"
   resolved "https://registry.yarnpkg.com/y-indexeddb/-/y-indexeddb-9.0.6.tgz#49aecac11bc229571fb134e0ec0717c0330b731f"
   integrity sha512-8mdCYdzZDWS2lGiB9Reaz67ZqvnV6EXH/F7L+TmBC+3mWjIBrPw4UcI79nOhEOh+y9lHXzNpSda4YJ06M13F1A==
@@ -8855,7 +8847,7 @@ y-protocols@^1.0.5:
   dependencies:
     lib0 "^0.2.42"
 
-y-webrtc@^10.2.0:
+y-webrtc@~10.2.0:
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/y-webrtc/-/y-webrtc-10.2.0.tgz#dae1460a9f3ae677c072fedff783864452fac1be"
   integrity sha512-YhHXJx46zc8En8Jpy5FUpAksAAndTV0dXbEKxJw/Zb8+Y6xVGaeB4+x44k0xo5i+SgZ00OjlXAQXgkJQesLc4Q==
@@ -8866,7 +8858,7 @@ y-webrtc@^10.2.0:
   optionalDependencies:
     ws "^7.2.0"
 
-y-websocket@^1.3.16:
+y-websocket@~1.3.16:
   version "1.3.16"
   resolved "https://registry.yarnpkg.com/y-websocket/-/y-websocket-1.3.16.tgz#0ec1a141d593933dfbfba2fb9fa9d95dca332c89"
   integrity sha512-538dwNOQeZCpMfhh67y40goxHQZKubjoXtfhQieUF2bIQfHVV44bGFeAiYiBHgwOSRdwp7qG4MmDwU0M3U3vng==
@@ -8983,10 +8975,10 @@ yeast@0.1.2:
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
   integrity sha1-AI4G2AlDIMNy28L47XagymyKxBk=
 
-yjs@^13.5.12:
-  version "13.5.12"
-  resolved "https://registry.yarnpkg.com/yjs/-/yjs-13.5.12.tgz#7a0cf3119fb368c07243825e989a55de164b3f9c"
-  integrity sha512-/buy1kh8Ls+t733Lgov9hiNxCsjHSCymTuZNahj2hsPNoGbvnSdDmCz9Z4F19Yr1eUAAXQLJF3q7fiBcvPC6Qg==
+yjs@~13.5.12:
+  version "13.5.13"
+  resolved "https://registry.yarnpkg.com/yjs/-/yjs-13.5.13.tgz#0bf4d415938fd57212805ba942a5d18ec77fb537"
+  integrity sha512-5vDcT2ZY8USY6jfwGU1xWcyLz4UwOZH9ue5Ri/G9qv3u4rD7bhKeZhtQM+92/7ft6T2fnZf6roVhDvCx7ixf7g==
   dependencies:
     lib0 "^0.2.41"
 

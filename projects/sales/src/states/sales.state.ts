@@ -48,13 +48,14 @@ export class SalesState {
 
   getProducts(): void {
     this.searchProgress.next(true);
-    this.saleService.getProducts().then(products => {
+    this.saleService.products().then(products => {
       if (Array.isArray(products) && products?.length > 0) {
         this.products.next(products);
       } else {
-        return this.getProductsRemote();
+        // return this.getProductsRemote();
       }
     }).catch(reason => {
+      console.log(reason);
       this.message(reason);
     }).finally(() => {
       this.searchProgress.next(false);
@@ -68,6 +69,7 @@ export class SalesState {
         this.products.next(products);
       }
     }).catch(reason => {
+      console.log(reason);
       this.message(reason);
     }).finally(() => {
       this.fetchProductsProgress.next(false);

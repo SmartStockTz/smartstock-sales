@@ -1,11 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {DeviceState} from '@smartstocktz/core-libs';
+import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {CustomerState} from '../states/customer.state';
 import {DialogCreateCustomerComponent} from '../components/dialog-create-customer.component';
 import {SheetCreateCustomerComponent} from '../components/sheet-create-customer.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatPaginator} from '@angular/material/paginator';
+import {database} from 'bfast';
 
 @Component({
   selector: 'app-customer-page',
@@ -48,16 +49,28 @@ import {MatPaginator} from '@angular/material/paginator';
   `,
   styleUrls: ['../styles/customers-page.style.css']
 })
-export class CustomersPage implements OnInit {
+export class CustomersPage implements OnInit, OnDestroy {
   paginator: MatPaginator;
+  private sig = false;
 
   constructor(private readonly dialog: MatDialog,
               public readonly customerState: CustomerState,
               public readonly matBottomSheet: MatBottomSheet,
+              private readonly userService: UserService,
               public readonly deviceState: DeviceState) {
   }
 
   async ngOnInit(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
+    const changes = database(shop.projectId).syncs('customers')
+      .changes();
+    changes.observe(_ => {
+      if (this.sig === true) {
+        return;
+      }
+      this.customerState.fetchCustomers();
+      this.sig = true;
+    });
   }
 
   addCustomer(): void {
@@ -90,5 +103,10 @@ export class CustomersPage implements OnInit {
 
   setPaginator($event: MatPaginator) {
     this.paginator = $event;
+  }
+
+  async ngOnDestroy(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
+    database(shop.projectId).syncs('customers').close();
   }
 }

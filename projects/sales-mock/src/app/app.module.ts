@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {IpfsService, LibModule} from '@smartstocktz/core-libs';
+import {IpfsService, LibModule, SyncsService} from '@smartstocktz/core-libs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
 import {LoginPageComponent} from './pages/login.page';
@@ -16,7 +16,6 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from './guards/auth.guard';
 import * as bfast from 'bfast';
-import {SalesNavigationService} from '../../../sales/src/services/sales-navigation.service';
 
 const routes: Routes = [
   {path: '', component: WelcomePage},
@@ -46,38 +45,14 @@ const routes: Routes = [
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(private readonly navigationState: SalesNavigationService) {
-    IpfsService.getVersion().then(value => {
-      console.log('ipfs version : ', value?.version);
-    }).catch(console.log);
+  constructor(private readonly syncsService: SyncsService) {
+    // IpfsService.getVersion().then(value => {
+    //   console.log('ipfs version : ', value?.version);
+    // }).catch(console.log);
     bfast.init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
     });
-    //   this.startSalesSync().catch(console.log);
-    // }
-    //
-    // shouldRun = true;
-
-    // async startSalesSync() {
-    //   console.log('sales worker started');
-    //   this.salesWorkerService.initiateSmartStock();
-    //   setInterval(_ => {
-    //     if (this.shouldRun === true) {
-    //       this.shouldRun = false;
-    //       this.salesWorkerService.run()
-    //         .then(_1 => {
-    //         })
-    //         .catch(_2 => {
-    //         })
-    //         .finally(() => {
-    //           this.shouldRun = true;
-    //         });
-    //     } else {
-    //       console.log('another save sales routine runs');
-    //     }
-    //   }, 5000);
-    // }
-
+    this.syncsService.startWorker().catch(console.log);
   }
 }
