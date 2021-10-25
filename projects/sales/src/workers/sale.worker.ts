@@ -213,8 +213,8 @@ export class SaleWorker {
         adapters: {
           auth: 'DEFAULT'
         },
-        databaseURL: `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}`,
-        functionsURL: `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}`,
+        databaseURL: getDaasAddress(shop),
+        functionsURL: getFaasAddress(shop),
       }, shop.projectId);
       const salesKeys: string[] = await this.getSalesLocalKeys(shop);
       // const sales: Array<BatchModel[]> = await this.getSalesLocal(shop); // bfast.cache({database: 'sales', collection: shop.projectId});
@@ -262,9 +262,9 @@ export class SaleWorker {
             this.shouldSaleSync = true;
           });
       } else {
-        // console.log('another save sales routine run');
+        console.log('another save sales routine run');
       }
-    }, 3000);
+    }, 2000);
   }
 
   // async getProductsRemote(shop: ShopModel, products: StockModel[]): Promise<StockModel[]> {
