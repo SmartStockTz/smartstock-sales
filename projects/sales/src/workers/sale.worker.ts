@@ -33,6 +33,10 @@ export class SaleWorker {
 
   private static async getShops() {
     try {
+      init({
+        applicationId: 'smartstock_lb',
+        projectId: 'smartstock'
+      });
       const user = await auth().currentUser();
       if (user && user.shops && Array.isArray(user.shops)) {
         const shops: ShopModel[] = [...user.shops];
@@ -54,6 +58,7 @@ export class SaleWorker {
         return [];
       }
     } catch (e) {
+      console.log(e);
       return [];
     }
   }
@@ -231,6 +236,7 @@ export class SaleWorker {
               throw {message: 'Invalid sales data'};
             }
           }
+          console.log('save and remove sales');
           // else {
           //   await this.removeSalesLocal(sale[0].cartId, shop);
           // }
@@ -249,7 +255,6 @@ export class SaleWorker {
     // this.shouldSaleSyncInit = false;
     console.log('sales sync started');
     setInterval(_ => {
-      // console.log(id, '******');
       if (this.shouldSaleSync === true) {
         this.shouldSaleSync = false;
         this.saveSaleRemote()

@@ -53,6 +53,6 @@ export class AppModule {
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
     });
-    this.syncsService.startWorker().catch(console.log);
+    // this.syncsService.startWorker().catch(console.log);
   }
 }
