@@ -81,6 +81,7 @@ export class SaleService {
         });
         await updateStockInLocalSyncs(sale, shop);
       }
+      database(shop.projectId).syncs('gossip').changes().set({id: 'sale', sale});
     }
   }
 
