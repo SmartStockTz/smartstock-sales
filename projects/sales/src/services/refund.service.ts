@@ -2,8 +2,9 @@ import {Injectable} from '@angular/core';
 import {SalesModel} from '../models/sale.model';
 import {database} from 'bfast';
 import moment from 'moment';
-import {UserService} from '@smartstocktz/core-libs';
+import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {CidService} from './cid.service';
+import {sha1} from 'crypto-hash';
 
 @Injectable({
   providedIn: 'root'
@@ -43,12 +44,54 @@ export class RefundService {
       lastname: user.lastname,
       username: user.username
     };
-    return database(shop.projectId).table('sales')
-      .query()
-      .byId(sale.id)
-      .updateBuilder()
-      .doc({refund: value})
-      .update();
+    await database(shop.projectId).bulk().update('sales', {
+      query: {
+        id: sale.id,
+      },
+      update: {
+        $set: {
+          refund: value
+        }
+      }
+    }).update('stocks', {
+      query: {
+        id: sale.stock.id
+      },
+      update: {
+        $set: {
+          [`quantity.${SecurityUtil.generateUUID()}`]: {
+            q: sale.stock.stockable === true ? value.quantity : 0,
+            s: 'refund',
+            d: new Date().toISOString()
+          }
+        }
+      }
+    }).commit();
+    const oldStock = database(shop.projectId).syncs('stocks').changes().get(sale.stock.id);
+    if (oldStock && typeof oldStock.quantity === 'object') {
+      oldStock.quantity[await sha1(JSON.stringify(sale))] = {
+        q: sale.stock.stockable === true ? value.quantity : 0,
+        s: 'refund',
+        d: new Date().toISOString()
+      };
+    }
+    if (oldStock && typeof oldStock.quantity === 'number') {
+      oldStock.quantity = {
+        [await sha1(JSON.stringify(sale))]: {
+          q: sale.stock.stockable === true ? value.quantity : 0,
+          s: 'refund',
+          d: new Date().toISOString()
+        }
+      };
+    }
+    database(shop.projectId).syncs('stocks').changes().set(oldStock);
+    if (sale && sale.refund && typeof sale.refund === 'object') {
+      sale.refund = Object.assign(sale.refund, value);
+    }else {
+      // @ts-ignore
+      sale.refund = value;
+    }
+    return sale;
   }
 }
 

@@ -2,7 +2,7 @@ import {expose} from 'comlink';
 import {CartItemModel} from '../models/cart-item.model';
 import {CartModel} from '../models/cart.model';
 import {SalesModel} from '../models/sale.model';
-import {LibUserModel, toSqlDate} from '@smartstocktz/core-libs';
+import {LibUserModel, SecurityUtil, toSqlDate} from '@smartstocktz/core-libs';
 import moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
 
@@ -113,6 +113,7 @@ export class CartWorker {
     const idTra = 'n';
     return carts.map<SalesModel>(value => {
       return {
+        id: SecurityUtil.generateUUID(),
         amount: CartWorker.getCartItemAmount(value, channel, discount),
         discount: CartWorker.getCartItemDiscount(
           {totalItems: carts.length, totalDiscount: discount}
@@ -143,7 +144,22 @@ export class CartWorker {
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        stock: value.product,
+        stock: {
+          id: value.product.id,
+          product: value.product.product,
+          stockable: value.product.stockable,
+          category: value.product.category,
+          unit: value.product.unit,
+          creditPrice: value.product.creditPrice,
+          quantity: value.product.quantity,
+          expire: value.product.expire,
+          retailPrice: value.product.retailPrice,
+          purchase: value.product.purchase,
+          type: value.product.type,
+          wholesalePrice: value.product.wholesalePrice,
+          wholesaleQuantity: value.product.wholesaleQuantity,
+          supplier: value.product.supplier
+        },
         stockId: value.product.id
       };
     });

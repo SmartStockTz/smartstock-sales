@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
 import {SaleWorker} from '../workers/sale.worker';
-import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
+import {getDaasAddress, SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
-import {database} from 'bfast';
+import {cache, database} from 'bfast';
+import {sha1} from 'crypto-hash';
+import {updateStockInLocalSyncs} from '../utils/stock.util';
 
 @Injectable({
   providedIn: 'root'
@@ -28,13 +30,13 @@ export class SaleService {
     }
   }
 
-  // stopWorker() {
-  //   if (this.saleWorkerNative) {
-  //     this.saleWorkerNative.terminate();
-  //     this.saleWorker = undefined;
-  //     this.saleWorkerNative = undefined;
-  //   }
-  // }
+  stopWorker() {
+    if (this.saleWorkerNative) {
+      this.saleWorkerNative.terminate();
+      this.saleWorker = undefined;
+      this.saleWorkerNative = undefined;
+    }
+  }
 
   async products(): Promise<StockModel[]> {
     await this.listeningStocks();
@@ -43,14 +45,43 @@ export class SaleService {
     const p = database(shop.projectId).syncs('stocks').changes().values();
     const products: StockModel[] = Array.from(p ? p : []);
     return this.saleWorker.filterSaleableProducts(products, shop);
-    // return [];
   }
 
   async saveSale(sales: SalesModel[]) {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const cartId = SecurityUtil.generateUUID();
-    return this.saleWorker.saveSale(sales, shop, cartId);
+    for (const sale of sales) {
+      sale.id = SecurityUtil.generateUUID();
+      sale.cartId = cartId;
+      sale.createdAt = new Date().toISOString();
+      sale.batch = SecurityUtil.generateUUID();
+      await cache().addSyncs({
+        applicationId: shop.applicationId,
+        projectId: shop.projectId,
+        payload: sale,
+        action: 'create',
+        databaseURL: getDaasAddress(shop),
+        tree: 'sales'
+      });
+      if (sale.stock.stockable === true) {
+        await cache().addSyncs({
+          applicationId: shop.applicationId,
+          projectId: shop.projectId,
+          payload: {
+            id: sale.stock.id,
+            [`quantity.${await sha1(JSON.stringify(sale))}`]: {
+              q: -sale.quantity,
+              s: 'sale',
+              d: new Date().toISOString()
+            }
+          },
+          tree: 'stocks',
+          action: 'update',
+          databaseURL: getDaasAddress(shop)
+        });
+        await updateStockInLocalSyncs(sale, shop);
+      }
+    }
   }
 
   private async remoteAllProducts(): Promise<StockModel[]> {
@@ -74,9 +105,7 @@ export class SaleService {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
     const products = await this.remoteAllProducts();
-    // console.log(products?.length, 'total all products');
     return this.saleWorker.filterSaleableProducts(products, shop);
-    // return [];
   }
 
   async search(query: string): Promise<StockModel[]> {
@@ -86,7 +115,6 @@ export class SaleService {
     const p = database(shop.projectId).syncs('stocks').changes().values();
     const products: StockModel[] = Array.from(p ? p : []);
     return this.saleWorker.search(products, query, shop);
-    // return [];
   }
 
   async listeningStocks(): Promise<any> {

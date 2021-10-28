@@ -1,16 +1,11 @@
-import {StockModel} from './stock.model';
-import {CustomerModel} from './customer.model';
-
 export interface SalesModel {
   soldBy: {
     username: string;
   };
-  id?: string;
-  _id?: string;
+  id: string;
   idTra?: string;
   createdAt?: any;
   updatedAt?: any;
-  updatedBy?: any;
   date: any;
   timer: any;
   product: string;
@@ -38,8 +33,33 @@ export interface SalesModel {
     email: string;
   };
   channel: 'whole' | 'retail' | 'invoice' | 'online' | string;
-  stock: StockModel;
+  stock: {
+    id?: string;
+    product: string;
+    type: 'simple' | 'grouped';
+    retailPrice: number;
+    wholesalePrice: number;
+    creditPrice?: number;
+    unit: string;
+    category: string;
+    quantity: number;
+    wholesaleQuantity: number;
+    purchase: number;
+    supplier: string;
+    expire: string;
+    stockable: boolean;
+  };
   batch?: string;
   stockId: string;
-  customerObject: CustomerModel;
+  customerObject: {
+    phone?: string;
+    email?: string;
+    company?: string;
+    street?: string;
+    payNumber?: string;
+    payRef?: string;
+    displayName: string;
+    tin?: string;
+    id?: string;
+  };
 }

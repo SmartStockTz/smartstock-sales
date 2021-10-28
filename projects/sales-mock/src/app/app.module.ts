@@ -46,13 +46,10 @@ const routes: Routes = [
 })
 export class AppModule {
   constructor(private readonly syncsService: SyncsService) {
-    // IpfsService.getVersion().then(value => {
-    //   console.log('ipfs version : ', value?.version);
-    // }).catch(console.log);
     init({
       applicationId: 'smartstock_lb',
       projectId: 'smartstock',
     });
-    // this.syncsService.startWorker().catch(console.log);
+    this.syncsService.startWorker().catch(console.log);
   }
 }

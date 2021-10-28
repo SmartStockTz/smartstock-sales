@@ -23,8 +23,8 @@ export interface StockModel {
   canExpire: boolean;
   unit: string;
   category: string;
-  stockable: boolean | true;
-  purchasable: boolean | true;
+  stockable: boolean;
+  purchasable: boolean;
   quantity: number;
   wholesaleQuantity: number;
   reorder: number;
