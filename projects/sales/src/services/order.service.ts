@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {getDaasAddress, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrdersWorker} from '../workers/orders.worker';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {CartItemModel} from '../models/cart-item.model';
-import {database, functions} from 'bfast';
+import {cache, database, functions} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
@@ -38,22 +38,18 @@ export class OrderService {
     return database(shop.projectId).syncs('orders').upload();
   }
 
-  // async listeningOrders(): Promise<void> {
-  //   const shop = await this.userService.getCurrentShop();
-  //   database(shop.projectId).syncs('orders');
-  // }
+  async listeningOrders(): Promise<void> {
+    const shop = await this.userService.getCurrentShop();
+    database(shop.projectId).syncs('orders');
+  }
 
   async stopListeningOrder(): Promise<void> {
-    // const shop = await this.userService.getCurrentShop();
-    // database(shop.projectId).syncs('orders').close();
+    const shop = await this.userService.getCurrentShop();
+    database(shop.projectId).syncs('orders').close();
   }
 
   async saveOrder(
-    id: string,
-    carts: CartItemModel[],
-    channel: string,
-    selectedCustomer: CustomerModel,
-    user: any
+    id: string, carts: CartItemModel[], channel: string, selectedCustomer: CustomerModel, user: any
   ): Promise<any> {
     if (!selectedCustomer || !selectedCustomer?.displayName) {
       throw {message: 'Please select a customer to save the order'};
@@ -63,6 +59,7 @@ export class OrderService {
     const order = {
       id: id ? id : SecurityUtil.generateUUID(),
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       channel: channel ? channel : 'retail',
       customer: selectedCustomer,
       items: carts,
@@ -81,25 +78,39 @@ export class OrderService {
         location: selectedCustomer?.street
       }
     };
-    database(shop.projectId)
-      .syncs('orders')
-      .changes()
-      .set(order);
+    database(shop.projectId).syncs('orders').changes().set(order);
+    await cache().addSyncs({
+      projectId: shop.projectId,
+      databaseURL: getDaasAddress(shop),
+      action: 'create',
+      tree: 'orders',
+      payload: order,
+      applicationId: shop.applicationId
+    });
     return order;
   }
 
-  private ordersFromSyncs(shop: ShopModel) {
-    const v = database(shop.projectId)
-      .syncs('orders')
-      .changes()
-      .values();
-    return Array.from(v);
+  private async ordersFromSyncs(shop: ShopModel): Promise<OrderModel[]> {
+    return new Promise((resolve, reject) => {
+      try {
+        database(shop.projectId).syncs('orders', syncs => {
+          const v = Array.from(syncs.changes().values());
+          if (v.length === 0) {
+            this.getRemoteOrders().then(resolve).catch(reject);
+          } else {
+            resolve(v);
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
   async getOrders(): Promise<OrderModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const c = this.ordersFromSyncs(shop);
+    const c = await this.ordersFromSyncs(shop);
     return this.ordersWorker.sortOrders(c);
   }
 
@@ -208,7 +219,7 @@ export class OrderService {
   async search(query: string): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const o = this.ordersFromSyncs(shop);
+    const o = await this.ordersFromSyncs(shop);
     return this.ordersWorker.search(query, o, shop);
   }
 
@@ -216,6 +227,14 @@ export class OrderService {
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
     database(shop.projectId).syncs('orders').changes().delete(order.id);
+    await cache().addSyncs({
+      projectId: shop.projectId,
+      payload: {id: order.id},
+      tree: 'orders',
+      applicationId: shop.applicationId,
+      action: 'delete',
+      databaseURL: getDaasAddress(shop)
+    });
     return order;
     // return this.ordersWorker.deleteOrder(order, shop);
   }

@@ -42,9 +42,16 @@ export class SaleService {
     await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const p = database(shop.projectId).syncs('stocks').changes().values();
-    const products: StockModel[] = Array.from(p ? p : []);
-    return this.saleWorker.filterSaleableProducts(products, shop);
+    return new Promise((resolve, reject) => {
+      database(shop.projectId).syncs('stocks', syncs => {
+        const p = Array.from(syncs.changes().values());
+        if (p.length === 0) {
+          this.getProductsRemote().then(resolve).catch(reject);
+        } else {
+          this.saleWorker.filterSaleableProducts(p, shop).then(resolve).catch(reject);
+        }
+      });
+    });
   }
 
   async saveSale(sales: SalesModel[]) {
@@ -124,12 +131,7 @@ export class SaleService {
   }
 
   async listeningStocksStop() {
-    // try {
-    //   this.syncs?.close();
-    // } catch (e) {
-    //   console.log(e, '********');
-    // } finally {
-    //   this.syncs = undefined;
-    // }
+    const shop = await this.userService.getCurrentShop();
+    database(shop.projectId).syncs('stocks').close();
   }
 }

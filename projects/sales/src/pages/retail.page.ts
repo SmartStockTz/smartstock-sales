@@ -11,7 +11,7 @@ import {SalesState} from '../states/sales.state';
   styleUrls: ['../styles/retail.style.css']
 })
 export class RetailPageComponent implements OnInit, OnDestroy {
-  private sig = false;
+  // private sig = false;
   constructor(public readonly userService: UserService,
               public readonly salesState: SalesState) {
     document.title = 'SmartStock - Retail Sale';
@@ -30,7 +30,7 @@ export class RetailPageComponent implements OnInit, OnDestroy {
   }
 
   async ngOnDestroy(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('stocks').close();
+    // const shop = await this.userService.getCurrentShop();
+    // database(shop.projectId).syncs('stocks').close();
   }
 }

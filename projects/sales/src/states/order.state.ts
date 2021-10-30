@@ -67,7 +67,6 @@ export class OrderState {
     this.getOrderFlag.next(true);
     this.orderService.getRemoteOrders().then(value => {
       if (value && Array.isArray(value)) {
-        // this.orders.value.push(...value);
         this.orders.next(value);
       }
     }).catch(_ => {

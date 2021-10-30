@@ -49,10 +49,8 @@ export class SalesState {
   getProducts(): void {
     this.searchProgress.next(true);
     this.saleService.products().then(products => {
-      if (Array.isArray(products) && products?.length > 0) {
+      if (Array.isArray(products)) {
         this.products.next(products);
-      } else {
-        // return this.getProductsRemote();
       }
     }).catch(reason => {
       console.log(reason);

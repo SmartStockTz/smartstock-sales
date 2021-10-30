@@ -22,15 +22,8 @@ export class CustomerService {
   }
 
   async stopChanges() {
-    // if (this.syncs) {
-    //   try {
-    //     this.syncs.close();
-    //   } catch (e) {
-    //     console.log(e);
-    //   } finally {
-    //     this.syncs = undefined;
-    //   }
-    // }
+    const shop = await this.userService.getCurrentShop();
+    database(shop.projectId).syncs('customers').close();
   }
 
   private async initClass(shop: ShopModel) {
@@ -40,22 +33,28 @@ export class CustomerService {
     }
   }
 
-  private customersFromSyncs(shop: ShopModel): CustomerModel[] {
-    const customers: any = database(shop.projectId)
-      .syncs('customers')
-      .changes()
-      .values();
-    return Array.from(customers);
+  private async customersFromSyncs(shop: ShopModel): Promise<CustomerModel[]> {
+    return new Promise((resolve, reject) => {
+      try {
+        database(shop.projectId).syncs('customers', syncs => {
+          const c = Array.from(syncs.changes().values());
+          if (c.length === 0) {
+            this.getRemoteCustomers().then(resolve).catch(reject);
+          } else {
+            resolve(c);
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
   async getCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.listeningChanges();
     await this.initClass(shop);
-    const c = this.customersFromSyncs(shop);
-    // if (Array.isArray(c) && c.length === 0) {
-    //   return this.getRemoteCustomers();
-    // }
+    const c = await this.customersFromSyncs(shop);
     return this.customerWorker.sort(c);
   }
 
@@ -80,7 +79,7 @@ export class CustomerService {
   async search(query: string): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
     await this.initClass(shop);
-    return this.customerWorker.search(query, shop, this.customersFromSyncs(shop));
+    return this.customerWorker.search(query, shop, await this.customersFromSyncs(shop));
   }
 
   async deleteCustomer(customer: CustomerModel): Promise<any> {

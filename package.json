@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "~12.1.4",
     "@angular/router": "~12.1.4",
     "@smartstocktz/core-libs": "~0.3.5",
-    "bfast": "~6.0.0-alpha.7",
+    "bfast": "^6.0.0-alpha.13",
     "comlink": "~4.3.1",
     "crypto-hash": "~1.3.0",
     "moment": "~2.29.1",
