@@ -55,7 +55,7 @@ export class CartService {
     discount: number,
     user: LibUserModel
   ): Promise<any> {
-    discount = isNaN(discount) ? 0 : discount;
+    discount = isNaN(discount) ? 0 : (discount / carts.length);
     const shop = await this.userService.getCurrentShop();
     await this.initWorker(shop);
     await this.printCart(carts, channel, discount, customer, false);
