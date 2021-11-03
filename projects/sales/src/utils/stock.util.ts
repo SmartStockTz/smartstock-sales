@@ -1,4 +1,4 @@
-import {cache, database} from 'bfast';
+import {cache} from 'bfast';
 import {sha1} from 'crypto-hash';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {SalesModel} from '../models/sale.model';

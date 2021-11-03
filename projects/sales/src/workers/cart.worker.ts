@@ -5,6 +5,7 @@ import {SalesModel} from '../models/sale.model';
 import {LibUserModel, SecurityUtil, toSqlDate} from '@smartstocktz/core-libs';
 import moment from 'moment';
 import {CustomerModel} from '../models/customer.model';
+import {StockModel} from '../models/stock.model';
 
 export class CartWorker {
 
@@ -151,7 +152,7 @@ export class CartWorker {
           category: value.product.category,
           unit: value.product.unit,
           creditPrice: value.product.creditPrice,
-          quantity: value.product.quantity,
+          quantity: this.getStockQuantity(value.product),
           expire: value.product.expire,
           retailPrice: value.product.retailPrice,
           purchase: value.product.purchase,
@@ -163,6 +164,18 @@ export class CartWorker {
         stockId: value.product.id
       };
     });
+  }
+
+  getStockQuantity(stock: StockModel): number {
+    let qty: any = 0;
+    if (stock && isNaN(Number(stock.quantity)) && typeof stock.quantity === 'object') {
+      // @ts-ignore
+      qty = Object.values(stock.quantity).reduce((a, b) => a + b.q, 0);
+    }
+    if (stock && !isNaN(Number(stock.quantity)) && typeof stock.quantity === 'number') {
+      qty = stock.quantity as number;
+    }
+    return qty as number;
   }
 
   async cartItemsToPrinterData(carts: CartModel[], customer: CustomerModel, channel: string,
