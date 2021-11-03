@@ -5,9 +5,10 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
-import {cache, database} from 'bfast';
+import {cache, database, functions} from 'bfast';
 import {sha1} from 'crypto-hash';
 import {updateStockInLocalSyncs} from '../utils/stock.util';
+import {SocketController} from 'bfast/dist/lib/controllers/socket.controller';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class SaleService {
   private saleWorker: SaleWorker;
   private saleWorkerNative;
   private remoteAllProductsRunning: boolean;
+  private changes: SocketController;
 
   constructor(private readonly userService: UserService) {
 
@@ -39,17 +41,15 @@ export class SaleService {
   }
 
   async products(): Promise<StockModel[]> {
-    await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    return new Promise((resolve, reject) => {
-      database(shop.projectId).syncs('stocks', syncs => {
-        const p = Array.from(syncs.changes().values());
-        if (p.length === 0) {
-          this.getProductsRemote().then(resolve).catch(reject);
-        } else {
-          this.saleWorker.filterSaleableProducts(p, shop).then(resolve).catch(reject);
-        }
+    return cache({database: shop.projectId, collection: 'stocks'}).getAll().then(stocks => {
+      if (Array.isArray(stocks) && stocks.length > 0) {
+        return stocks;
+      }
+      return this.getProductsRemote().then(rP => {
+        cache({database: shop.projectId, collection: 'stocks'}).setBulk(rP.map(x => x.id), rP).catch(console.log);
+        return rP;
       });
     });
   }
@@ -88,25 +88,12 @@ export class SaleService {
         });
         await updateStockInLocalSyncs(sale, shop);
       }
-      database(shop.projectId).syncs('gossip').changes().set({id: 'sale', sale});
     }
   }
 
   private async remoteAllProducts(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    try {
-      this.remoteAllProductsRunning = true;
-      const status = await database(shop.projectId).syncs('stocks').upload();
-      if (status) {
-        const p = database(shop.projectId).syncs('stocks').changes().values();
-        return Array.from(p);
-      } else {
-        throw {message: 'products load fail with false status'};
-      }
-    } finally {
-      this.remoteAllProductsRunning = false;
-    }
-    return [];
+    return database(shop.projectId).table('stocks').getAll();
   }
 
   async getProductsRemote(): Promise<StockModel[]> {
@@ -117,21 +104,59 @@ export class SaleService {
   }
 
   async search(query: string): Promise<StockModel[]> {
-    await this.listeningStocks();
     const shop = await this.userService.getCurrentShop();
     await this.startWorker(shop);
-    const p = database(shop.projectId).syncs('stocks').changes().values();
-    const products: StockModel[] = Array.from(p ? p : []);
+    const products: StockModel[] = await this.products();
     return this.saleWorker.search(products, query, shop);
   }
 
-  async listeningStocks(): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('stocks');
+  async listeningStocksStop(): Promise<void> {
+    if (this.changes && this.changes.close) {
+      this.changes.close();
+    }
   }
 
-  async listeningStocksStop() {
+  async listeningStocks(): Promise<void> {
     const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('stocks').close();
+    this.changes = functions(shop.projectId).event(
+      '/daas-changes',
+      () => {
+        console.log('connected on products changes');
+        this.changes.emit({
+          auth: {
+            masterKey: shop.masterKey
+          },
+          body: {
+            projectId: shop.projectId,
+            applicationId: shop.applicationId,
+            pipeline: [],
+            domain: 'stocks'
+          }
+        });
+      },
+      () => console.log('disconnected on products changes')
+    );
+    this.changes.listener(async response => {
+      // console.log(response);
+      const stockCache = cache({database: shop.projectId, collection: 'stocks'});
+      if (response && response.body && response.body.change) {
+        switch (response.body.change.name) {
+          case 'create':
+            const data = response.body.change.snapshot;
+            await stockCache.set(data.id, data);
+            return;
+          case 'update':
+            let updateData = response.body.change.snapshot;
+            const oldData = await stockCache.get(updateData.id);
+            updateData = Object.assign(typeof oldData === 'object' ? oldData : {}, updateData);
+            await stockCache.set(updateData.id, updateData);
+            return;
+          case 'delete':
+            const deletedData = response.body.change.snapshot;
+            await stockCache.remove(deletedData.id);
+            return;
+        }
+      }
+    });
   }
 }

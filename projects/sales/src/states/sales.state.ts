@@ -26,7 +26,6 @@ export class SalesState {
 
   stockListingStop() {
     this.saleService.listeningStocksStop().catch(console.log);
-    // this.saleService.stopWorker();
   }
 
   saveSales(sales: SalesModel[]): void {

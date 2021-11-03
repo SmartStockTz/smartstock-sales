@@ -58,26 +58,7 @@ export class CustomerWorker {
     return customers;
   }
 
-  // private static async removeCustomerLocal(id: string, shop: ShopModel) {
-  //   bfast.database(shop.projectId).syncs('customers')
-  //     .changes()
-  //     .delete(id);
-  // }
-
-  // private static async setCustomerLocal(customer: CustomerModel, shop: ShopModel) {
-  //   bfast.database(shop.projectId).syncs('customers')
-  //     .changes()
-  //     .set(customer);
-  // }
-
-  // private static async setCustomersLocal(customers: CustomerModel[], shop: ShopModel) {
-  //   for (const customer of customers) {
-  //     await this.setCustomerLocal(customer, shop);
-  //   }
-  // }
-
   async getCustomersRemote(shop: ShopModel, customers: CustomerModel[]): Promise<CustomerModel[]> {
-    // let rCustomers: CustomerModel[] = await bfast.database(shop.projectId).syncs('customers').upload();
     customers = await CustomerWorker.sortCustomers(customers);
     // if (!customers) {
     //   customers = localCustomers;

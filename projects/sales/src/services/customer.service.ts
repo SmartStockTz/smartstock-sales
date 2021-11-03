@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {UserService} from '@smartstocktz/core-libs';
+import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {wrap} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {CustomerWorker} from '../workers/customer.worker';
-import {database} from 'bfast';
+import {cache, database} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
@@ -16,16 +16,6 @@ export class CustomerService {
 
   }
 
-  async listeningChanges() {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('customers');
-  }
-
-  async stopChanges() {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('customers').close();
-  }
-
   private async initClass(shop: ShopModel) {
     if (!this.customerWorker) {
       const CW = wrap(new Worker(new URL('../workers/customer.worker', import.meta.url))) as unknown as any;
@@ -34,25 +24,21 @@ export class CustomerService {
   }
 
   private async customersFromSyncs(shop: ShopModel): Promise<CustomerModel[]> {
-    return new Promise((resolve, reject) => {
-      try {
-        database(shop.projectId).syncs('customers', syncs => {
-          const c = Array.from(syncs.changes().values());
-          if (c.length === 0) {
-            this.getRemoteCustomers().then(resolve).catch(reject);
-          } else {
-            resolve(c);
-          }
-        });
-      } catch (e) {
-        reject(e);
+    const cCache = cache({database: shop.projectId, collection: 'customers'});
+    return cCache.getAll().then(customers => {
+      if (Array.isArray(customers) && customers.length > 0) {
+        return customers;
       }
+      return this.getRemoteCustomers().then(rC => {
+        cCache.setBulk(rC.map(x => x.id), rC).catch(console.log);
+        return rC;
+      });
     });
   }
 
   async getCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.listeningChanges();
+    // await this.listeningChanges();
     await this.initClass(shop);
     const c = await this.customersFromSyncs(shop);
     return this.customerWorker.sort(c);
@@ -60,20 +46,24 @@ export class CustomerService {
 
   async getRemoteCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.listeningChanges();
     await this.initClass(shop);
-    const c = await database(shop.projectId).syncs('customers').upload();
+    const c: any[] = await database(shop.projectId).table('customers').getAll();
     return this.customerWorker.getCustomersRemote(shop, c);
   }
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.userService.getCurrentShop();
-    // await this.initClass(shop);
-    database(shop.projectId).syncs('customers')
-      .changes()
-      .set(customer as any);
+    customer.id = SecurityUtil.generateUUID();
+    customer.createdAt = new Date().toISOString();
+    customer.updatedAt = new Date().toISOString();
+    await database(shop.projectId).table('customers')
+      .query()
+      .byId(customer.id)
+      .updateBuilder()
+      .doc(customer)
+      .update();
+    cache({database: shop.projectId, collection: 'customers'}).set(customer.id, customer).catch(console.log);
     return customer;
-    // return this.customerWorker.createCustomer(customer, shop);
   }
 
   async search(query: string): Promise<CustomerModel[]> {
@@ -84,11 +74,8 @@ export class CustomerService {
 
   async deleteCustomer(customer: CustomerModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    // await this.initClass(shop);
-    database(shop.projectId).syncs('customers')
-      .changes()
-      .delete(customer.id);
+    await database(shop.projectId).table('customers').query().byId(customer.id).delete();
+    cache({database: shop.projectId, collection: 'customers'}).remove(customer.id).catch(console.log);
     return customer;
-    // return this.customerWorker.deleteCustomer(customer, shop);
   }
 }

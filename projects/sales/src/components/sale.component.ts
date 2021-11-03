@@ -92,21 +92,10 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   async ngOnDestroy(): Promise<void> {
     this.salesState.stockListingStop();
     this.destroyer.next('done');
-    // if (this.obfn) {
-    //   this?.obfn?.unobserve();
-    // }
   }
 
   async ngOnInit(): Promise<void> {
-    // const shop = await this.userService.getCurrentShop();
-    // this.obfn = database(shop.projectId).syncs('stocks').changes().observe(_ => {
-    //   if (this.sig === false) {
-    //     this.salesState.getProducts();
-    //     this.sig = true;
-    //   } else {
-    //     return;
-    //   }
-    // });
+    this.salesState.stockListening();
     this.salesState.getProducts();
     this.cartState.carts.pipe(
       takeUntil(this.destroyer)

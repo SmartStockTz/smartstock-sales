@@ -35,18 +35,58 @@ export class OrderService {
   // }
 
   private async remoteAllOrders(shop: ShopModel): Promise<OrderModel[]> {
-    return database(shop.projectId).syncs('orders').upload();
+    return database(shop.projectId).table('orders').getAll();
   }
 
-  async listeningOrders(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('orders');
-  }
-
-  async stopListeningOrder(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('orders').close();
-  }
+  // async customerListeningStop(): Promise<void> {
+  //   if (this.changes && this.changes.close) {
+  //     this.changes.close();
+  //   }
+  // }
+  //
+  // async customerListening(): Promise<void> {
+  //   const shop = await this.userService.getCurrentShop();
+  //   this.changes = functions(shop.projectId).event(
+  //     '/daas-changes',
+  //     () => {
+  //       console.log('connected on customers changes');
+  //       this.changes.emit({
+  //         auth: {
+  //           masterKey: shop.masterKey
+  //         },
+  //         body: {
+  //           projectId: shop.projectId,
+  //           applicationId: shop.applicationId,
+  //           pipeline: [],
+  //           domain: 'customers'
+  //         }
+  //       });
+  //     },
+  //     () => console.log('disconnected on customers changes')
+  //   );
+  //   this.changes.listener(async response => {
+  //     console.log(response);
+  //     const customerCache = cache({database: shop.projectId, collection: 'customers'});
+  //     if (response && response.body && response.body.change) {
+  //       switch (response.body.change.name) {
+  //         case 'create':
+  //           const data = response.body.change.snapshot;
+  //           await customerCache.set(data.id, data);
+  //           return;
+  //         case 'update':
+  //           let updateData = response.body.change.snapshot;
+  //           const oldData = await customerCache.get(updateData.id);
+  //           updateData = Object.assign(typeof oldData === 'object' ? oldData : {}, updateData);
+  //           await customerCache.set(updateData.id, updateData);
+  //           return;
+  //         case 'delete':
+  //           const deletedData = response.body.change.snapshot;
+  //           await customerCache.remove(deletedData.id);
+  //           return;
+  //       }
+  //     }
+  //   });
+  // }
 
   async saveOrder(
     id: string, carts: CartItemModel[], channel: string, selectedCustomer: CustomerModel, user: any
@@ -78,32 +118,20 @@ export class OrderService {
         location: selectedCustomer?.street
       }
     };
-    database(shop.projectId).syncs('orders').changes().set(order);
-    await cache().addSyncs({
-      projectId: shop.projectId,
-      databaseURL: getDaasAddress(shop),
-      action: 'create',
-      tree: 'orders',
-      payload: order,
-      applicationId: shop.applicationId
-    });
+    await database(shop.projectId).table('orders').save(order);
+    await cache({database: shop.projectId, collection: 'orders'}).set(order.id, order);
     return order;
   }
 
   private async ordersFromSyncs(shop: ShopModel): Promise<OrderModel[]> {
-    return new Promise((resolve, reject) => {
-      try {
-        database(shop.projectId).syncs('orders', syncs => {
-          const v = Array.from(syncs.changes().values());
-          if (v.length === 0) {
-            this.getRemoteOrders().then(resolve).catch(reject);
-          } else {
-            resolve(v);
-          }
-        });
-      } catch (e) {
-        reject(e);
+    return cache({database: shop.projectId, collection: 'orders'}).getAll().then(orders => {
+      if (Array.isArray(orders) && orders.length > 0) {
+        return orders;
       }
+      return this.getRemoteOrders().then(rO => {
+        cache({database: shop.projectId, collection: 'orders'}).setBulk(rO.map(x => x.id), rO).catch(console.log);
+        return rO;
+      });
     });
   }
 
@@ -122,60 +150,55 @@ export class OrderService {
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
-    return database().collection('orders')
-      .query()
-      .byId(orderId)
-      .updateBuilder()
-      .set('paid', true)
-      .update();
+    return database().collection('orders').query().byId(orderId).updateBuilder().set('paid', true).update();
   }
 
-  async markAsCompleted(order: OrderModel): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    return database(shop.projectId).bulk()
-      .update('orders', {
-        query: {
-          id: order.id,
-        },
-        update: {
-          $set: {
-            paid: true,
-            status: 'COMPLETED'
-          }
-        }
-      })
-      .create('sales', order.items.map(x => {
-        const quantity = x.quantity;
-        return {
-          amount: quantity * x.product.retailPrice,
-          discount: 0,
-          quantity,
-          product: x.product.product,
-          category: x.product.category,
-          unit: x.product.unit,
-          channel: 'online',
-          date: toSqlDate(new Date()),
-          idTra: 'n',
-          user: 'online',
-          batch: SecurityUtil.generateUUID(),
-          stockId: x.product.id
-        };
-      }))
-      .update('stocks', order.items
-        .filter(x => x.product.stockable === true)
-        .map(y => {
-          return {
-            query: {
-              id: y.product.id,
-            },
-            update: {
-              $inc: {
-                quantity: -Number(y.quantity),
-              }
-            }
-          };
-        })).commit();
-  }
+  // async markAsCompleted(order: OrderModel): Promise<any> {
+  //   const shop = await this.userService.getCurrentShop();
+  //   return database(shop.projectId).bulk()
+  //     .update('orders', {
+  //       query: {
+  //         id: order.id,
+  //       },
+  //       update: {
+  //         $set: {
+  //           paid: true,
+  //           status: 'COMPLETED'
+  //         }
+  //       }
+  //     })
+  //     .create('sales', order.items.map(x => {
+  //       const quantity = x.quantity;
+  //       return {
+  //         amount: quantity * x.product.retailPrice,
+  //         discount: 0,
+  //         quantity,
+  //         product: x.product.product,
+  //         category: x.product.category,
+  //         unit: x.product.unit,
+  //         channel: 'online',
+  //         date: toSqlDate(new Date()),
+  //         idTra: 'n',
+  //         user: 'online',
+  //         batch: SecurityUtil.generateUUID(),
+  //         stockId: x.product.id
+  //       };
+  //     }))
+  //     .update('stocks', order.items
+  //       .filter(x => x.product.stockable === true)
+  //       .map(y => {
+  //         return {
+  //           query: {
+  //             id: y.product.id,
+  //           },
+  //           update: {
+  //             $inc: {
+  //               quantity: -Number(y.quantity),
+  //             }
+  //           }
+  //         };
+  //       })).commit();
+  // }
 
   async checkOrderIsPaid(order: string): Promise<any> {
     const payments = await functions('fahamupay')
@@ -184,25 +207,25 @@ export class OrderService {
     return payments.map(x => Math.round(Number(x.amount))).reduce((a, b) => a + b, 0);
   }
 
-  async markOrderAsCancelled(order: OrderModel): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    return database(shop.projectId).collection('orders')
-      .query()
-      .byId(order.id)
-      .updateBuilder()
-      .set('status', 'CANCELLED')
-      .update();
-  }
+  // async markOrderAsCancelled(order: OrderModel): Promise<any> {
+  //   const shop = await this.userService.getCurrentShop();
+  //   return database(shop.projectId).collection('orders')
+  //     .query()
+  //     .byId(order.id)
+  //     .updateBuilder()
+  //     .set('status', 'CANCELLED')
+  //     .update();
+  // }
 
-  async markAsProcessed(order: OrderModel): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    return database(shop.projectId).collection('orders')
-      .query()
-      .byId(order.id)
-      .updateBuilder()
-      .set('status', 'PROCESSED')
-      .update();
-  }
+  // async markAsProcessed(order: OrderModel): Promise<any> {
+  //   const shop = await this.userService.getCurrentShop();
+  //   return database(shop.projectId).collection('orders')
+  //     .query()
+  //     .byId(order.id)
+  //     .updateBuilder()
+  //     .set('status', 'PROCESSED')
+  //     .update();
+  // }
 
   // private async setOrderLocal(snapshot: OrderModel) {
   //   const shop = await this.userService.getCurrentShop();
@@ -225,16 +248,9 @@ export class OrderService {
 
   async deleteOrder(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
-    database(shop.projectId).syncs('orders').changes().delete(order.id);
-    await cache().addSyncs({
-      projectId: shop.projectId,
-      payload: {id: order.id},
-      tree: 'orders',
-      applicationId: shop.applicationId,
-      action: 'delete',
-      databaseURL: getDaasAddress(shop)
-    });
+    // await this.startWorker(shop);
+    await database(shop.projectId).table('orders').query().byId(order.id).delete();
+    cache({database: shop.projectId, collection: 'orders'}).remove(order.id).catch(console.log);
     return order;
     // return this.ordersWorker.deleteOrder(order, shop);
   }

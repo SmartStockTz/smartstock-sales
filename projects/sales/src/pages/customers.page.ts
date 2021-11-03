@@ -51,27 +51,15 @@ import {database} from 'bfast';
 })
 export class CustomersPage implements OnInit, OnDestroy {
   paginator: MatPaginator;
-  private sig = false;
-  private obfn;
 
   constructor(private readonly dialog: MatDialog,
               public readonly customerState: CustomerState,
               public readonly matBottomSheet: MatBottomSheet,
-              private readonly userService: UserService,
               public readonly deviceState: DeviceState) {
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    const changes = database(shop.projectId).syncs('customers')
-      .changes();
-    this.obfn = changes.observe(_ => {
-      if (this.sig === true) {
-        return;
-      }
-      this.customerState.fetchCustomers();
-      this.sig = true;
-    });
+    this.customerState.fetchCustomers();
   }
 
   addCustomer(): void {
@@ -107,8 +95,5 @@ export class CustomersPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.obfn) {
-      this.obfn?.unobserve();
-    }
   }
 }

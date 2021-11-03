@@ -34,8 +34,6 @@ import {database} from 'bfast';
 export class CustomersTableOptionsComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() pag = new EventEmitter<MatPaginator>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  private sig = false;
-  private obfn;
 
   constructor(public readonly deviceState: DeviceState,
               public readonly customerState: CustomerState,
@@ -45,22 +43,10 @@ export class CustomersTableOptionsComponent implements OnInit, OnDestroy, AfterV
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
     this.customerState.fetchCustomers();
-    this.obfn = database(shop.projectId).syncs('customers').changes().observe(_ => {
-      if (this?.sig === false) {
-        this.customerState.fetchCustomers();
-        this.sig = true;
-      } else {
-        return;
-      }
-    });
   }
 
   ngOnDestroy() {
-    if (this.obfn) {
-      this.obfn?.unobserve();
-    }
   }
 
   hotReload() {

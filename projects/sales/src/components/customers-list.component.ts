@@ -47,13 +47,10 @@ import {database} from 'bfast';
 export class CustomersListComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: MatTableDataSource<CustomerModel> = new MatTableDataSource([]);
   destroyer: Subject<any> = new Subject<any>();
-  private sig = false;
-  private obfn;
 
   constructor(public readonly customerState: CustomerState,
               public readonly matDialog: MatDialog,
               public readonly matBottomSheet: MatBottomSheet,
-              private readonly userService: UserService,
               public readonly deviceState: DeviceState) {
   }
 
@@ -61,9 +58,6 @@ export class CustomersListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.destroyer.next('done');
     this.dataSource = null;
     this.customerState.customers.next([]);
-    if (this.obfn) {
-      this.obfn?.unobserve();
-    }
   }
 
   ngAfterViewInit(): void {
@@ -71,16 +65,7 @@ export class CustomersListComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
     this.customerState.fetchCustomers();
-    this.obfn = database(shop.projectId).syncs('customers').changes().observe(_ => {
-      if (this?.sig === false) {
-        this.customerState.fetchCustomers();
-        this.sig = true;
-      } else {
-        return;
-      }
-    });
   }
 
   configureDataSource() {

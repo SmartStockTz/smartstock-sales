@@ -139,8 +139,6 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   destroyer: Subject<any> = new Subject<any>();
-  private sig = false;
-  private obfn;
 
   constructor(public readonly orderState: OrderState,
               public readonly matDialog: MatDialog,
@@ -155,7 +153,6 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyer.next('done');
     this.dataSource = null;
     this.orderState.orders.next([]);
-    this?.obfn?.unobserve();
   }
 
   ngAfterViewInit(): void {
@@ -163,15 +160,7 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
     this.orderState.getOrders();
-    this.obfn = database(shop.projectId).syncs('orders').changes().observe(_ => {
-      if (this.sig === true){
-        return;
-      }
-      this.orderState.getOrders();
-      this.sig = true;
-    });
   }
 
   configureDataSource() {

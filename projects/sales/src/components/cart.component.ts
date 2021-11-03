@@ -122,8 +122,6 @@ export class CartComponent implements OnInit, OnDestroy {
   );
   destroyer = new Subject();
   currentUser: any;
-  private sig = false;
-  private obfn;
 
   constructor(public readonly userService: UserService,
               public readonly customerState: CustomerState,
@@ -139,21 +137,9 @@ export class CartComponent implements OnInit, OnDestroy {
     this.customerState.customers.next([]);
     this.cartState.selectedCustomer.next(null);
     this.destroyer.next('done');
-    if (this.obfn) {
-      this.obfn?.unobserve();
-    }
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    this.obfn = database(shop.projectId).syncs('customers').changes().observe(_ => {
-      if (this?.sig === false) {
-        this.customerState.fetchCustomers();
-        this.sig = true;
-      } else {
-        return;
-      }
-    });
     this.customerFormControl.setValue(this.cartState.cartOrder.value?.customer?.displayName);
     this.customerState.fetchCustomers();
     this.getUser();

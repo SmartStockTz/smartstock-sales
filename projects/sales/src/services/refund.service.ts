@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SalesModel} from '../models/sale.model';
-import {database} from 'bfast';
+import {cache, database} from 'bfast';
 import moment from 'moment';
 import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {CidService} from './cid.service';
@@ -67,7 +67,7 @@ export class RefundService {
         }
       }
     }).commit();
-    const oldStock = database(shop.projectId).syncs('stocks').changes().get(sale.stock.id);
+    const oldStock: any = cache({database: shop.projectId, collection: 'stocks'}).get(sale.stock.id);
     if (oldStock && typeof oldStock.quantity === 'object') {
       oldStock.quantity[await sha1(JSON.stringify(sale))] = {
         q: sale.stock.stockable === true ? value.quantity : 0,
@@ -84,7 +84,9 @@ export class RefundService {
         }
       };
     }
-    database(shop.projectId).syncs('stocks').changes().set(oldStock);
+    if (oldStock && oldStock.id){
+      cache({database: shop.projectId, collection: 'stocks'}).set(oldStock.id, oldStock).catch(console.log);
+    }
     if (sale && sale.refund && typeof sale.refund === 'object') {
       sale.refund = Object.assign(sale.refund, value);
     }else {

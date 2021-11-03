@@ -11,9 +11,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class OrderState {
 
   orders: BehaviorSubject<OrderModel[]> = new BehaviorSubject<OrderModel[]>([]);
-  orderFilterKeyword: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  // orderFilterKeyword: BehaviorSubject<string> = new BehaviorSubject<string>('');
   getOrderFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  markAsCompleteFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  // markAsCompleteFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(private readonly orderService: OrderService,
               private readonly logger: LogService,
@@ -36,32 +36,32 @@ export class OrderState {
     });
   }
 
-  markAsComplete(order: OrderModel): void {
-    this.markAsCompleteFlag.next(true);
-    this.orderService.markAsCompleted(order).then(_ => {
-      this.orders.value.map(x => {
-        if (x.id === order.id) {
-          x.status = 'COMPLETED';
-          x.paid = true;
-        }
-        return x;
-      });
-      this.message('Order updated');
-    }).catch(reason => {
-      this.logger.i(reason);
-      this.message(reason && reason.message ? reason.message : reason);
-    }).finally(() => {
-      this.markAsCompleteFlag.next(false);
-    });
-  }
+  // markAsComplete(order: OrderModel): void {
+  //   this.markAsCompleteFlag.next(true);
+  //   this.orderService.markAsCompleted(order).then(_ => {
+  //     this.orders.value.map(x => {
+  //       if (x.id === order.id) {
+  //         x.status = 'COMPLETED';
+  //         x.paid = true;
+  //       }
+  //       return x;
+  //     });
+  //     this.message('Order updated');
+  //   }).catch(reason => {
+  //     this.logger.i(reason);
+  //     this.message(reason && reason.message ? reason.message : reason);
+  //   }).finally(() => {
+  //     this.markAsCompleteFlag.next(false);
+  //   });
+  // }
 
-  async markOrderAsCancelled(order: OrderModel): Promise<any> {
-    return this.orderService.markOrderAsCancelled(order);
-  }
+  // async markOrderAsCancelled(order: OrderModel): Promise<any> {
+  //   return this.orderService.markOrderAsCancelled(order);
+  // }
 
-  async markAsProcessed(order: OrderModel): Promise<any> {
-    return this.orderService.markAsProcessed(order);
-  }
+  // async markAsProcessed(order: OrderModel): Promise<any> {
+  //   return this.orderService.markAsProcessed(order);
+  // }
 
   getOrdersRemote() {
     this.getOrderFlag.next(true);

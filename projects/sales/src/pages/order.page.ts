@@ -60,7 +60,6 @@ import {database} from 'bfast';
   styleUrls: ['../styles/orders-page.style.css']
 })
 export class OrderPage implements OnInit, OnDestroy {
-  private sig = false;
   constructor(private readonly dialog: MatDialog,
               public readonly orderState: OrderState,
               private readonly userService: UserService,
@@ -68,16 +67,7 @@ export class OrderPage implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    const changes = database(shop.projectId).syncs('orders')
-      .changes();
-    changes.observe(_ => {
-      if (this.sig === true) {
-        return;
-      }
-      this.orderState.getOrders();
-      this.sig = true;
-    });
+    this.orderState.getOrders();
   }
 
   addOrder(): void {
@@ -99,8 +89,6 @@ export class OrderPage implements OnInit, OnDestroy {
   }
 
   async ngOnDestroy(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    database(shop.projectId).syncs('orders').close();
   }
 }
 

@@ -1366,10 +1366,10 @@
     "@angular-devkit/schematics" "12.1.4"
     jsonc-parser "3.0.0"
 
-"@smartstocktz/core-libs@~0.3.6":
-  version "0.3.6"
-  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.3.6/19e49403e967d4cfef57f044a085d076c1b3236d9b1bb7ae58b2d1e259678de9#f539a9aae552566b3c2ca9f41f9b391667139dca"
-  integrity sha512-+gKuguYFXTJ1mc73Pabqa3RQoW5hWbsa3MyEsXalpVq6VxG8tV/cAtwDECmpXRCLSi9DXtWH4oJwMVNQai4dpQ==
+"@smartstocktz/core-libs@~0.3.7":
+  version "0.3.7"
+  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.3.7/5e24335003c6a90422e2ba513f3d6f079212b176e138fe0c25cff9f9d06e0d8d#b83d445ccc189e8820e397ef21786d82437cddc7"
+  integrity sha512-SdfC+tg1Z9tfdiuhcSQV1kwRZLkaqvHQv0o2qWy3HT2KVxqu461NR3lmaBOR///rb24YHJ+1U2x+ppB9YQKE5A==
   dependencies:
     tslib "^2.0.0"
 
