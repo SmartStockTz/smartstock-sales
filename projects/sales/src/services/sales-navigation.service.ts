@@ -28,16 +28,17 @@ export class SalesNavigationService {
           click: null
         },
         {
+          name: 'Invoices',
+          roles: ['*'],
+          link: '/sale/invoices',
+          click: null
+        },
+        {
           name: 'Orders',
           roles: ['*'],
           link: '/sale/order',
           click: null
         },
-        // {
-        //   name: 'Credit sale',
-        //   roles: ['*'],
-        //   link: '/sale/invoices'
-        // },
         {
           name: 'Customers',
           roles: ['*'],

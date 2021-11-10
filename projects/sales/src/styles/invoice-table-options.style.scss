@@ -1,0 +1,49 @@
+.options-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  background: transparent;
+  align-content: center;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+
+.options-table-text{
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 16px;
+
+  color: #000000;
+}
+
+
+.spacer{
+  flex: 1 1 auto;
+}
+
+.paginator{
+  background: transparent;
+}
+
+
+.reload-button{
+  //width: 67px;
+  height: 38px;
+  margin: 0 5px;
+
+  background: rgba(0, 170, 7, 0.1);
+  border-radius: 3px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 17px;
+  line-height: 14px;
+
+
+  color: #016D05;
+
+}

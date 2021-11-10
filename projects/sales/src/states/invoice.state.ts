@@ -1,57 +1,105 @@
 import {Injectable} from '@angular/core';
 import {MessageService} from '@smartstocktz/core-libs';
 import {BehaviorSubject} from 'rxjs';
-import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceService} from '../services/invoice.services';
+import {InvoiceModel} from '../models/invoice.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvoiceState {
-  isFetchingInvoices: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  totalInvoiceItems: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  fetchingInvoicesProgress = new BehaviorSubject<boolean>(false);
+  addPaymentProgress = new BehaviorSubject<boolean>(false);
+  addInvoiceProgress = new BehaviorSubject<boolean>(false);
+  loadMoreProgress = new BehaviorSubject<boolean>(false);
+  totalInvoices: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   invoices: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  filterKeyword = new BehaviorSubject<string>(null);
+  size = 50;
 
-  constructor(private readonly invoiceService: InvoiceService, private readonly messageService: MessageService) {
+  constructor(private readonly invoiceService: InvoiceService,
+              private readonly messageService: MessageService) {
 
+  }
+
+  fetchInvoices(page: number): void {
+    this.fetchingInvoicesProgress.next(true);
+    this.invoiceService.countAll(this.filterKeyword.value ? this.filterKeyword.value : '')
+      .then(value => {
+        this.totalInvoices.next(value);
+        return this.invoiceService.fetchInvoices(
+          this.size,
+          this.size * page,
+          this.filterKeyword.value ? this.filterKeyword.value : ''
+        );
+      }).then(value => {
+      if (Array.isArray(value)) {
+        this.invoices.next(value);
+      }
+    }).catch(reason => {
+      console.log(reason);
+      this.messageService.showMobileInfoMessage(reason.message ? reason.message : reason.toString());
+    }).finally(() => {
+      this.fetchingInvoicesProgress.next(false);
+    });
   }
 
   async countAll(): Promise<any> {
     return this.invoiceService.invoicesCount();
   }
 
-  calculateTotalReturns(returns: [any]) {
-    if (returns && Array.isArray(returns)) {
-      return returns.map(a => a.amount).reduce((a, b, i) => {
-        return a + b;
+  async addPayment(invoice: InvoiceModel, payment: { [key: string]: number }): Promise<any> {
+    this.addPaymentProgress.next(true);
+    payment = Object.assign(invoice.payment ? invoice.payment : {}, payment);
+    return this.invoiceService.addPayment(invoice.id, payment).then(value => {
+      const tPu = this.invoices.value.map(x => {
+        if (x.id === value.id) {
+          return value;
+        }
+        return x;
       });
-    } else {
-      return 0.0;
-    }
-  }
-
-  fetch(size = 20, skip = 0): void {
-    this.isFetchingInvoices.next(true);
-    this.invoiceService.getInvoices({
-      skip,
-      size
-    }).then(value => {
-      this.invoices.next(value ? value : []);
+      this.invoices.next(tPu);
+      return null;
     }).catch(reason => {
-      this.messageService.showMobileInfoMessage(reason && reason.message ? reason.message : reason.toString(), 2000, 'bottom');
+      this.messageService.showMobileInfoMessage(reason.message ? reason.message : reason.toString());
     }).finally(() => {
-      this.isFetchingInvoices.next(false);
+      this.addPaymentProgress.next(false);
     });
   }
 
-  async fetchSync(size = 20, skip = 0): Promise<InvoiceModel[]> {
-    return await this.invoiceService.getInvoices({
-      skip,
-      size
+  loadMore(): void {
+    this.loadMoreProgress.next(true);
+    this.invoiceService
+      .fetchInvoices(this.size, this.invoices.value.length, this.filterKeyword.value)
+      .then(value => {
+        this.invoices.next([...this.invoices.value, ...value]);
+      }).catch(reason => {
+      this.messageService.showMobileInfoMessage(reason.message ? reason.message : reason.toString());
+    }).finally(() => {
+      this.loadMoreProgress.next(false);
     });
   }
 
-  async saveInvoice(invoice) {
-    return await this.invoiceService.saveInvoice(invoice);
+  async addInvoice(invoice: InvoiceModel): Promise<any> {
+    this.addInvoiceProgress.next(true);
+    return this.invoiceService.addInvoice(invoice).catch(reason => {
+      this.messageService.showMobileInfoMessage(reason.message ? reason.message : reason.toString());
+    }).finally(() => {
+      this.addInvoiceProgress.next(false);
+    });
   }
+
+  // calculateTotalReturns(returns: [any]) {
+  //   if (returns && Array.isArray(returns)) {
+  //     return returns.map(a => a.amount).reduce((a, b, i) => {
+  //       return a + b;
+  //     });
+  //   } else {
+  //     return 0.0;
+  //   }
+  // }
+
+  // async saveInvoice(invoice) {
+  //   return await this.invoiceService.saveInvoice(invoice);
+  // }
 }

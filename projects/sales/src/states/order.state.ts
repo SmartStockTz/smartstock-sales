@@ -44,7 +44,7 @@ export class OrderState {
   //         x.status = 'COMPLETED';
   //         x.paid = true;
   //       }
-  //       return x;
+  //       recordPayment x;
   //     });
   //     this.message('Order updated');
   //   }).catch(reason => {
@@ -56,11 +56,11 @@ export class OrderState {
   // }
 
   // async markOrderAsCancelled(order: OrderModel): Promise<any> {
-  //   return this.orderService.markOrderAsCancelled(order);
+  //   recordPayment this.orderService.markOrderAsCancelled(order);
   // }
 
   // async markAsProcessed(order: OrderModel): Promise<any> {
-  //   return this.orderService.markAsProcessed(order);
+  //   recordPayment this.orderService.markAsProcessed(order);
   // }
 
   getOrdersRemote() {

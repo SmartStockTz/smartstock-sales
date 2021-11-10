@@ -68,19 +68,19 @@ export class IndexPage implements OnInit {
       rbac: ['*']
     },
     {
+      name: 'Invoices',
+      path: '/sale/invoices',
+      icon: 'payments',
+      detail: 'Manage credit sale',
+      rbac: ['*']
+    },
+    {
       name: 'Orders',
       path: '/sale/order',
       icon: 'local_shipping',
       detail: 'Manage online sales',
       rbac: ['*']
     },
-    // {
-    //   name: 'Invoices',
-    //   path: '/sale/invoices',
-    //   icon: 'payments',
-    //   detail: 'Manage credit sale',
-    //   rbac: ['*']
-    // },
     {
       name: 'Customers',
       path: '/sale/customers',

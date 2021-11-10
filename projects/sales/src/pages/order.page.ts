@@ -1,11 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DeviceState, UserService} from '@smartstocktz/core-libs';
 import {MatDialog} from '@angular/material/dialog';
-import {CustomerState} from '../states/customer.state';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {OrderState} from '../states/order.state';
 import {DialogNewOrderComponent} from '../components/dialog-new-order.component';
-import {database} from 'bfast';
 
 @Component({
   selector: 'app-order-page',

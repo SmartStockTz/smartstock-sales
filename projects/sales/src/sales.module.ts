@@ -46,9 +46,7 @@ import {InfoDialogComponent} from './components/info-dialog.component';
 import {MatSelectModule} from '@angular/material/select';
 import {CreateCustomerComponent} from './components/create-customer-form.component';
 import {MatMenuModule} from '@angular/material/menu';
-import {IncompleteInvoicesTableComponent} from './components/incomplete-invoices-table.component';
 import {InvoiceDetailsComponent} from './components/invoice-details.component';
-import {AddReturnSheetComponent} from './components/add-returns-sheet.component';
 import {CustomersPage} from './pages/customers.page';
 import {CustomersListComponent} from './components/customers-list.component';
 import {RefundsPage} from './pages/refunds.page';
@@ -65,7 +63,6 @@ import {FedhaPipe} from './pipes/fedha.pipe';
 import {DialogCashSaleCartOptionsComponent} from './components/dialog-cash-sale-cart-options.component';
 import {CashSaleCartOptionsComponent} from './components/cash-sale-cart-options.component';
 import {OrderService} from './services/order.service';
-import {SaleService} from './services/sale.service';
 import {OrderListComponent} from './components/order-list.component';
 import {DialogNewOrderComponent} from './components/dialog-new-order.component';
 import {RefundBodyComponent} from './components/refund-body.component';
@@ -78,6 +75,28 @@ import {RefundBodyListMobileComponent} from './components/refund-body-list.mobil
 import {CustomerActiveComponent} from './components/customer-active.component';
 import {CustomersTableComponent} from './components/customers-table.component';
 import {CustomersTableOptionsComponent} from './components/customers-table-options.component';
+import {InvoicePage} from './pages/invoice.page';
+import {InvoicesDesktopComponent} from './components/invoices-desktop.component';
+import {InvoicesTableOptionsComponent} from './components/invoices-table-options.component';
+import {InvoicesTableComponent} from './components/invoices-table.component';
+import {InvoiceDetailsModelComponent} from './components/invoice-details-model.component';
+import {AddInvoicePaymentDialogComponent} from './components/add-invoice-payment-dialog.component';
+import {AddInvoicePaymentFormComponent} from './components/add-invoice-payment-form.component';
+import {AgoPipe} from './pipes/ago.pipe';
+import {CreateInvoicePage} from './pages/create-invoice.page';
+import {InvoiceCartComponent} from './components/invoice-cart.component';
+import {InvoicesMobileComponent} from './components/invoices-mobile.component';
+import {InfiniteScrollModule} from 'ngx-infinite-scroll';
+import {InvoiceProductTilesComponent} from './components/invoice-product-tiles.component';
+import {InvoiceProductCardComponent} from './components/invoice-product-card.component';
+import {AddToInvoiceCartDialogComponent} from './components/add-to-invoice-cart-dialog.component';
+import {AddToInvoiceCartFormComponent} from './components/add-to-invoice-cart-form.component';
+import {AddToInvoiceCartSheetComponent} from './components/add-to-invoice-cart-sheet.component';
+import {InvoiceProductListItemComponent} from './components/invoice-product-list-item.component';
+import {InvoiceProductListComponent} from './components/invoice-product-list.component';
+import {SaveInvoiceFormComponent} from './components/save-invoice-form.component';
+import {SaveInvoiceSheetComponent} from './components/save-invoice-sheet.component';
+import {SaveInvoiceDialogComponent} from './components/save-invoice-dialog.component';
 
 const routes: Routes = [
   {path: '', component: IndexPage},
@@ -85,9 +104,8 @@ const routes: Routes = [
   {path: 'customers', component: CustomersPage},
   {path: 'whole', component: WholePageComponent},
   {path: 'retail', component: RetailPageComponent},
-  // {path: 'invoices', component: InvoiceIndexPage},
-  // {path: 'invoices/create', component: },
-  // {path: 'invoices/list', component: InvoiceListPage},
+  {path: 'invoices', component: InvoicePage},
+  {path: 'invoices/create', component: CreateInvoicePage},
   {path: 'refund', component: RefundsPage},
 ];
 
@@ -139,9 +157,30 @@ const routes: Routes = [
     MatExpansionModule,
     MatSnackBarModule,
     LibModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    InfiniteScrollModule
   ],
   declarations: [
+    CreateInvoicePage,
+    InvoiceProductTilesComponent,
+    InvoiceProductCardComponent,
+    AddToInvoiceCartDialogComponent,
+    AddToInvoiceCartFormComponent,
+    AddToInvoiceCartSheetComponent,
+    InvoiceProductListItemComponent,
+    InvoiceProductListComponent,
+    SaveInvoiceFormComponent,
+    SaveInvoiceSheetComponent,
+    SaveInvoiceDialogComponent,
+    InvoicesMobileComponent,
+    InvoiceCartComponent,
+    InvoicesDesktopComponent,
+    InvoicesTableOptionsComponent,
+    InvoicesTableComponent,
+    InvoiceDetailsModelComponent,
+    AddInvoicePaymentDialogComponent,
+    AddInvoicePaymentFormComponent,
+    InvoicePage,
     CustomerActiveComponent,
     CustomersTableComponent,
     CustomersTableOptionsComponent,
@@ -152,8 +191,6 @@ const routes: Routes = [
     RefundsPage,
     CustomersListComponent,
     CustomersPage,
-    AddReturnSheetComponent,
-    IncompleteInvoicesTableComponent,
     CreateCustomerComponent,
     InvoiceDetailsComponent,
     InfoDialogComponent,
@@ -183,18 +220,17 @@ const routes: Routes = [
     RefundBodyMobileComponent,
     RefundBodyHeaderComponent,
     RefundBodyTableComponent,
+    AgoPipe
   ],
   entryComponents: []
 })
 export class SalesModule {
   constructor(private readonly salesNav: SalesNavigationService,
               private readonly ordersService: OrderService,
-              private readonly userService: UserService,
-              private readonly salesService: SaleService) {
+              private readonly userService: UserService) {
     this.salesNav.init();
     this.salesNav.selected();
     this.userService.getCurrentShop().then(async shop => {
-      // await salesService.startWorker(shop);
       await this.ordersService.startWorker(shop);
     }).catch(console.log);
   }

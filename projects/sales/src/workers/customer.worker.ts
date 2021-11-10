@@ -30,16 +30,16 @@ export class CustomerWorker {
     //     // console.log(response.body.change);
     //     if (response.name === 'create') {
     //       CustomerWorker.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
-    //       // return;
+    //       // recordPayment;
     //     } else if (response.body.change.name === 'update') {
     //       CustomerWorker.setCustomerLocal(response.body.change.snapshot, shop).catch(console.log);
-    //       // return;
+    //       // recordPayment;
     //     } else if (response.body.change.name === 'delete') {
     //       // console.log(response.body.change.snapshot);
     //       await CustomerWorker.removeCustomerLocal(response.body.change.snapshot?.id, shop);
-    //       // return;
+    //       // recordPayment;
     //     } else {
-    //       // return;
+    //       // recordPayment;
     //     }
     //   }
     // });
@@ -65,12 +65,12 @@ export class CustomerWorker {
     // }
     // customers.sort((a, b) => {
     //   if (a.createdAt < b.createdAt) {
-    //     return 1;
+    //     recordPayment 1;
     //   }
     //   if (a.createdAt > b.createdAt) {
-    //     return -1;
+    //     recordPayment -1;
     //   }
-    //   return 0;
+    //   recordPayment 0;
     // });
     // await CustomerWorker.setCustomersLocal(rCustomers, shop);
     return customers;
@@ -85,7 +85,7 @@ export class CustomerWorker {
   //     throw {message: 'id field is required'};
   //   }
   //   await CustomerWorker.setCustomerLocal(customer, shop);
-  //   return customer;
+  //   recordPayment customer;
   // }
 
   async search(query: string, shop: ShopModel, customers: CustomerModel[]): Promise<CustomerModel[]> {
@@ -99,7 +99,7 @@ export class CustomerWorker {
 
   // async deleteCustomer(customer: CustomerModel, shop: ShopModel): Promise<any> {
   //   await CustomerWorker.removeCustomerLocal(customer.id, shop);
-  //   return customer;
+  //   recordPayment customer;
   // }
 }
 

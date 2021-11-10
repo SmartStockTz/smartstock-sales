@@ -42,24 +42,24 @@ export class OrdersWorker {
   //   orders = orders.map(x => {
   //     if (x.id === order.id) {
   //       update = true;
-  //       return order;
+  //       recordPayment order;
   //     } else {
-  //       return x;
+  //       recordPayment x;
   //     }
   //   });
   //   if (update === false) {
   //     orders.push(order);
   //   }
-  //   return this.setOrdersLocal(orders, shop);
+  //   recordPayment this.setOrdersLocal(orders, shop);
   // }
 
   // async setOrdersLocal(orders: OrderModel[], shop): Promise<OrderModel[]> {
-  //   return bfast.cache({database: 'orders', collection: 'orders'}, shop.projectId).set('all', orders);
+  //   recordPayment bfast.cache({database: 'orders', collection: 'orders'}, shop.projectId).set('all', orders);
   // }
 
   // async removeOrderLocal(id: string, shop: ShopModel): Promise<OrderModel[]> {
   //   const orders = await this.getOrdersLocal(shop);
-  //   return this.setOrdersLocal(orders.filter(x => x.id !== id), shop);
+  //   recordPayment this.setOrdersLocal(orders.filter(x => x.id !== id), shop);
   // }
 
   // async getOrdersLocal(shop): Promise<OrderModel[]> {
@@ -68,13 +68,13 @@ export class OrdersWorker {
   //     .get('all');
   //   const ordersInSync = await this.getOrdersLocalSync(shop);
   //   if (Array.isArray(orders)) {
-  //     return orders.filter(x => {
-  //       return ordersInSync.findIndex(value => {
-  //         return value.order.id === x.id && value.action === 'delete';
+  //     recordPayment orders.filter(x => {
+  //       recordPayment ordersInSync.findIndex(value => {
+  //         recordPayment value.order.id === x.id && value.action === 'delete';
   //       }) === -1;
   //     });
   //   } else {
-  //     return [];
+  //     recordPayment [];
   //   }
   // }
 
@@ -82,13 +82,13 @@ export class OrdersWorker {
   //   if (Array.isArray(orders)) {
   //     orders = orders.map(x => {
   //       if (hashesMap[x.toString()]) {
-  //         return hashesMap[x.toString()];
+  //         recordPayment hashesMap[x.toString()];
   //       } else {
-  //         return x;
+  //         recordPayment x;
   //       }
   //     });
   //   }
-  //   return orders;
+  //   recordPayment orders;
   // }
 
   async findOrderTotal(carts: CartItemModel[], channel: string): Promise<number> {
@@ -146,7 +146,7 @@ export class OrdersWorker {
   //   // await this.setOrderLocal(orderSync.order, shop);
   //   // const order = await this.setOrderSyncLocal(orderSync, shop);
   //   // this.syncOrders(shop).catch(console.log);
-  //   return orderSync.order;
+  //   recordPayment orderSync.order;
   // }
 
   // async getOrdersRemote(shop: ShopModel, rOrders: OrderModel[]): Promise<OrderModel[]> {
@@ -155,13 +155,13 @@ export class OrdersWorker {
   //     rOrders = localOrders;
   //   }
   //   await this.setOrdersLocal(rOrders, shop);
-  //   return rOrders.sort((a, b) => {
+  //   recordPayment rOrders.sort((a, b) => {
   //     if (a.createdAt > b.createdAt) {
-  //       return -1;
+  //       recordPayment -1;
   //     } else if (a.createdAt < b.createdAt) {
-  //       return 1;
+  //       recordPayment 1;
   //     } else {
-  //       return 0;
+  //       recordPayment 0;
   //     }
   //   });
   // }
@@ -182,17 +182,17 @@ export class OrdersWorker {
   // async getOrders(shop: ShopModel): Promise<CustomerModel[]> {
   //   const orders: any[] = await this.getOrdersLocal(shop);
   //   if (Array.isArray(orders) && orders.length !== 0) {
-  //     return orders.sort((a, b) => {
+  //     recordPayment orders.sort((a, b) => {
   //       if (a.createdAt > b.createdAt) {
-  //         return -1;
+  //         recordPayment -1;
   //       } else if (a.createdAt < b.createdAt) {
-  //         return 1;
+  //         recordPayment 1;
   //       } else {
-  //         return 0;
+  //         recordPayment 0;
   //       }
   //     });
   //   } else {
-  //     return [];
+  //     recordPayment [];
   //   }
   // }
 

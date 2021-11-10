@@ -1357,6 +1357,11 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@scarf/scarf@^1.1.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@scarf/scarf/-/scarf-1.1.1.tgz#d8b9f20037b3a37dbf8dcdc4b3b72f9285bfce35"
+  integrity sha512-VGbKDbk1RFIaSmdVb0cNjjWJoRWRI/Weo23AjRCC2nryO0iAS8pzsToJfPVPtVs74WHw4L1UTADNdIYRLkirZQ==
+
 "@schematics/angular@12.1.4":
   version "12.1.4"
   resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-12.1.4.tgz#13035db487c850ea53029a17b1de49062aa4888b"
@@ -1366,10 +1371,10 @@
     "@angular-devkit/schematics" "12.1.4"
     jsonc-parser "3.0.0"
 
-"@smartstocktz/core-libs@~0.3.7":
-  version "0.3.7"
-  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.3.7/5e24335003c6a90422e2ba513f3d6f079212b176e138fe0c25cff9f9d06e0d8d#b83d445ccc189e8820e397ef21786d82437cddc7"
-  integrity sha512-SdfC+tg1Z9tfdiuhcSQV1kwRZLkaqvHQv0o2qWy3HT2KVxqu461NR3lmaBOR///rb24YHJ+1U2x+ppB9YQKE5A==
+"@smartstocktz/core-libs@^0.4.2":
+  version "0.4.2"
+  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.4.2/8ad78c0cc8da544ad645f988b6e39cacd6224a6bdd61b0f40d1e854d214c0070#fd965cf12637299fdbd051bdd7c04a22f7c1aa74"
+  integrity sha512-+u2HC1MFX2UxcHyVzcoyPseE3N3bWEXq8D8DjyUvTmR1UXPnEUM4QzVdRQgeuLPrsLSNFNbjlTfXb3Yb6CzNhw==
   dependencies:
     tslib "^2.0.0"
 
@@ -2126,10 +2131,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bfast@^6.0.0-alpha.14:
-  version "6.0.0-alpha.14"
-  resolved "https://registry.yarnpkg.com/bfast/-/bfast-6.0.0-alpha.14.tgz#d0510ee60ec6aa288f4150991831c189b5f5ab0d"
-  integrity sha512-VwhyMV8ESV/NQhnzAi5wBFUQaRzysbshT2nCb9mWmshUqiRbq7YfGn/5twNEi8Icme6lZqtcI3d6kkpy0hWD4w==
+bfast@^6.0.0-alpha.15:
+  version "6.0.0-alpha.15"
+  resolved "https://registry.yarnpkg.com/bfast/-/bfast-6.0.0-alpha.15.tgz#96df8f6d626b7a84ddd8a5525e5f6e5a46e7b667"
+  integrity sha512-/MBUhIzo87ujYa/FTv4P7uzkYglMDTWff0LbecltxSC6wJT7lRVLdXmzMhcNG4WalC4vRBLjaHat2e/KSYnvFA==
   dependencies:
     axios "~0.22.0"
     bufferutil "~4.0.4"
@@ -5756,6 +5761,14 @@ ng-packagr@^12.0.6:
     sass "^1.32.8"
     stylus "^0.54.8"
 
+ngx-infinite-scroll@^10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/ngx-infinite-scroll/-/ngx-infinite-scroll-10.0.1.tgz#6f51f2f8775a7c50d1dd8bad125d4e748abbe880"
+  integrity sha512-7is0eJZ9kJPsaHohRmMhJ/QFHAW9jp9twO5HcHRvFM/Yl/R8QCiokgjwmH0/CR3MuxUanxfHZMfO3PbYTwlBEg==
+  dependencies:
+    "@scarf/scarf" "^1.1.0"
+    opencollective-postinstall "^2.0.2"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
@@ -6022,6 +6035,11 @@ open@8.2.1:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
+
+opencollective-postinstall@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
+  integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
 
 opn@^5.5.0:
   version "5.5.0"

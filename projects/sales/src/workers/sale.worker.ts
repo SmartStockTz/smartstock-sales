@@ -1,10 +1,7 @@
 import {expose} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {StockModel} from '../models/stock.model';
-import {getDaasAddress, SecurityUtil} from '@smartstocktz/core-libs';
-import {SalesModel} from '../models/sale.model';
-import {cache, init} from 'bfast';
-import {sha1} from 'crypto-hash';
+import {init} from 'bfast';
 
 function init_(shop: ShopModel) {
   init({

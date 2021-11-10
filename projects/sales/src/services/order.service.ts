@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {getDaasAddress, SecurityUtil, toSqlDate, UserService} from '@smartstocktz/core-libs';
+import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {OrderModel} from '../models/order.model';
 import {CustomerModel} from '../models/customer.model';
 import {OrdersWorker} from '../workers/orders.worker';
@@ -72,17 +72,17 @@ export class OrderService {
   //         case 'create':
   //           const data = response.body.change.snapshot;
   //           await customerCache.set(data.id, data);
-  //           return;
+  //           recordPayment;
   //         case 'update':
   //           let updateData = response.body.change.snapshot;
   //           const oldData = await customerCache.get(updateData.id);
   //           updateData = Object.assign(typeof oldData === 'object' ? oldData : {}, updateData);
   //           await customerCache.set(updateData.id, updateData);
-  //           return;
+  //           recordPayment;
   //         case 'delete':
   //           const deletedData = response.body.change.snapshot;
   //           await customerCache.remove(deletedData.id);
-  //           return;
+  //           recordPayment;
   //       }
   //     }
   //   });
@@ -155,7 +155,7 @@ export class OrderService {
 
   // async markAsCompleted(order: OrderModel): Promise<any> {
   //   const shop = await this.userService.getCurrentShop();
-  //   return database(shop.projectId).bulk()
+  //   recordPayment database(shop.projectId).bulk()
   //     .update('orders', {
   //       query: {
   //         id: order.id,
@@ -169,7 +169,7 @@ export class OrderService {
   //     })
   //     .create('sales', order.items.map(x => {
   //       const quantity = x.quantity;
-  //       return {
+  //       recordPayment {
   //         amount: quantity * x.product.retailPrice,
   //         discount: 0,
   //         quantity,
@@ -187,7 +187,7 @@ export class OrderService {
   //     .update('stocks', order.items
   //       .filter(x => x.product.stockable === true)
   //       .map(y => {
-  //         return {
+  //         recordPayment {
   //           query: {
   //             id: y.product.id,
   //           },
@@ -209,7 +209,7 @@ export class OrderService {
 
   // async markOrderAsCancelled(order: OrderModel): Promise<any> {
   //   const shop = await this.userService.getCurrentShop();
-  //   return database(shop.projectId).collection('orders')
+  //   recordPayment database(shop.projectId).collection('orders')
   //     .query()
   //     .byId(order.id)
   //     .updateBuilder()
@@ -219,7 +219,7 @@ export class OrderService {
 
   // async markAsProcessed(order: OrderModel): Promise<any> {
   //   const shop = await this.userService.getCurrentShop();
-  //   return database(shop.projectId).collection('orders')
+  //   recordPayment database(shop.projectId).collection('orders')
   //     .query()
   //     .byId(order.id)
   //     .updateBuilder()
@@ -230,13 +230,13 @@ export class OrderService {
   // private async setOrderLocal(snapshot: OrderModel) {
   //   const shop = await this.userService.getCurrentShop();
   //   await this.startWorker(shop);
-  //   return this.ordersWorker.setOrderLocal(snapshot, shop);
+  //   recordPayment this.ordersWorker.setOrderLocal(snapshot, shop);
   // }
   //
   // private async removeOrderLocal(snapshot: OrderModel) {
   //   const shop = await this.userService.getCurrentShop();
   //   await this.startWorker(shop);
-  //   return this.ordersWorker.removeOrderLocal(snapshot.id, shop);
+  //   recordPayment this.ordersWorker.removeOrderLocal(snapshot.id, shop);
   // }
 
   async search(query: string): Promise<any> {
@@ -252,6 +252,6 @@ export class OrderService {
     await database(shop.projectId).table('orders').query().byId(order.id).delete();
     cache({database: shop.projectId, collection: 'orders'}).remove(order.id).catch(console.log);
     return order;
-    // return this.ordersWorker.deleteOrder(order, shop);
+    // recordPayment this.ordersWorker.deleteOrder(order, shop);
   }
 }

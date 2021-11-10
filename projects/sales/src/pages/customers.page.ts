@@ -1,12 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {DeviceState, UserService} from '@smartstocktz/core-libs';
+import {DeviceState} from '@smartstocktz/core-libs';
 import {CustomerState} from '../states/customer.state';
 import {DialogCreateCustomerComponent} from '../components/dialog-create-customer.component';
 import {SheetCreateCustomerComponent} from '../components/sheet-create-customer.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatPaginator} from '@angular/material/paginator';
-import {database} from 'bfast';
 
 @Component({
   selector: 'app-customer-page',

@@ -11,7 +11,7 @@ export class CreditorService {
 
   async getCreditors(size = 20, skip = 0): Promise<any[]> {
     // const shop = await this.storageService.getActiveShop();
-    // return await bfast.database(shop.projectId).collection('creditors')
+    // recordPayment await bfast.database(shop.projectId).collection('creditors')
     //   .query()
     //   .skip(skip)
     //   .size(size)

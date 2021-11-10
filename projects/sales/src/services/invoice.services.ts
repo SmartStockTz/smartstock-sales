@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {UserService} from '@smartstocktz/core-libs';
+import {SecurityUtil, UserService} from '@smartstocktz/core-libs';
 import {InvoiceModel} from '../models/invoice.model';
 import {database} from 'bfast';
 
@@ -12,21 +12,63 @@ export class InvoiceService {
 
   }
 
-  async getInvoices(pagination: { size: number, skip: number }): Promise<InvoiceModel[]> {
-    // const shop = await this.storageService.getActiveShop();
-    // return await bfast.database(shop.projectId)
-    //   .collection('invoices')
-    //   .query()
-    //   // .orderBy('_created_at', -1)
-    //   .size(pagination.size)
-    //   .skip(pagination.skip)
-    //   .find();
-    return [];
+  async fetchInvoices(size: number, skip: number, searchKeyword: string): Promise<InvoiceModel[]> {
+    const activeShop = await this.userService.getCurrentShop();
+    return await database(activeShop.projectId)
+      .collection('invoices')
+      .query()
+      .cids(false)
+      .size(size)
+      .skip(skip)
+      .searchByRegex('date', searchKeyword === null ? '' : searchKeyword)
+      .orderBy('date', 'desc')
+      .find();
+  }
+
+  async addInvoice(invoice: InvoiceModel): Promise<any> {
+    const shop = await this.userService.getCurrentShop();
+    const stockableItems = invoice.items.filter((x) => x.stock.stockable === true);
+    const r = await database(shop.projectId).bulk()
+      .create('invoices', invoice)
+      .update('stocks', stockableItems.map((item) => {
+        return {
+          query: {
+            id: item.stock.id,
+          },
+          update: {
+            $set: {
+              updatedAt: new Date(),
+              [`quantity.${SecurityUtil.generateUUID()}`]: {
+                q: -Number(item.quantity),
+                s: 'invoice',
+                d: new Date().toISOString()
+              }
+            }
+          },
+        };
+      })).commit();
+    return r;
+  }
+
+
+  async countAll(date: string): Promise<any> {
+    const shop = await this.userService.getCurrentShop();
+    return await database(shop.projectId).collection('invoices').query()
+      .searchByRegex('date', date)
+      .count(true)
+      .find();
+  }
+
+  async addPayment(id: string, payment: { [key: string]: number }): Promise<InvoiceModel> {
+    const shop = await this.userService.getCurrentShop();
+    return await database(shop.projectId).collection('invoices').query().byId(id).updateBuilder()
+      .set('payment', payment)
+      .update();
   }
 
   async invoicesCount(): Promise<number> {
     // const shop = await this.storageService.getActiveShop();
-    // return await bfast.database(shop.projectId)
+    // recordPayment await bfast.database(shop.projectId)
     //   .collection('invoices')
     //   .query()
     //   .count(true)
@@ -35,42 +77,20 @@ export class InvoiceService {
   }
 
   async saveInvoice(invoice: InvoiceModel) {
-    const shop = await this.userService.getCurrentShop();
-    return await database(shop.projectId).bulk()
-      .create('invoices', invoice)
-      .update('stocks', invoice.items.map(item => {
-        return {
-          update: {
-            $inc: {
-              quantity: -Number(item.quantity)
-            }
-          },
-          query: {
-            id: item.stock.id
-          },
-        };
-      })).commit();
-  }
-
-  async addReturn(id: string, value: any) {
-    const shop = await this.userService.getCurrentShop();
-    const invoice: InvoiceModel = await database(shop.projectId)
-      .collection('invoices')
-      .get(id);
-
-    if (invoice && invoice.returns && Array.isArray(invoice.returns)) {
-      invoice.returns.push(value);
-    } else {
-      invoice.returns = [value];
-    }
-    delete invoice.updatedAt;
-
-    // return await bfast.database(shop.projectId)
-    //   .collection('invoices')
-    //   .query()
-    //   .byId(id)
-    //   .updateBuilder()
-    //   .doc(invoice)
-    //   .update();
+    // const shop = await this.userService.getCurrentShop();
+    // recordPayment await database(shop.projectId).bulk()
+    //   .create('invoices', invoice)
+    //   .update('stocks', invoice.items.map(item => {
+    //     recordPayment {
+    //       update: {
+    //         $inc: {
+    //           quantity: -Number(item.quantity)
+    //         }
+    //       },
+    //       query: {
+    //         id: item.stock.id
+    //       },
+    //     };
+    //   })).commit();
   }
 }

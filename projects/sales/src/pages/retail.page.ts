@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {database} from 'bfast';
 import {UserService} from '@smartstocktz/core-libs';
 import {SalesState} from '../states/sales.state';
 

@@ -2,9 +2,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 import moment from 'moment';
 
 @Pipe({
-  name: 'muda'
+  name: 'ago'
 })
-export class MudaPipe implements PipeTransform {
+export class AgoPipe implements PipeTransform {
 
 
   constructor() {
@@ -12,7 +12,7 @@ export class MudaPipe implements PipeTransform {
 
   transform(value: any, ...args: any[]): string {
     if (value) {
-      return moment(value).format('HH:mm');
+      return moment(value).fromNow();
     } else {
       return 'N/A';
     }

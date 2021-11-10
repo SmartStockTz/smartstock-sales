@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {CustomerModel, LibUserModel, UserService} from '@smartstocktz/core-libs';
-import {of} from 'rxjs';
 
 @Component({
   selector: 'app-customer-active',
