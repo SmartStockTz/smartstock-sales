@@ -225,13 +225,8 @@ const routes: Routes = [
   entryComponents: []
 })
 export class SalesModule {
-  constructor(private readonly salesNav: SalesNavigationService,
-              private readonly ordersService: OrderService,
-              private readonly userService: UserService) {
+  constructor(private readonly salesNav: SalesNavigationService) {
     this.salesNav.init();
     this.salesNav.selected();
-    this.userService.getCurrentShop().then(async shop => {
-      await this.ordersService.startWorker(shop);
-    }).catch(console.log);
   }
 }

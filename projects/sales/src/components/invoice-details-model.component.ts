@@ -20,7 +20,7 @@ import {InvoiceItemModel} from '../models/invoice-item.model';
       <div class="row px-3 pt-4 m-0 justify-content-between">
         <div>
           <p class="mb-0">Invoice No.</p>
-          <p>{{data.batchId}}</p>
+          <p>{{data?.batchId}}</p>
         </div>
 <!--        <div>-->
 <!--          <p class="mb-0">Supplier</p>-->

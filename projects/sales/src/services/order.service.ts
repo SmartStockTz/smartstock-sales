@@ -12,27 +12,23 @@ import {cache, database, functions} from 'bfast';
   providedIn: 'root'
 })
 export class OrderService {
-  private ordersWorker: OrdersWorker;
-  private ordersWorkerNative;
 
   constructor(private readonly userService: UserService) {
   }
 
-  async startWorker(shop: ShopModel) {
-    if (!this.ordersWorker) {
-      this.ordersWorkerNative = new Worker(new URL('../workers/orders.worker', import .meta.url));
-      const SW = wrap(this.ordersWorkerNative) as unknown as any;
-      this.ordersWorker = await new SW(shop);
+  private static async withWorker(fn: (ordersWorker: OrdersWorker) => Promise<any>): Promise<any> {
+    let nativeWorker: Worker;
+    try {
+      nativeWorker = new Worker(new URL('../workers/orders.worker', import .meta.url));
+      const SW = wrap(nativeWorker) as unknown as any;
+      const stWorker = await new SW();
+      return await fn(stWorker);
+    } finally {
+      if (nativeWorker) {
+        nativeWorker.terminate();
+      }
     }
   }
-
-  // stopWorker() {
-  //   if (this.ordersWorkerNative) {
-  //     this.ordersWorkerNative.terminate();
-  //     this.ordersWorker = undefined;
-  //     this.ordersWorkerNative = undefined;
-  //   }
-  // }
 
   private async remoteAllOrders(shop: ShopModel): Promise<OrderModel[]> {
     return database(shop.projectId).table('orders').getAll();
@@ -95,7 +91,6 @@ export class OrderService {
       throw {message: 'Please select a customer to save the order'};
     }
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const order = {
       id: id ? id : SecurityUtil.generateUUID(),
       createdAt: new Date().toISOString(),
@@ -112,7 +107,7 @@ export class OrderService {
         username: user?.username,
         lastname: user?.lastname
       },
-      total: await this.ordersWorker.findOrderTotal(carts, channel),
+      total: await OrderService.withWorker(ordersWorker => ordersWorker.findOrderTotal(carts, channel)),
       shipping: {
         mobile: selectedCustomer?.phone,
         location: selectedCustomer?.street
@@ -137,16 +132,14 @@ export class OrderService {
 
   async getOrders(): Promise<OrderModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const c = await this.ordersFromSyncs(shop);
-    return this.ordersWorker.sortOrders(c);
+    return OrderService.withWorker(ordersWorker => ordersWorker.sortOrders(c));
   }
 
   async getRemoteOrders(): Promise<OrderModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const orders = await this.remoteAllOrders(shop);
-    return this.ordersWorker.sortOrders(orders);
+    return OrderService.withWorker(ordersWorker => ordersWorker.sortOrders(orders));
   }
 
   async markOrderIsPaid(orderId: string): Promise<any> {
@@ -241,9 +234,8 @@ export class OrderService {
 
   async search(query: string): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const o = await this.ordersFromSyncs(shop);
-    return this.ordersWorker.search(query, o, shop);
+    return OrderService.withWorker(ordersWorker => ordersWorker.search(query, o, shop));
   }
 
   async deleteOrder(order: OrderModel): Promise<any> {

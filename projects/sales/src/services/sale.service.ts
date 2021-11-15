@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {SaleWorker} from '../workers/sale.worker';
 import {getDaasAddress, SecurityUtil, UserService} from '@smartstocktz/core-libs';
-import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {wrap} from 'comlink';
 import {StockModel} from '../models/stock.model';
 import {SalesModel} from '../models/sale.model';
@@ -15,34 +14,28 @@ import {SocketController} from 'bfast/dist/lib/controllers/socket.controller';
 })
 
 export class SaleService {
-  private saleWorker: SaleWorker;
-  private saleWorkerNative;
-  private remoteAllProductsRunning: boolean;
   private changes: SocketController;
 
   constructor(private readonly userService: UserService) {
 
   }
 
-  async startWorker(shop: ShopModel) {
-    if (!this.saleWorker) {
-      this.saleWorkerNative = new Worker(new URL('../workers/sale.worker', import .meta.url));
-      const SW = wrap(this.saleWorkerNative) as unknown as any;
-      this.saleWorker = await new SW(shop);
-    }
-  }
-
-  stopWorker() {
-    if (this.saleWorkerNative) {
-      this.saleWorkerNative.terminate();
-      this.saleWorker = undefined;
-      this.saleWorkerNative = undefined;
+  private static async withWorker(fn: (saleWorker: SaleWorker) => Promise<any>): Promise<any> {
+    let nativeWorker: Worker;
+    try {
+      nativeWorker = new Worker(new URL('../workers/sale.worker', import .meta.url));
+      const SW = wrap(nativeWorker) as unknown as any;
+      const stWorker = await new SW();
+      return await fn(stWorker);
+    } finally {
+      if (nativeWorker) {
+        nativeWorker.terminate();
+      }
     }
   }
 
   async products(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     return cache({database: shop.projectId, collection: 'stocks'}).getAll().then(stocks => {
       if (Array.isArray(stocks) && stocks.length > 0) {
         return stocks;
@@ -98,16 +91,18 @@ export class SaleService {
 
   async getProductsRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const products = await this.remoteAllProducts();
-    return this.saleWorker.filterSaleableProducts(products, shop);
+    return SaleService.withWorker(saleWorker => {
+      return saleWorker.filterSaleableProducts(products, shop);
+    });
   }
 
   async search(query: string): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.startWorker(shop);
     const products: StockModel[] = await this.products();
-    return this.saleWorker.search(products, query, shop);
+    return SaleService.withWorker(saleWorker => {
+      return saleWorker.search(products, query, shop);
+    });
   }
 
   async listeningStocksStop(): Promise<void> {

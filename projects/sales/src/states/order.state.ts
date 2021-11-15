@@ -11,9 +11,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class OrderState {
 
   orders: BehaviorSubject<OrderModel[]> = new BehaviorSubject<OrderModel[]>([]);
-  // orderFilterKeyword: BehaviorSubject<string> = new BehaviorSubject<string>('');
   getOrderFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  // markAsCompleteFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(private readonly orderService: OrderService,
               private readonly logger: LogService,
@@ -23,9 +21,7 @@ export class OrderState {
   getOrders(): void {
     this.getOrderFlag.next(true);
     this.orderService.getOrders().then(value => {
-      // console.log(value);
       if (value && Array.isArray(value)) {
-        // this.orders.value.push(...value);
         this.orders.next(value);
       }
     }).catch(_ => {

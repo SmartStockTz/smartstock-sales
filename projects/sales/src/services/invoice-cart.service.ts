@@ -6,27 +6,9 @@ import {InvoiceModel} from '../models/invoice.model';
   providedIn: 'root'
 })
 export class InvoiceCartService {
-  // cartWorker: CartWorker;
-  // cartWorkerNative;
 
   constructor() {
   }
-
-  // private async initWorker(shop: ShopModel) {
-  //   if (!this.cartWorker) {
-  //     this.cartWorkerNative = new Worker(new URL('../workers/cart.worker', import.meta.url));
-  //     const SW = wrap(this.cartWorkerNative) as unknown as any;
-  //     this.cartWorker = await new SW(shop);
-  //   }
-  // }
-
-  // stopWorker() {
-  //   if (this.cartWorkerNative) {
-  //     this.cartWorkerNative.terminate();
-  //     this.cartWorker = undefined;
-  //     this.cartWorkerNative = undefined;
-  //   }
-  // }
 
   async findTotal(carts: InvoiceItemModel[]): Promise<number> {
     return carts.map<number>(value => {

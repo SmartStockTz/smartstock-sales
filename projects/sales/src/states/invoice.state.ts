@@ -88,18 +88,4 @@ export class InvoiceState {
       this.addInvoiceProgress.next(false);
     });
   }
-
-  // calculateTotalReturns(returns: [any]) {
-  //   if (returns && Array.isArray(returns)) {
-  //     return returns.map(a => a.amount).reduce((a, b, i) => {
-  //       return a + b;
-  //     });
-  //   } else {
-  //     return 0.0;
-  //   }
-  // }
-
-  // async saveInvoice(invoice) {
-  //   return await this.invoiceService.saveInvoice(invoice);
-  // }
 }

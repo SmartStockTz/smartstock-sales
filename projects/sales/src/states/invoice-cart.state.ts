@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {PrintService} from '@smartstocktz/core-libs';
-import {SupplierModel} from '../models/supplier.model';
 import {Router} from '@angular/router';
 import {InvoiceItemModel} from '../models/invoice-item.model';
 import {InvoiceService} from '../services/invoice.services';

@@ -10,16 +10,22 @@ import {cache, database} from 'bfast';
   providedIn: 'root'
 })
 export class CustomerService {
-  private customerWorker: CustomerWorker;
 
   constructor(private readonly userService: UserService) {
 
   }
 
-  private async initClass(shop: ShopModel) {
-    if (!this.customerWorker) {
-      const CW = wrap(new Worker(new URL('../workers/customer.worker', import.meta.url))) as unknown as any;
-      this.customerWorker = await new CW(shop);
+  private static async withWorker(fn: (customerWorker: CustomerWorker) => Promise<any>): Promise<any> {
+    let nativeWorker: Worker;
+    try {
+      nativeWorker = new Worker(new URL('../workers/customer.worker', import .meta.url));
+      const SW = wrap(nativeWorker) as unknown as any;
+      const stWorker = await new SW();
+      return await fn(stWorker);
+    } finally {
+      if (nativeWorker) {
+        nativeWorker.terminate();
+      }
     }
   }
 
@@ -38,17 +44,14 @@ export class CustomerService {
 
   async getCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    // await this.listeningChanges();
-    await this.initClass(shop);
     const c = await this.customersFromSyncs(shop);
-    return this.customerWorker.sort(c);
+    return CustomerService.withWorker(customerWorker => customerWorker.sort(c));
   }
 
   async getRemoteCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
     const c: any[] = await database(shop.projectId).table('customers').getAll();
-    return this.customerWorker.getCustomersRemote(shop, c);
+    return CustomerService.withWorker(customerWorker => customerWorker.getCustomersRemote(shop, c));
   }
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
@@ -68,8 +71,7 @@ export class CustomerService {
 
   async search(query: string): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    await this.initClass(shop);
-    return this.customerWorker.search(query, shop, await this.customersFromSyncs(shop));
+    return CustomerService.withWorker(async customerWorker => customerWorker.search(query, shop, await this.customersFromSyncs(shop)));
   }
 
   async deleteCustomer(customer: CustomerModel): Promise<any> {

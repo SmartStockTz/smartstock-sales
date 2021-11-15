@@ -1,24 +1,13 @@
 import {expose} from 'comlink';
 import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {StockModel} from '../models/stock.model';
-import {init} from 'bfast';
-
-function init_(shop: ShopModel) {
-  init({
-    applicationId: 'smartstock_lb',
-    projectId: 'smartstock'
-  });
-}
 
 export class SaleWorker {
 
-  constructor(shop: ShopModel) {
-    init_(shop);
+  constructor() {
   }
 
   async filterSaleableProducts(products: StockModel[], shop: ShopModel): Promise<StockModel[]> {
-    init(shop);
-    // const products = await this.getProductsLocal(shop);
     return products.filter(x => x.saleable);
   }
 
@@ -59,7 +48,6 @@ export class SaleWorker {
   // }
 
   async search(stocks: StockModel[], query: string, shop: ShopModel): Promise<StockModel[]> {
-    init(shop);
     return stocks.filter(x => {
       return (x?.saleable === true) && (x?.product?.toString()?.toLowerCase().includes(query?.toLowerCase()));
     });

@@ -24,7 +24,6 @@ import {AddInvoicePaymentDialogComponent} from './add-invoice-payment-dialog.com
       <mat-nav-list>
         <mat-list-item [matMenuTriggerFor]="menu" *cdkVirtualFor="let invoice of invoiceState.invoices | async">
           <!--          <p style="width: 80vw; text-align: start" class="text-truncate"-->
-          <!--             matLine>#{{purchase.batchId}}</p>-->
           <p matLine>Amount Due: {{dueAmount(invoice) | fedha | async}}</p>
           <p matLine>{{invoice.type}}</p>
           <mat-card-subtitle matLine>{{invoice.date | date:'short'}}</mat-card-subtitle>

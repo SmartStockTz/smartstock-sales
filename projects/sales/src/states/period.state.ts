@@ -16,8 +16,6 @@ export class PeriodState {
     endDate: toSqlDate(new Date())
   });
 
-  public readonly dateRange$ = this.dateRangeSource.asObservable();
-
   editDateRange(newDateRange): any {
     this.dateRangeSource.next(newDateRange);
   }

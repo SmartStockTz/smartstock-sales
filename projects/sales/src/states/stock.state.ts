@@ -21,11 +21,6 @@ export class StockState {
   ) {
   }
 
-  async addSupplier(supplier: SupplierModel): Promise<any> {
-    const shop = await this.userService.getCurrentShop();
-    return database(shop.projectId).collection('suppliers').save(supplier);
-  }
-
   async deleteSupplier(id: string): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     return database(shop.projectId).collection('suppliers').query().byId(id).delete();

@@ -28,18 +28,6 @@
             "tsConfig": "projects/sales/tsconfig.spec.json",
             "karmaConfig": "projects/sales/karma.conf.js"
           }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/sales/tsconfig.lib.json",
-              "projects/sales/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
         }
       }
     },
@@ -149,19 +137,6 @@
               "projects/sales-mock/src/styles.css"
             ],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/sales-mock/tsconfig.app.json",
-              "projects/sales-mock/tsconfig.spec.json",
-              "projects/sales-mock/e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         },
         "e2e": {

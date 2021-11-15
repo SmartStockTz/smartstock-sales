@@ -104,7 +104,6 @@ export class CartState {
   }
 
   dispose() {
-    this.cartService.stopWorker();
     if (this.cartOrder.value?.id) {
       this.carts.next([]);
       this.cartOrder.next(null);

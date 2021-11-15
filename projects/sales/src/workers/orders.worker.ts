@@ -3,37 +3,26 @@ import {ShopModel} from '@smartstocktz/core-libs/models/shop.model';
 import {CartItemModel} from '../models/cart-item.model';
 import {OrderModel} from '../models/order.model';
 import {getDaasAddress, getFaasAddress} from '@smartstocktz/core-libs';
-import {init} from 'bfast';
 
-function init_(shop: ShopModel) {
-  init({
-    applicationId: 'smartstock_lb',
-    projectId: 'smartstock'
-  });
-  init({
-    applicationId: shop.applicationId,
-    projectId: shop.projectId,
-    adapters: {
-      auth: 'DEFAULT'
-    },
-    databaseURL: getDaasAddress(shop),
-    functionsURL: getFaasAddress(shop),
-  }, shop.projectId);
-}
+// function init_(shop: ShopModel) {
+//   init({
+//     applicationId: 'smartstock_lb',
+//     projectId: 'smartstock'
+//   });
+//   init({
+//     applicationId: shop.applicationId,
+//     projectId: shop.projectId,
+//     adapters: {
+//       auth: 'DEFAULT'
+//     },
+//     databaseURL: getDaasAddress(shop),
+//     functionsURL: getFaasAddress(shop),
+//   }, shop.projectId);
+// }
 
 export class OrdersWorker {
 
-  constructor(private readonly shop: ShopModel) {
-    init_(this.shop);
-    // this.syncOrders(this.shop).catch(console.log);
-    // this.listeningOrders(this.shop).catch(console.log);
-  }
-
-  private syncInterval;
-  private changes;
-
-  async listeningOrdersStop() {
-    this.changes?.close();
+  constructor() {
   }
 
   // async setOrderLocal(order: OrderModel, shop): Promise<OrderModel[]> {
