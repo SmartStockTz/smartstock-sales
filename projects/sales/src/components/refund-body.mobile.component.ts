@@ -5,8 +5,8 @@ import {Component, OnInit} from '@angular/core';
   template: `
     <div class="refund-container-mobile">
       <app-refund-body-header-mobile-component></app-refund-body-header-mobile-component>
-      <app-refund-body-list-mobile-component></app-refund-body-list-mobile-component>
     </div>
+    <app-refund-body-list-mobile-component></app-refund-body-list-mobile-component>
   `,
   styleUrls: ['../styles/refund-body.style.scss']
 })

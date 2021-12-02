@@ -15,7 +15,7 @@ import {AddInvoicePaymentDialogComponent} from './add-invoice-payment-dialog.com
   template: `
     <mat-progress-bar mode="indeterminate" *ngIf="invoiceState.fetchingInvoicesProgress | async"></mat-progress-bar>
     <app-data-not-ready *ngIf="(invoiceState.invoices | async).length === 0"></app-data-not-ready>
-    <cdk-virtual-scroll-viewport [itemSize]="90" style="height: 92vh"
+    <cdk-virtual-scroll-viewport [itemSize]="90" style="height: 100%; margin-top: 0"
                                  infinite-scroll
                                  (scrolled)="loadMore($event)"
                                  [scrollWindow]="false"

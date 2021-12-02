@@ -9,7 +9,7 @@ import {MatPaginator} from '@angular/material/paginator';
   template: `
     <div class="actions-container-wrapper">
       <div class="actions-container">
-        <mat-form-field appearance="outline">
+        <mat-form-field>
           <mat-label>Date</mat-label>
           <input [formControl]="dateControl" matInput [matDatepicker]="picker">
           <mat-datepicker-toggle matSuffix [for]="picker" [disabled]="false"></mat-datepicker-toggle>
@@ -20,7 +20,7 @@ import {MatPaginator} from '@angular/material/paginator';
           Load sales
         </button>
         <span class="actions-spacer"></span>
-        <mat-paginator #c_paginator></mat-paginator>
+        <mat-paginator style="background: transparent" #c_paginator></mat-paginator>
       </div>
       <mat-progress-bar mode="indeterminate" *ngIf="refundState.loadSales | async"></mat-progress-bar>
     </div>

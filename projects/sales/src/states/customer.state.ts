@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {SecurityUtil, StorageService} from '@smartstocktz/core-libs';
+import {SecurityUtil} from '@smartstocktz/core-libs';
 import {CustomerModel} from '../models/customer.model';
 import {BehaviorSubject} from 'rxjs';
 import {CustomerService} from '../services/customer.service';
@@ -13,8 +13,7 @@ export class CustomerState {
   loadingCustomers = new BehaviorSubject<boolean>(false);
   saveCustomerFlag = new BehaviorSubject<boolean>(false);
 
-  constructor(private readonly storage: StorageService,
-              private readonly snack: MatSnackBar,
+  constructor(private readonly snack: MatSnackBar,
               private readonly customerService: CustomerService) {
   }
 

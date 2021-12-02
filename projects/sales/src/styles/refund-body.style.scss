@@ -1,5 +1,6 @@
 .refund-container {
-  padding: 14px 16px;
+  margin-top: 16px;
+  //padding: 0 16px;
 }
 
 .refund-container-mobile {
@@ -39,11 +40,14 @@
 }
 
 .actions-container-wrapper {
-  background: white;
+  background: #f5f5f5;
   z-index: 10000;
-  padding-top: 4px;
+  padding: 8px 6px 0 6px;
   position: sticky;
-  top: 64px;
+  top: 0;
+  //display: flex;
+  //flex-direction: row;
+  //align-items: center;
 }
 
 //::ng-deep {
@@ -62,7 +66,7 @@ mat-list-item {
 }
 
 .table-header {
-  background: #F0F0F0;
+  //background: #F0F0F0;
   border-radius: 5px !important;
 }
 
