@@ -89,11 +89,10 @@ export class AddToInvoiceCartFormComponent implements OnInit {
     const invoiceItem: InvoiceItemModel = {
       amount: this.addToCartForm.value.amount * this.addToCartForm.value.quantity,
       stock: {
+        purchase: this.product.purchase,
         product: this.product.product,
         id: this.product.id,
         category: this.product?.category,
-        purchasable: !!this.product.purchasable,
-        saleable: !!this.product.saleable,
         stockable: !!this.product.stockable,
         supplier: this.product?.supplier,
         unit: this.product?.unit

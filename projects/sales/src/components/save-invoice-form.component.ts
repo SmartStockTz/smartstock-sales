@@ -17,25 +17,6 @@ import moment from 'moment';
         <div class="dialog-header-line"></div>
       </div>
       <form class="inputs-container" [formGroup]="invoiceHeaderForm" (ngSubmit)="recordInvoice()">
-        <!--        <div class="input-container">-->
-        <!--          <p class="input-head">Purchase reference</p>-->
-        <!--          <input formControlName="refNumber" class="input-body">-->
-        <!--          <mat-error *ngIf="invoiceHeaderForm.get('refNumber').invalid">-->
-        <!--            Purchase reference required-->
-        <!--          </mat-error>-->
-        <!--        </div>-->
-        <!--        <div class="input-container">-->
-        <!--          <p class="input-head">Purchase type</p>-->
-        <!--          <mat-form-field appearance="outline">-->
-        <!--            <mat-select formControlName="type" [value]="'receipt'">-->
-        <!--              <mat-option [value]="'receipt'">Cash purchase</mat-option>-->
-        <!--              <mat-option [value]="'invoice'">Invoice purchase</mat-option>-->
-        <!--            </mat-select>-->
-        <!--            <mat-error *ngIf="invoiceHeaderForm.get('type').invalid">-->
-        <!--              Purchase type required-->
-        <!--            </mat-error>-->
-        <!--          </mat-form-field>-->
-        <!--        </div>-->
         <mat-form-field appearance="outline">
           <mat-label class="input-head">Date</mat-label>
           <input matInput formControlName="date" [matDatepicker]="picker">
@@ -89,7 +70,7 @@ export class SaveInvoiceFormComponent implements OnInit {
       return this.invoiceState.addInvoice({
         id: SecurityUtil.generateUUID(),
         dueDate: this.invoiceHeaderForm.value.dueDate,
-        date: this.invoiceHeaderForm.value.date,
+        date: moment(this.invoiceHeaderForm.value.date).format('YYYY-MM-DD'),
         updatedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         customer: {

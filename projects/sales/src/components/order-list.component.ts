@@ -22,80 +22,82 @@ import {database} from 'bfast';
   selector: 'app-order-list',
   template: `
     <mat-progress-bar *ngIf="orderState.getOrderFlag | async" mode="indeterminate" color="primary"></mat-progress-bar>
-    <table *ngIf="(deviceState.isSmallScreen | async) ===false" mat-table [dataSource]="dataSource" matSort>
-      <ng-container matColumnDef="details">
-        <th class="table-title-text" mat-header-cell *matHeaderCellDef mat-sort-header>Details</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row">
-          <p><b>{{row.firstName}} {{row.secondName}}</b></p>
-          <p>Mobile : {{ row.mobile ? row.mobile : row.phone }}</p>
-          <p>Email : {{ row.email }}</p>
-        </td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
+    <div class="my-table">
+      <table *ngIf="(deviceState.isSmallScreen | async) ===false" mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="details">
+          <th class="table-title-text" mat-header-cell *matHeaderCellDef mat-sort-header>Details</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row">
+            <p><b>{{row.firstName}} {{row.secondName}}</b></p>
+            <p>Mobile : {{ row.mobile ? row.mobile : row.phone }}</p>
+            <p>Email : {{ row.email }}</p>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
 
-      <ng-container matColumnDef="check">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>
-          <mat-checkbox></mat-checkbox>
-        </th>
-        <td class="table-body-text" mat-cell *matCellDef="let row">
-          <mat-checkbox></mat-checkbox>
-        </td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
-      <ng-container matColumnDef="Name">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Customer</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row?.customer?.displayName}} </td>
-        <td mat-footer-cell *matFooterCellDef></td>
-      </ng-container>
-      <ng-container matColumnDef="Mobile">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Mobile</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row"> {{ row?.shipping?.mobile}} </td>
-        <!--<td mat-footer-cell *matFooterCellDef>Total</td>-->
-      </ng-container>
-      <ng-container matColumnDef="Amount">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Amount</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.total | fedha | async}} </td>
-        <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
-      </ng-container>
-      <ng-container matColumnDef="Date">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Date</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row"> {{dateT(row.date)}} </td>
-        <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
-      </ng-container>
-      <!--      <ng-container matColumnDef="Status">-->
-      <!--        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Status</th>-->
-      <!--        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.paid === true?'PAID':''}} </td>-->
-      <!--        &lt;!&ndash;<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>&ndash;&gt;-->
-      <!--      </ng-container>-->
-      <ng-container matColumnDef="Action">
-        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Actions</th>
-        <td class="table-body-text" mat-cell *matCellDef="let row">
-          <button [matMenuTriggerFor]="menu" mat-icon-button>
-            <mat-icon>more_horiz</mat-icon>
-          </button>
-          <mat-menu #menu>
-            <mat-nav-list>
-              <mat-list-item (click)="processOrder(row)">
-                <p matLine>Process Order</p>
-                <mat-icon matListIcon>shopping_cart</mat-icon>
-              </mat-list-item>
-              <mat-list-item (click)="deleteOrder(row)">
-                <p matLine>Delete Order</p>
-                <mat-icon matListIcon>cancel</mat-icon>
-              </mat-list-item>
-              <mat-list-item (click)="orderDetails(row)">
-                <p matLine>Details</p>
-                <mat-icon matListIcon>receipt</mat-icon>
-              </mat-list-item>
-            </mat-nav-list>
-          </mat-menu>
-        </td>
-      </ng-container>
-      <tr class="customers-table-header" mat-header-row
-          *matHeaderRowDef="(deviceState.isSmallScreen | async)===true?displayColumnsMobile:displayColumns"></tr>
-      <tr mat-row class="table-data-row"
-          *matRowDef="let row; columns: (deviceState.isSmallScreen | async)===true?displayColumnsMobile:displayColumns;"></tr>
-    </table>
+        <ng-container matColumnDef="check">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>
+            <mat-checkbox></mat-checkbox>
+          </th>
+          <td class="table-body-text" mat-cell *matCellDef="let row">
+            <mat-checkbox></mat-checkbox>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="Name">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Customer</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row"> {{row?.customer?.displayName}} </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="Mobile">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Mobile</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row"> {{ row?.shipping?.mobile}} </td>
+          <!--<td mat-footer-cell *matFooterCellDef>Total</td>-->
+        </ng-container>
+        <ng-container matColumnDef="Amount">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Amount</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.total | fedha | async}} </td>
+          <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
+        </ng-container>
+        <ng-container matColumnDef="Date">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Date</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row"> {{dateT(row.date)}} </td>
+          <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
+        </ng-container>
+        <!--      <ng-container matColumnDef="Status">-->
+        <!--        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Status</th>-->
+        <!--        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.paid === true?'PAID':''}} </td>-->
+        <!--        &lt;!&ndash;<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>&ndash;&gt;-->
+        <!--      </ng-container>-->
+        <ng-container matColumnDef="Action">
+          <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Actions</th>
+          <td class="table-body-text" mat-cell *matCellDef="let row">
+            <button [matMenuTriggerFor]="menu" mat-icon-button>
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #menu>
+              <mat-nav-list>
+                <mat-list-item (click)="processOrder(row)">
+                  <p matLine>Process Order</p>
+                  <mat-icon matListIcon>shopping_cart</mat-icon>
+                </mat-list-item>
+                <mat-list-item (click)="deleteOrder(row)">
+                  <p matLine>Delete Order</p>
+                  <mat-icon matListIcon>cancel</mat-icon>
+                </mat-list-item>
+                <mat-list-item (click)="orderDetails(row)">
+                  <p matLine>Details</p>
+                  <mat-icon matListIcon>receipt</mat-icon>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-menu>
+          </td>
+        </ng-container>
+        <tr class="customers-table-header" mat-header-row
+            *matHeaderRowDef="(deviceState.isSmallScreen | async)===true?displayColumnsMobile:displayColumns"></tr>
+        <tr mat-row class="table-data-row"
+            *matRowDef="let row; columns: (deviceState.isSmallScreen | async)===true?displayColumnsMobile:displayColumns;"></tr>
+      </table>
+    </div>
 
     <div id="l_c">
       <cdk-virtual-scroll-viewport style="min-height: 90vh" *ngIf="(deviceState.isSmallScreen | async) ===true" [itemSize]="30">

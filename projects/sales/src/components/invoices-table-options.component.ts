@@ -5,7 +5,7 @@ import {InvoiceState} from '../states/invoice.state';
 @Component({
   selector: 'app-invoices-table-options',
   template: `
-    <div style="position: sticky!important;top: 64px; z-index: 100000; background: #f5f5f5">
+    <div style="position: sticky!important;top: 0; z-index: 100000; background: #f5f5f5">
       <div class="options-container">
         <button mat-button routerLink="/sale/invoices/create" class="reload-button">Create</button>
         <button mat-button class="reload-button" (click)="hotReload()">Reload</button>

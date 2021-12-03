@@ -4,8 +4,8 @@ import {MatPaginator} from '@angular/material/paginator';
 @Component({
   selector: 'app-refund-body-component',
   template: `
+    <app-refund-body-header-component (paginator)="gP($event)"></app-refund-body-header-component>
     <div class="refund-container">
-      <app-refund-body-header-component (paginator)="gP($event)"></app-refund-body-header-component>
       <app-refund-body-table-component *ngIf="paginator" [paginator]="paginator"></app-refund-body-table-component>
     </div>
   `,

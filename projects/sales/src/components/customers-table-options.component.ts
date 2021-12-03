@@ -11,7 +11,7 @@ import {database} from 'bfast';
 @Component({
   selector: 'app-customers-table-options',
   template: `
-    <div style="position: sticky; top: 64px; z-index: 100000; background: #f5f5f5;">
+    <div style="position: sticky; top: 0; z-index: 100000; background: #f5f5f5;">
       <div *ngIf="(deviceState.isSmallScreen | async)===false" class="actions-container">
         <button (click)="addCustomer()" color="primary" mat-button>
           <mat-icon matPrefix>add</mat-icon>

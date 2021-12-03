@@ -46,7 +46,8 @@ import {DialogNewOrderComponent} from '../components/dialog-new-order.component'
             </button>
             <span class="actions-spacer"></span>
             <!--            <div *ngIf="(deviceState.isSmallScreen | async)===false">-->
-            <mat-paginator [ngStyle]="{display: (deviceState.isSmallScreen | async)===true?'none':''}" #c_paginator></mat-paginator>
+            <mat-paginator [ngStyle]="{display: (deviceState.isSmallScreen | async)===true?'none':'', background:'transparent'}"
+                           #c_paginator></mat-paginator>
             <!--            </div>-->
           </div>
           <app-order-list [paginator]="c_paginator"></app-order-list>

@@ -3,11 +3,10 @@ import {MatDrawer, MatSidenav} from '@angular/material/sidenav';
 import {SalesState} from '../states/sales.state';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FormControl, Validators} from '@angular/forms';
-import {DeviceState, LogService, StorageService, UserService} from '@smartstocktz/core-libs';
+import {DeviceState} from '@smartstocktz/core-libs';
 import {CartState} from '../states/cart.state';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {database} from 'bfast';
 
 @Component({
   selector: 'app-sale',
@@ -79,8 +78,6 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   searchInputControl = new FormControl('', [Validators.nullValidator, Validators.required]);
   showRefreshCart = false;
   destroyer = new Subject<any>();
-  // private sig = false;
-  // private obfn;
 
   constructor(public readonly snack: MatSnackBar,
               public readonly changeDetect: ChangeDetectorRef,

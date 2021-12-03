@@ -1594,10 +1594,10 @@
     "@angular-devkit/schematics" "13.0.2"
     jsonc-parser "3.0.0"
 
-"@smartstocktz/core-libs@^0.4.8":
-  version "0.4.8"
-  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.4.8/b70afeaf8b49442861a1f61379b45d95f5fc8c209df4cd23a4d30af1fdfcead2#83327444d72f1ff14e766b14c8934ff6aa64c8f8"
-  integrity sha512-ZXdNEC8z/4S0kDMGPZoWWrjgtQm5O9Ok9HJ0NU6Xe7J7FMnCTgH/GZ+3VJZbhQqaXIORSezPLTouecZQR25sLQ==
+"@smartstocktz/core-libs@^0.5.0":
+  version "0.5.0"
+  resolved "https://npm.pkg.github.com/download/@smartstocktz/core-libs/0.5.0/4326397cf777df468e51c55970b2728c058c317818680aa4f85b47bce97ecfb6#c3e06ad9e8a02c7dcb3845808811511a1ffd8ebb"
+  integrity sha512-bUwNdBJwmE/jxLKaR7yaSUXihpCaUhoHa/da+aXwo4RcIXIFHT0BnCr0wOzQNS7DxceFGV89S+N+SWmJRwGPrg==
   dependencies:
     tslib "^2.0.0"
 
@@ -2257,10 +2257,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bfast@^6.0.0-alpha.16:
-  version "6.0.0-alpha.16"
-  resolved "https://registry.yarnpkg.com/bfast/-/bfast-6.0.0-alpha.16.tgz#5ad567a4793e1ca87191c6631ebb1ace1d63bf79"
-  integrity sha512-fEMQouPDPfHeyHbKJIIMDQVm153AwyTp3SB2hf47TMaEnTW8zF5/wb4jMOruNKy2+uSwwOi6SWWKTqShJfjyxg==
+bfast@^6.0.0-alpha.17:
+  version "6.0.0-alpha.17"
+  resolved "https://registry.yarnpkg.com/bfast/-/bfast-6.0.0-alpha.17.tgz#fcb5237fc5158f57f5f908d8a5be5f22b4b5c09a"
+  integrity sha512-mAN0C9XmflAXP5/L9+SR9jFI6InQ7Z3lejLBwNdCZ8Ces0Z3z7DCJF6CUrSSV8SuWBmYynO7nV8a1R5JSf/WNQ==
   dependencies:
     axios "~0.22.0"
     bufferutil "~4.0.4"

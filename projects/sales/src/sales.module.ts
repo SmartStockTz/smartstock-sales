@@ -29,7 +29,7 @@ import {SaleComponent} from './components/sale.component';
 import {CartPreviewComponent} from './components/cart-preview.component';
 import {RouterModule, ROUTES, Routes} from '@angular/router';
 import {WholePageComponent} from './pages/whole.page';
-import {LibModule, UserService} from '@smartstocktz/core-libs';
+import {LibModule, PaymentGuard} from '@smartstocktz/core-libs';
 import {IndexPage} from './pages/index.page';
 import {OrderPage} from './pages/order.page';
 import {CdkTableModule} from '@angular/cdk/table';
@@ -62,7 +62,6 @@ import {SheetCreateCustomerComponent} from './components/sheet-create-customer.c
 import {FedhaPipe} from './pipes/fedha.pipe';
 import {DialogCashSaleCartOptionsComponent} from './components/dialog-cash-sale-cart-options.component';
 import {CashSaleCartOptionsComponent} from './components/cash-sale-cart-options.component';
-import {OrderService} from './services/order.service';
 import {OrderListComponent} from './components/order-list.component';
 import {DialogNewOrderComponent} from './components/dialog-new-order.component';
 import {RefundBodyComponent} from './components/refund-body.component';
@@ -100,13 +99,13 @@ import {SaveInvoiceDialogComponent} from './components/save-invoice-dialog.compo
 
 const routes: Routes = [
   {path: '', component: IndexPage},
-  {path: 'order', component: OrderPage},
+  {path: 'order', canActivate: [PaymentGuard], component: OrderPage},
   {path: 'customers', component: CustomersPage},
-  {path: 'whole', component: WholePageComponent},
-  {path: 'retail', component: RetailPageComponent},
+  {path: 'whole', canActivate: [PaymentGuard], component: WholePageComponent},
+  {path: 'retail', canActivate: [PaymentGuard], component: RetailPageComponent},
   {path: 'invoices', component: InvoicePage},
-  {path: 'invoices/create', component: CreateInvoicePage},
-  {path: 'refund', component: RefundsPage},
+  {path: 'invoices/create', canActivate: [PaymentGuard], component: CreateInvoicePage},
+  {path: 'refund', canActivate: [PaymentGuard], component: RefundsPage},
 ];
 
 @NgModule({

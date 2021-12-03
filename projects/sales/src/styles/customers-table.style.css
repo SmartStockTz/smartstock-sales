@@ -1,11 +1,11 @@
-.customers-table-header{
+.customers-table-header {
   height: 39px;
-  background: #F0F0F0;
-  border-radius: 5px!important;
+  /*background: #F0F0F0;*/
+  border-radius: 5px !important;
 }
 
-.table-title-text{
-  font-family: Roboto;
+.table-title-text {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   font-style: normal;
   font-weight: 300;
   font-size: 14px;
@@ -14,8 +14,8 @@
   color: #000000;
 }
 
-.table-body-text{
-  font-family: Roboto;
+.table-body-text {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   font-style: normal;
   font-weight: normal;
   font-size: 18px;
@@ -25,9 +25,14 @@
 
 }
 
-td{
-  padding: 4px!important;
+td {
+  padding: 4px !important;
 }
-th{
-  padding: 4px!important;
+
+th {
+  padding: 4px !important;
+}
+
+.my-table {
+  padding: 16px 24px;
 }

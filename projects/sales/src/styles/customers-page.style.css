@@ -1,7 +1,7 @@
 .customers-container {
   padding: 8px 16px;
   background-color: transparent;
-  min-height: 100vh;
+  /*min-height: 100%;*/
 }
 
 .customers-container-mobile {

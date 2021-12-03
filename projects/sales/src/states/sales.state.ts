@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {SalesModel} from '../models/sale.model';
-import {StorageService} from '@smartstocktz/core-libs';
 import {BehaviorSubject} from 'rxjs';
 import {SaleService} from '../services/sale.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -15,8 +14,7 @@ export class SalesState {
   searchProgress = new BehaviorSubject(false);
   products = new BehaviorSubject([]);
 
-  constructor(private readonly storageService: StorageService,
-              private readonly snack: MatSnackBar,
+  constructor(private readonly snack: MatSnackBar,
               private readonly saleService: SaleService) {
   }
 
