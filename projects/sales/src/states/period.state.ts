@@ -1,17 +1,15 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
-import {toSqlDate} from '@smartstocktz/core-libs';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
+import { toSqlDate } from "smartstock-core";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class PeriodState {
-
-  constructor() {
-  }
+  constructor() {}
 
   private dateRangeSource = new BehaviorSubject<any>({
-    period: 'day',
+    period: "day",
     startDate: toSqlDate(new Date()),
     endDate: toSqlDate(new Date())
   });

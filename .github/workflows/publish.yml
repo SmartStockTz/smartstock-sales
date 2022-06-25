@@ -1,0 +1,24 @@
+
+name: Publish to npm
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      - run: npm install --location=global @angular/cli
+      - run: npm install --location=global yarn
+      - run: npm install -f
+      - run: npm config set //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+      - run: npm run publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
