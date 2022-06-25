@@ -1,9 +1,6 @@
 {
-  "name": "@smartstocktz/sales",
-  "version": "0.3.3",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/smartstocktz"
-  },
+  "name": "smartstock-sales",
+  "version": "1.0.0",
   "repository": {
     "url": "git://github.com/SmartStockTz/smartstock-sales.git"
   },
