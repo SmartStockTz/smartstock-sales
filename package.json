@@ -1,8 +1,9 @@
 {
   "name": "smartstock-sales",
-  "version": "0.1.20",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
+    "box": "yarn install && yarn start",
     "start": "ng serve -c dev sales-mock",
     "build": "ng build -c production sales && node copy-workers.js",
     "publish": "npm run build && cd dist/sales && npm publish --ignore-script",
@@ -22,7 +23,7 @@
     "@angular/platform-browser": "~13.0.1",
     "@angular/platform-browser-dynamic": "~13.0.1",
     "@angular/router": "~13.0.1",
-    "@smartstocktz/core-libs": "^0.5.0",
+    "smartstock-core": "^1.0.1",
     "bfast": "^6.0.0-alpha.17",
     "comlink": "~4.3.1",
     "crypto-hash": "~1.3.0",
