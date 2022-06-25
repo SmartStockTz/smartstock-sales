@@ -1,13 +1,13 @@
-import {expose} from 'comlink';
-import {CustomerModel} from '../models/customer.model';
-import {ShopModel} from '@smartstocktz/core-libs';
+import { expose } from "comlink";
+import { CustomerModel } from "../models/customer.model";
+import { ShopModel } from "smartstock-core";
 
 export class CustomerWorker {
+  constructor() {}
 
-  constructor() {
-  }
-
-  private static async sortCustomers(customers: CustomerModel[]): Promise<CustomerModel[]> {
+  private static async sortCustomers(
+    customers: CustomerModel[]
+  ): Promise<CustomerModel[]> {
     customers.sort((a, b) => {
       if (a.createdAt < b.createdAt) {
         return 1;
@@ -20,7 +20,10 @@ export class CustomerWorker {
     return customers;
   }
 
-  async getCustomersRemote(shop: ShopModel, customers: CustomerModel[]): Promise<CustomerModel[]> {
+  async getCustomersRemote(
+    shop: ShopModel,
+    customers: CustomerModel[]
+  ): Promise<CustomerModel[]> {
     customers = await CustomerWorker.sortCustomers(customers);
     return customers;
   }
@@ -29,10 +32,16 @@ export class CustomerWorker {
     return CustomerWorker.sortCustomers(customers);
   }
 
-  async search(query: string, shop: ShopModel, customers: CustomerModel[]): Promise<CustomerModel[]> {
+  async search(
+    query: string,
+    shop: ShopModel,
+    customers: CustomerModel[]
+  ): Promise<CustomerModel[]> {
     const localCustomers: any[] = await CustomerWorker.sortCustomers(customers);
     if (Array.isArray(localCustomers)) {
-      return localCustomers.filter(y => JSON.stringify(y).toLowerCase().includes(query.toLowerCase()));
+      return localCustomers.filter((y) =>
+        JSON.stringify(y).toLowerCase().includes(query.toLowerCase())
+      );
     } else {
       return [];
     }

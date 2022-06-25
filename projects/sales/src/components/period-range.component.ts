@@ -1,35 +1,40 @@
-import {Component, Injectable, Input, OnInit} from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
-import {toSqlDate} from '@smartstocktz/core-libs';
-import {MatDatepicker} from '@angular/material/datepicker';
+import { Component, Injectable, Input, OnInit } from "@angular/core";
+import { FormControl, FormGroup } from "@angular/forms";
+import { toSqlDate } from "smartstock-core";
+import { MatDatepicker } from "@angular/material/datepicker";
 
-import * as _moment from 'moment';
+import * as _moment from "moment";
 // @ts-ignore
-import {default as _rollupMoment, Moment} from 'moment';
-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
-import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter} from '@angular/material-moment-adapter';
-import {PeriodState} from '../states/period.state';
-
+import { default as _rollupMoment, Moment } from "moment";
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE
+} from "@angular/material/core";
+import {
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+  MomentDateAdapter
+} from "@angular/material-moment-adapter";
+import { PeriodState } from "../states/period.state";
 
 const moment = _rollupMoment || _moment;
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'DD MMM YYYY',
+    dateInput: "DD MMM YYYY"
   },
   display: {
-    dateInput: 'DD MMM YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
+    dateInput: "DD MMM YYYY",
+    monthYearLabel: "MMM YYYY",
+    dateA11yLabel: "LL",
+    monthYearA11yLabel: "MMMM YYYY"
+  }
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
-
 @Component({
-  selector: 'app-period-date-range',
+  selector: "app-period-date-range",
   template: `
     <div class="d-flex flex-row justify-content-end align-items-center">
       <mat-form-field class="px-3" [hidden]="hidePeriod" appearance="outline">
@@ -42,29 +47,63 @@ export const MY_FORMATS = {
       </mat-form-field>
       <mat-form-field class="px-3" appearance="outline">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="dp" [min]="minDate" [max]="maxDate" [formControl]="fromDateFormControl"
-               (dateChange)="chosenDayHandler($event, dp, 'startDate')">
+        <input
+          matInput
+          [matDatepicker]="dp"
+          [min]="minDate"
+          [max]="maxDate"
+          [formControl]="fromDateFormControl"
+          (dateChange)="chosenDayHandler($event, dp, 'startDate')"
+        />
         <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp
-                        [startView]="periodFormControl.value === 'day' ? 'month' : periodFormControl.value === 'month' ? 'year' : 'multi-year'"
-                        (yearSelected)="chosenYearHandler($event, dp, 'startDate')"
-                        (monthSelected)="chosenMonthHandler($event, dp, 'startDate')"
+        <mat-datepicker
+          #dp
+          [startView]="
+            periodFormControl.value === 'day'
+              ? 'month'
+              : periodFormControl.value === 'month'
+              ? 'year'
+              : 'multi-year'
+          "
+          (yearSelected)="chosenYearHandler($event, dp, 'startDate')"
+          (monthSelected)="chosenMonthHandler($event, dp, 'startDate')"
         >
         </mat-datepicker>
       </mat-form-field>
       <mat-form-field *ngIf="!hideEndDate" class="px-3" appearance="outline">
         <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="dp2" [min]="minDate" [max]="maxDate" [formControl]="toDateFormControl"
-               (dateChange)="chosenDayHandler($event, dp, 'endDate')">
+        <input
+          matInput
+          [matDatepicker]="dp2"
+          [min]="minDate"
+          [max]="maxDate"
+          [formControl]="toDateFormControl"
+          (dateChange)="chosenDayHandler($event, dp, 'endDate')"
+        />
         <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
-        <mat-datepicker dataformatas="DD-MMM-YYYY" #dp2
-                        [startView]="periodFormControl.value === 'day' ? 'month' : periodFormControl.value === 'month' ? 'year' : 'multi-year'"
-                        (yearSelected)="chosenYearHandler($event, dp2, 'endDate')"
-                        (monthSelected)="chosenMonthHandler($event, dp2, 'endDate')"
+        <mat-datepicker
+          dataformatas="DD-MMM-YYYY"
+          #dp2
+          [startView]="
+            periodFormControl.value === 'day'
+              ? 'month'
+              : periodFormControl.value === 'month'
+              ? 'year'
+              : 'multi-year'
+          "
+          (yearSelected)="chosenYearHandler($event, dp2, 'endDate')"
+          (monthSelected)="chosenMonthHandler($event, dp2, 'endDate')"
         >
         </mat-datepicker>
       </mat-form-field>
-      <button mat-raised-button class="mb-auto mt-1 p-1" color="primary" (click)="applyDateRange()">Apply</button>
+      <button
+        mat-raised-button
+        class="mb-auto mt-1 p-1"
+        color="primary"
+        (click)="applyDateRange()"
+      >
+        Apply
+      </button>
     </div>
   `,
   // styleUrls: ['../styles/sales-trends.style.scss'],
@@ -75,8 +114,8 @@ export const MY_FORMATS = {
       deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
     },
 
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
-  ],
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }
+  ]
 })
 export class PeriodDateRangeComponent implements OnInit {
   dateRange: FormGroup;
@@ -84,9 +123,9 @@ export class PeriodDateRangeComponent implements OnInit {
   minDate = new Date(new Date().setFullYear(2015));
   from = new Date();
   to = new Date();
-  @ Input() hidePeriod = false;
+  @Input() hidePeriod = false;
   @Input() hideEndDate = false;
-  @ Input() setPeriod = 'day';
+  @Input() setPeriod = "day";
 
   fromDateFormControl = new FormControl(moment());
   toDateFormControl = new FormControl(moment());
@@ -99,22 +138,27 @@ export class PeriodDateRangeComponent implements OnInit {
     // });
   }
 
-
   ngOnInit(): void {
-    this.fromDateFormControl.setValue(this.hidePeriod === true && this.setPeriod === 'year' ?
-      (this.from.getFullYear() - 1).toString() : this.from);
+    this.fromDateFormControl.setValue(
+      this.hidePeriod === true && this.setPeriod === "year"
+        ? (this.from.getFullYear() - 1).toString()
+        : this.from
+    );
     // this.fromDateFormControl.setValue(this.hidePeriod ? this.from.getFullYear() : this.from);
     this.toDateFormControl.setValue(this.to);
     // console.log(this.from.getFullYear());
     this.periodFormControl.setValue(this.setPeriod);
-
   }
 
-  chosenYearHandler(normalizedYear: Moment, datepicker: MatDatepicker<any>, selectedInput: string): any {
-    if (selectedInput === 'startDate') {
+  chosenYearHandler(
+    normalizedYear: Moment,
+    datepicker: MatDatepicker<any>,
+    selectedInput: string
+  ): any {
+    if (selectedInput === "startDate") {
       this.from = new Date(new Date().setFullYear(normalizedYear.year()));
 
-      if (this.periodFormControl.value === 'year') {
+      if (this.periodFormControl.value === "year") {
         datepicker.close();
         this.from = new Date(new Date(this.from).setMonth(0));
         this.from = new Date(new Date(this.from).setDate(1));
@@ -122,40 +166,56 @@ export class PeriodDateRangeComponent implements OnInit {
       }
     } else {
       this.to = new Date(new Date().setFullYear(normalizedYear.year()));
-      if (this.periodFormControl.value === 'year') {
+      if (this.periodFormControl.value === "year") {
         datepicker.close();
         this.to = new Date(new Date(this.to).setMonth(12));
         this.to = new Date(new Date(this.to).setDate(1));
-        this.to = new Date(new Date(this.to).setDate(new Date(this.to).getDate() - 1));
+        this.to = new Date(
+          new Date(this.to).setDate(new Date(this.to).getDate() - 1)
+        );
         this.toDateFormControl.setValue(this.to);
       }
     }
   }
 
-  chosenMonthHandler(normalizedMonth: Moment, datepicker: MatDatepicker<any>, selectedInput: string): any {
-    if (selectedInput === 'startDate') {
-      this.from = new Date(new Date(this.from).setMonth(normalizedMonth.month()));
-      if (this.periodFormControl.value === 'month') {
+  chosenMonthHandler(
+    normalizedMonth: Moment,
+    datepicker: MatDatepicker<any>,
+    selectedInput: string
+  ): any {
+    if (selectedInput === "startDate") {
+      this.from = new Date(
+        new Date(this.from).setMonth(normalizedMonth.month())
+      );
+      if (this.periodFormControl.value === "month") {
         datepicker.close();
         this.from = new Date(new Date(this.from).setDate(1));
         this.fromDateFormControl.setValue(this.from);
       }
     } else {
       this.to = new Date(new Date(this.to).setMonth(normalizedMonth.month()));
-      if (this.periodFormControl.value === 'month') {
+      if (this.periodFormControl.value === "month") {
         datepicker.close();
         this.to = new Date(new Date(this.to).setDate(1));
-        this.to = new Date(new Date(this.to).setMonth(normalizedMonth.month() + 1));
-        this.to = new Date(new Date(this.to).setDate(new Date(this.to).getDate() - 1));
+        this.to = new Date(
+          new Date(this.to).setMonth(normalizedMonth.month() + 1)
+        );
+        this.to = new Date(
+          new Date(this.to).setDate(new Date(this.to).getDate() - 1)
+        );
         this.toDateFormControl.setValue(this.to);
       }
     }
   }
 
-  chosenDayHandler(normalizedDate: any, datepicker: MatDatepicker<any>, selectedInput: string): any {
+  chosenDayHandler(
+    normalizedDate: any,
+    datepicker: MatDatepicker<any>,
+    selectedInput: string
+  ): any {
     normalizedDate = normalizedDate.target.value;
 
-    if (selectedInput === 'startDate') {
+    if (selectedInput === "startDate") {
       this.from = new Date(new Date(this.from).setDate(normalizedDate.date()));
       datepicker.close();
       this.fromDateFormControl.setValue(this.from);

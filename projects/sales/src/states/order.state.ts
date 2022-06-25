@@ -1,35 +1,39 @@
-import {Injectable} from '@angular/core';
-import {OrderService} from '../services/order.service';
-import {BehaviorSubject} from 'rxjs';
-import {OrderModel} from '../models/order.model';
-import {LogService} from '@smartstocktz/core-libs';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { Injectable } from "@angular/core";
+import { OrderService } from "../services/order.service";
+import { BehaviorSubject } from "rxjs";
+import { OrderModel } from "../models/order.model";
+import { LogService } from "smartstock-core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class OrderState {
-
   orders: BehaviorSubject<OrderModel[]> = new BehaviorSubject<OrderModel[]>([]);
   getOrderFlag: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  constructor(private readonly orderService: OrderService,
-              private readonly logger: LogService,
-              private readonly snack: MatSnackBar) {
-  }
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly logger: LogService,
+    private readonly snack: MatSnackBar
+  ) {}
 
   getOrders(): void {
     this.getOrderFlag.next(true);
-    this.orderService.getOrders().then(value => {
-      if (value && Array.isArray(value)) {
-        this.orders.next(value);
-      }
-    }).catch(_ => {
-      this.logger.i(_);
-      this.message('Fails to fetch orders');
-    }).finally(() => {
-      this.getOrderFlag.next(false);
-    });
+    this.orderService
+      .getOrders()
+      .then((value) => {
+        if (value && Array.isArray(value)) {
+          this.orders.next(value);
+        }
+      })
+      .catch((_) => {
+        this.logger.i(_);
+        this.message("Fails to fetch orders");
+      })
+      .finally(() => {
+        this.getOrderFlag.next(false);
+      });
   }
 
   // markAsComplete(order: OrderModel): void {
@@ -61,47 +65,63 @@ export class OrderState {
 
   getOrdersRemote() {
     this.getOrderFlag.next(true);
-    this.orderService.getRemoteOrders().then(value => {
-      if (value && Array.isArray(value)) {
-        this.orders.next(value);
-      }
-    }).catch(_ => {
-      this.logger.i(_);
-      this.message('Fails to fetch orders');
-    }).finally(() => {
-      this.getOrderFlag.next(false);
-    });
+    this.orderService
+      .getRemoteOrders()
+      .then((value) => {
+        if (value && Array.isArray(value)) {
+          this.orders.next(value);
+        }
+      })
+      .catch((_) => {
+        this.logger.i(_);
+        this.message("Fails to fetch orders");
+      })
+      .finally(() => {
+        this.getOrderFlag.next(false);
+      });
   }
 
   private message(reason: any) {
-    this.snack.open(reason && reason.message ? reason.message : reason.toString(), 'Ok', {
-      duration: 2000
-    });
+    this.snack.open(
+      reason && reason.message ? reason.message : reason.toString(),
+      "Ok",
+      {
+        duration: 2000
+      }
+    );
   }
 
   query(query: string) {
     this.getOrderFlag.next(true);
-    this.orderService.search(query).then(value => {
-      if (value && Array.isArray(value)) {
-        this.orders.next(value);
-      }
-    }).catch(reason => {
-      this.message(reason);
-    }).finally(() => {
-      this.getOrderFlag.next(false);
-    });
+    this.orderService
+      .search(query)
+      .then((value) => {
+        if (value && Array.isArray(value)) {
+          this.orders.next(value);
+        }
+      })
+      .catch((reason) => {
+        this.message(reason);
+      })
+      .finally(() => {
+        this.getOrderFlag.next(false);
+      });
   }
 
   deleteOrder(order: OrderModel) {
     this.getOrderFlag.next(true);
-    this.message('Deleting...');
-    this.orderService.deleteOrder(order).then(v => {
-      this.orders.next(this.orders.value.filter(x => x.id !== order.id));
-      this.message(`Order deleted permanent`);
-    }).catch(reason => {
-      this.message(reason);
-    }).finally(() => {
-      this.getOrderFlag.next(false);
-    });
+    this.message("Deleting...");
+    this.orderService
+      .deleteOrder(order)
+      .then((v) => {
+        this.orders.next(this.orders.value.filter((x) => x.id !== order.id));
+        this.message(`Order deleted permanent`);
+      })
+      .catch((reason) => {
+        this.message(reason);
+      })
+      .finally(() => {
+        this.getOrderFlag.next(false);
+      });
   }
 }

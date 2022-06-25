@@ -1,16 +1,15 @@
-import {Injectable} from '@angular/core';
-import {IpfsService} from '@smartstocktz/core-libs';
+import { Injectable } from "@angular/core";
+import { IpfsService } from "smartstock-core";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class CidService {
-  constructor() {
-  }
+  constructor() {}
 
   async toDatas(cids: string[]) {
-    return await Promise.all(
-      cids.map(async c => {
+    return (await Promise.all(
+      cids.map(async (c) => {
         return IpfsService.getDataFromCid(c);
         // console.log(dt);
         // dt.id = dt._id;
@@ -21,6 +20,6 @@ export class CidService {
         // delete dt._updated_at;
         // recordPayment dt;
       })
-    ) as any;
+    )) as any;
   }
 }
