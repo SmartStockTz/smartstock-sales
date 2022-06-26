@@ -10,7 +10,7 @@ import {
 import { MatDrawer, MatSidenav } from "@angular/material/sidenav";
 import { SalesState } from "../states/sales.state";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { DeviceState } from "smartstock-core";
 import { CartState } from "../states/cart.state";
 import { Subject } from "rxjs";
@@ -122,7 +122,7 @@ export class SaleComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("cartdrawer") cartDrawer: MatDrawer;
   @Input() isViewedInWholesale = true;
   @Input() isViewedInInvoice = false;
-  searchInputControl = new FormControl("", [
+  searchInputControl = new UntypedFormControl("", [
     Validators.nullValidator,
     Validators.required
   ]);

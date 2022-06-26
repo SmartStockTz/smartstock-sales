@@ -1,5 +1,5 @@
 import { Component, Injectable, Input, OnInit } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { toSqlDate } from "smartstock-core";
 import { MatDatepicker } from "@angular/material/datepicker";
 
@@ -118,7 +118,7 @@ export const MY_FORMATS = {
   ]
 })
 export class PeriodDateRangeComponent implements OnInit {
-  dateRange: FormGroup;
+  dateRange: UntypedFormGroup;
   maxDate = new Date();
   minDate = new Date(new Date().setFullYear(2015));
   from = new Date();
@@ -127,9 +127,9 @@ export class PeriodDateRangeComponent implements OnInit {
   @Input() hideEndDate = false;
   @Input() setPeriod = "day";
 
-  fromDateFormControl = new FormControl(moment());
-  toDateFormControl = new FormControl(moment());
-  periodFormControl = new FormControl();
+  fromDateFormControl = new UntypedFormControl(moment());
+  toDateFormControl = new UntypedFormControl(moment());
+  periodFormControl = new UntypedFormControl();
 
   constructor(private periodDateRangeService: PeriodState) {
     // this.dateRange = new FormGroup({

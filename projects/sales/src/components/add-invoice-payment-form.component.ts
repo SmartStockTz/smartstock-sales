@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceState} from '../states/invoice.state';
 
@@ -44,12 +44,12 @@ import {InvoiceState} from '../states/invoice.state';
 })
 
 export class AddInvoicePaymentFormComponent implements OnInit {
-  invoicePaymentForm: FormGroup;
+  invoicePaymentForm: UntypedFormGroup;
   @Input() invoice: InvoiceModel;
   @Output() done = new EventEmitter();
 
   constructor(public readonly invoiceState: InvoiceState,
-              private readonly formBuilder: FormBuilder) {
+              private readonly formBuilder: UntypedFormBuilder) {
   }
 
   ngOnInit(): void {

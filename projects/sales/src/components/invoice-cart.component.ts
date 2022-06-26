@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatSidenav } from "@angular/material/sidenav";
 import { CartDrawerState, DeviceState, UserService } from "smartstock-core";
 import { MatDialog } from "@angular/material/dialog";
@@ -146,7 +146,7 @@ import { CustomerModel } from "../models/customer.model";
 })
 export class InvoiceCartComponent implements OnInit, OnDestroy {
   drawer: MatSidenav;
-  supplierFormControl = new FormControl("", [
+  supplierFormControl = new UntypedFormControl("", [
     Validators.nullValidator,
     Validators.required,
     Validators.minLength(1)

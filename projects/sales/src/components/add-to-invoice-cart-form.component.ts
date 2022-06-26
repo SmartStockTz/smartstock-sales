@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {StockModel} from '../models/stock.model';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {StockState} from '../states/stock.state';
 import {InvoiceItemModel} from '../models/invoice-item.model';
 import {InvoiceCartState} from '../states/invoice-cart.state';
@@ -69,13 +69,13 @@ import {InvoiceCartState} from '../states/invoice-cart.state';
 })
 
 export class AddToInvoiceCartFormComponent implements OnInit {
-  addToCartForm: FormGroup;
+  addToCartForm: UntypedFormGroup;
   @Input() product: StockModel;
   @Output() done = new EventEmitter();
 
   constructor(private readonly invoiceCartState: InvoiceCartState,
               private readonly stockState: StockState,
-              private readonly formBuilder: FormBuilder) {
+              private readonly formBuilder: UntypedFormBuilder) {
   }
 
   ngOnInit(): void {

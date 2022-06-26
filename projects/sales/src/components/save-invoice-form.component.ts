@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { StockModel } from "../models/stock.model";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { SecurityUtil, UserService } from "smartstock-core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
@@ -56,7 +56,7 @@ import moment from "moment";
   styleUrls: ["../styles/add-to-cart.style.scss"]
 })
 export class SaveInvoiceFormComponent implements OnInit {
-  invoiceHeaderForm: FormGroup;
+  invoiceHeaderForm: UntypedFormGroup;
   @Input() product: StockModel;
   @Output() done = new EventEmitter();
 
@@ -67,7 +67,7 @@ export class SaveInvoiceFormComponent implements OnInit {
     private readonly snack: MatSnackBar,
     private readonly router: Router,
     private readonly stockState: StockState,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: UntypedFormBuilder
   ) {}
 
   ngOnInit(): void {

@@ -6,7 +6,7 @@ import {
   OnInit,
   Output
 } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatSidenav } from "@angular/material/sidenav";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { DeviceState } from "smartstock-core";
@@ -168,7 +168,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   @Output() afterAddToCart = new EventEmitter();
 
   detailView = false;
-  quantityFormControl = new FormControl(1, [
+  quantityFormControl = new UntypedFormControl(1, [
     Validators.nullValidator,
     Validators.min(1)
   ]);

@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { DeviceState } from "smartstock-core";
 import { RefundState } from "../states/refund.state";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { MatPaginator } from "@angular/material/paginator";
 
 @Component({
@@ -57,7 +57,7 @@ export class RefundBodyHeaderComponent implements OnInit, AfterViewInit {
   @Output() paginator: EventEmitter<MatPaginator> = new EventEmitter<
     MatPaginator
   >();
-  dateControl = new FormControl(new Date());
+  dateControl = new UntypedFormControl(new Date());
 
   constructor(
     public readonly deviceState: DeviceState,

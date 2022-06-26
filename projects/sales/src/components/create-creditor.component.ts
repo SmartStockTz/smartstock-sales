@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CreditorState} from '../states/creditor.state';
@@ -59,11 +59,11 @@ import {CreditorState} from '../states/creditor.state';
   selector: 'app-create-creditor'
 })
 export class CreateCreditorComponent implements OnInit {
-  createCreditorForm: FormGroup;
+  createCreditorForm: UntypedFormGroup;
   createShopProgress = false;
 
   constructor(public dialogRef: MatDialogRef<CreateCreditorComponent>,
-              public readonly formBuilder: FormBuilder,
+              public readonly formBuilder: UntypedFormBuilder,
               @Inject(MAT_DIALOG_DATA) public data: any, private readonly snack: MatSnackBar,
               public readonly creditorState: CreditorState) {
 

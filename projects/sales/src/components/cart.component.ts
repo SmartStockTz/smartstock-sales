@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { FormControl, Validators } from "@angular/forms";
+import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatSidenav } from "@angular/material/sidenav";
 import { CustomerState } from "../states/customer.state";
 import { DeviceState, UserService } from "smartstock-core";
@@ -180,11 +180,11 @@ import { database } from "bfast";
 export class CartComponent implements OnInit, OnDestroy {
   @Input() channel: "retail" | "whole" | "credit" = "retail";
   @Input() cartdrawer: MatSidenav;
-  discountFormControl = new FormControl(0, [
+  discountFormControl = new UntypedFormControl(0, [
     Validators.nullValidator,
     Validators.min(0)
   ]);
-  customerFormControl = new FormControl("", [
+  customerFormControl = new UntypedFormControl("", [
     Validators.nullValidator,
     Validators.required,
     Validators.minLength(1)
