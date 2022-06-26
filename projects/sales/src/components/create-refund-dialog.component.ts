@@ -1,5 +1,5 @@
 import {Component, Inject, NgZone, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -38,11 +38,11 @@ import {RefundState} from '../states/refund.state';
 export class CreateRefundDialogComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  refundForm: FormGroup;
+  refundForm: UntypedFormGroup;
 
   constructor(public dialogRef: MatDialogRef<CreateRefundDialogComponent>,
               public readonly refundState: RefundState,
-              public readonly formBuilder: FormBuilder,
+              public readonly formBuilder: UntypedFormBuilder,
               @Inject(MAT_DIALOG_DATA) public readonly data: {
                 sale: SalesModel
               }) {

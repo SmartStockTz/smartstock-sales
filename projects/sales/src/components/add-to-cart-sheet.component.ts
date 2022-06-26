@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {StockModel} from '../models/stock.model';
 import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
@@ -46,7 +46,7 @@ export class AddToCartSheetComponent implements OnInit, OnDestroy, AfterViewInit
               @Inject(MAT_BOTTOM_SHEET_DATA) public readonly data: {
                 stock: StockModel,
                 isViewedInWholesale: boolean,
-                quantityFormControl: FormControl,
+                quantityFormControl: UntypedFormControl,
                 addToCart: (product: StockModel) => any,
                 incrementQty: () => any,
                 decrementQty: () => any

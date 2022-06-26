@@ -60,7 +60,8 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "webWorkerTsConfig": "projects/sales-mock/tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -136,7 +137,8 @@
             "styles": [
               "projects/sales-mock/src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "webWorkerTsConfig": "projects/sales-mock/tsconfig.worker.json"
           }
         },
         "e2e": {
@@ -156,6 +158,5 @@
   },
   "cli": {
     "analytics": false
-  },
-  "defaultProject": "sales"
+  }
 }

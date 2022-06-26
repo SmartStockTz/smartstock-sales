@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CustomerState} from '../states/customer.state';
 import {CustomerModel} from '../models/customer.model';
@@ -54,12 +54,12 @@ import {CustomerModel} from '../models/customer.model';
   selector: 'app-create-customer-form'
 })
 export class CreateCustomerComponent implements OnInit {
-  createCustomerForm: FormGroup;
+  createCustomerForm: UntypedFormGroup;
   @Input() updateMode = false;
   @Input() customer: CustomerModel = null;
   @Output() done = new EventEmitter<CustomerModel>();
 
-  constructor(public readonly formBuilder: FormBuilder,
+  constructor(public readonly formBuilder: UntypedFormBuilder,
               public readonly snack: MatSnackBar,
               public readonly customerState: CustomerState) {
 
