@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Output} from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cash-sale-cart-options',
@@ -14,6 +15,10 @@ import {Component, EventEmitter, Output} from '@angular/core';
         </mat-list-item>
         <mat-list-item (click)="printOnly()">
           <p matLine>Print cart only</p>
+          <mat-icon matListIcon>print</mat-icon>
+        </mat-list-item>
+        <mat-list-item (click)="chooseDefaultPrinter()">
+          <p matLine>Set default printer</p>
           <mat-icon matListIcon>print</mat-icon>
         </mat-list-item>
       </mat-nav-list>
@@ -34,5 +39,9 @@ export class CashSaleCartOptionsComponent {
 
   printOnly() {
     this.done.emit('print');
+  }
+  
+  chooseDefaultPrinter(): void{
+    this.done.emit('printer');
   }
 }

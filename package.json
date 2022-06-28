@@ -1,6 +1,6 @@
 {
   "name": "smartstock-sales",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "ng": "ng",
     "box": "yarn install && yarn start",
@@ -29,7 +29,7 @@
     "moment": "2.29.3",
     "ngx-infinite-scroll": "13.0.2",
     "rxjs": "~7.4.0",
-    "smartstock-core": "1.0.2",
+    "smartstock-core": "^1.0.4",
     "tslib": "^2.3.0",
     "uuid": "8.3.2",
     "zone.js": "~0.11.4"
