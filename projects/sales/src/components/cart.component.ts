@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl, Validators } from "@angular/forms";
 import { MatSidenav } from "@angular/material/sidenav";
 import { CustomerState } from "../states/customer.state";
-import { DeviceState, UserService } from "smartstock-core";
+import { DeviceState, PrintService, UserService } from "smartstock-core";
 import { CartState } from "../states/cart.state";
 import { CustomerModel } from "../models/customer.model";
 import { MatDialog } from "@angular/material/dialog";
@@ -199,6 +199,7 @@ export class CartComponent implements OnInit, OnDestroy {
     public readonly deviceState: DeviceState,
     public readonly snack: MatSnackBar,
     public readonly sheet: MatBottomSheet,
+    private readonly printService: PrintService,
     private readonly dialog: MatDialog
   ) {}
 
@@ -335,6 +336,9 @@ export class CartComponent implements OnInit, OnDestroy {
             this.cartState
               .printOnly(this.channel, this.discountFormControl.value)
               .catch(console.log);
+            return;
+          case "printer":
+            this.printService.showChoosePrinter();
             return;
         }
       });
