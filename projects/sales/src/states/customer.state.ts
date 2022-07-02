@@ -16,7 +16,7 @@ export class CustomerState {
   constructor(
     private readonly snack: MatSnackBar,
     private readonly customerService: CustomerService
-  ) {}
+  ) { }
 
   fetchCustomers(): void {
     this.loadingCustomers.next(true);
@@ -77,34 +77,30 @@ export class CustomerState {
       customer.id = SecurityUtil.generateUUID();
     }
     if (!customer.createdAt) {
-      customer._created_at = new Date();
+      customer.createdAt = new Date();
     }
-    return this.customerService
-      .createCustomer(customer)
-      .then((value) => {
-        if (value) {
-          let update = false;
-          const c = this.customers.value.map((x) => {
-            if (x.id === customer.id) {
-              update = true;
-              return value;
-            } else {
-              return x;
-            }
-          });
-          if (update === false) {
-            c.push(value);
+    return this.customerService.createCustomer(customer).then((value) => {
+      if (value) {
+        let update = false;
+        const c = this.customers.value.map((x) => {
+          if (x.id === customer.id) {
+            update = true;
+            return value;
+          } else {
+            return x;
           }
-          this.customers.next(c);
+        });
+        if (update === false) {
+          c.push(value);
         }
-        return value;
-      })
-      .catch((reason) => {
-        this.errorMessage(reason);
-      })
-      .finally(() => {
-        this.saveCustomerFlag.next(false);
-      });
+        this.customers.next(c);
+      }
+      return value;
+    }).catch((reason) => {
+      this.errorMessage(reason);
+    }).finally(() => {
+      this.saveCustomerFlag.next(false);
+    });
   }
 
   private errorMessage(reason) {
