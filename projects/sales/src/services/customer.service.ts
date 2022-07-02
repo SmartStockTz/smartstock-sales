@@ -65,7 +65,7 @@ export class CustomerService {
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.userService.getCurrentShop();
-    customer.id = SecurityUtil.generateUUID();
+    customer.id = customer.phone?customer.phone: SecurityUtil.generateUUID()
     customer.createdAt = new Date().toISOString();
     customer.updatedAt = new Date().toISOString();
     await database(shop.projectId)
@@ -73,6 +73,7 @@ export class CustomerService {
       .query()
       .byId(customer.id)
       .updateBuilder()
+      .upsert(true)
       .doc(customer)
       .update();
     cache({ database: shop.projectId, collection: "customers" })

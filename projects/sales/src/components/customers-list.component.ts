@@ -1,7 +1,6 @@
 import {
   AfterViewInit,
   Component,
-  Input,
   OnDestroy,
   OnInit
 } from "@angular/core";
@@ -16,7 +15,6 @@ import { DeleteConfirmDialogComponent } from "./delete-confirm-dialog.component"
 import { DialogCreateCustomerComponent } from "./dialog-create-customer.component";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { SheetCreateCustomerComponent } from "./sheet-create-customer.component";
-import { database } from "bfast";
 
 @Component({
   selector: "app-customers-list",
@@ -30,21 +28,16 @@ import { database } from "bfast";
         mode="indeterminate"
         color="primary"
       ></mat-progress-bar>
-      <cdk-virtual-scroll-viewport style="min-height: 90vh" [itemSize]="10">
+      <cdk-virtual-scroll-viewport style="min-height: 100vh" [itemSize]="10">
         <mat-list>
           <mat-list-item
             [matMenuTriggerFor]="menu"
             *cdkVirtualFor="let customer of dataSource.connect() | async"
           >
             <h1 matLine>
-              <app-customer-active [customer]="customer"></app-customer-active>
-              {{ customer.displayName }} |
-              <mat-card-subtitle>{{
-                customer.createdAt | date
-              }}</mat-card-subtitle>
+              {{ customer.displayName }}
             </h1>
             <p matLine>{{ customer.phone }}</p>
-            <p matLine>{{ customer.email }}</p>
             <mat-icon matSuffix>more_horiz</mat-icon>
             <mat-menu xPosition="before" #menu>
               <button (click)="updateCustomer(customer)" mat-menu-item>

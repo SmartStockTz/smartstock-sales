@@ -25,29 +25,6 @@ import { SheetCreateCustomerComponent } from "./sheet-create-customer.component"
   template: `
     <div class="customers-container">
       <table mat-table [dataSource]="dataSource" matSort>
-        <!--      <ng-container matColumnDef="details">-->
-        <!--        <th class="table-title-text" mat-header-cell *matHeaderCellDef mat-sort-header>Details</th>-->
-        <!--        <td class="table-body-text" mat-cell *matCellDef="let row">-->
-        <!--          <p><b>{{row.firstName}} {{row.secondName}} | {{row.createdAt |date:'short'}}</b></p>-->
-        <!--          <p>Mobile : {{ row.mobile ? row.mobile : row.phone }}</p>-->
-        <!--          <p>Email : {{ row.email }}</p>-->
-        <!--        </td>-->
-        <!--        <td mat-footer-cell *matFooterCellDef></td>-->
-        <!--      </ng-container>-->
-        <ng-container matColumnDef="check">
-          <th
-            mat-header-cell
-            class="table-title-text"
-            *matHeaderCellDef
-            mat-sort-header
-          >
-            <mat-checkbox></mat-checkbox>
-          </th>
-          <td class="table-body-text" mat-cell *matCellDef="let row">
-            <mat-checkbox></mat-checkbox>
-          </td>
-          <td mat-footer-cell *matFooterCellDef></td>
-        </ng-container>
         <ng-container matColumnDef="Name">
           <th
             mat-header-cell
@@ -58,9 +35,7 @@ import { SheetCreateCustomerComponent } from "./sheet-create-customer.component"
             Name
           </th>
           <td class="table-body-text" mat-cell *matCellDef="let row">
-            <app-customer-active [customer]="row"></app-customer-active>
-            {{ row.displayName }} |
-            <mat-card-subtitle>{{ row.createdAt | date }}</mat-card-subtitle>
+            {{ row.displayName }}
           </td>
           <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
@@ -90,7 +65,6 @@ import { SheetCreateCustomerComponent } from "./sheet-create-customer.component"
           <td class="table-body-text" mat-cell *matCellDef="let row">
             {{ row.email }}
           </td>
-          <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
         </ng-container>
         <ng-container matColumnDef="Action">
           <th
@@ -140,7 +114,7 @@ export class CustomersTableComponent
   implements OnInit, OnDestroy, AfterViewInit {
   customers: CustomerModel[];
   dataSource: MatTableDataSource<CustomerModel> = new MatTableDataSource([]);
-  displayColumns = ["check", "Name", "Mobile", "Email", "Action"];
+  displayColumns = ["Name", "Mobile", "Email", "Action"];
   @Input() paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   destroyer: Subject<any> = new Subject<any>();

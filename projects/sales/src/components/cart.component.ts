@@ -275,12 +275,14 @@ export class CartComponent implements OnInit, OnDestroy {
       this.customerFormControl.value &&
       this.customerFormControl.value !== ""
     ) {
-      this.cartState.selectedCustomer.next({
-        displayName: this.customerFormControl.value
-      });
-      this.customerState
-        .saveCustomer(this.cartState.selectedCustomer.value)
-        .catch(console.log);
+      // this.cartState.selectedCustomer.next({
+      //   displayName: this.customerFormControl.value
+      // });
+      // this.customerState
+      //   .saveCustomer(this.cartState.selectedCustomer.value)
+      //   .catch(console.log);
+      this.createCustomer();
+      return
     }
     if (this.channel === "whole" && !this.cartState.selectedCustomer.value) {
       this.snack.open("Please enter customer name, or add a customer", "Ok", {
@@ -301,11 +303,22 @@ export class CartComponent implements OnInit, OnDestroy {
 
   createCustomer() {
     if (this.deviceState.isSmallScreen.value === true) {
-      this.sheet.open(SheetCreateCustomerComponent);
+      this.sheet.open(SheetCreateCustomerComponent, {
+        data: {
+          customer: {
+            displayName: this.customerFormControl.value
+          }
+        }
+      });
       return;
     }
     this.dialog.open(DialogCreateCustomerComponent, {
-      maxWidth: "500px"
+      maxWidth: "500px",
+      data: {
+        customer: {
+          displayName: this.customerFormControl.value
+        }
+      }
     });
   }
 
