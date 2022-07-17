@@ -21,16 +21,16 @@ import { ShopModel } from 'smartstock-core';
       <div class='container-fluid row'>
         <div class="col-12 col-md-6 col-lg-6 col-xl-6">
           <h4><b>Bill from</b></h4>
-          <h4>Name: {{data.shop?.businessName}}</h4>
-          <h4>Street: {{data.shop.street}}</h4>
-          <h4>City: {{data.shop.region}}, {{data.shop.country}}</h4>
+          <p>Name: {{data.shop?.businessName}}</p>
+          <p>Street: {{data.shop.street}}</p>
+          <p>City: {{data.shop.region}}, {{data.shop.country}}</p>
           <!-- <h4>mobile: {{data.shop.region}}, {{data.shop.country}}</h4> -->
         </div>
         <div class="col-12  col-md-6 col-lg-6 col-xl-6">
           <h4><b>Bill to</b></h4>
-          <h4>Name: {{data.order?.customer?.displayName}}</h4>
-          <h4>Mobile: {{data.order?.customer?.phone}}</h4>
-          <h4>Email: {{data.order?.customer?.email}}</h4>
+          <p>Name: {{data.order?.customer?.displayName}}</p>
+          <p>>Mobile: {{data.order?.customer?.phone}}</p>
+          <p>Email: {{data.order?.customer?.email}}</p>
         </div>
       </div>
       <!-- <hr class="hrline"> -->
@@ -106,7 +106,7 @@ export class OrdersItemsComponent implements OnInit {
     return typeof unit === 'number' ? unit * item.quantity : 0
   }
   totalCost() {
-    return this.data.order.items.reduce((a, b) => a + this.unitPrice(b), 0);
+    return this.data.order.items.reduce((a, b) => a + (this.unitPrice(b)*b.quantity), 0);
   }
 
   printOrder(){
