@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { PrintService } from "smartstock-core";
-import { Router } from "@angular/router";
+import { SecurityUtil } from "smartstock-core";
 import { InvoiceItemModel } from "../models/invoice-item.model";
-import { InvoiceService } from "../services/invoice.services";
 import { InvoiceCartService } from "../services/invoice-cart.service";
 import { CustomerModel } from "../models/customer.model";
+import { OrderService } from "../public-api";
+import { UserModel } from "bfast/dist/lib/models/UserModel";
 
 @Injectable({
   providedIn: "root"
@@ -19,16 +19,14 @@ export class InvoiceCartState {
 
   constructor(
     private readonly invoiceCartService: InvoiceCartService,
-    private readonly printService: PrintService,
-    private readonly invoiceService: InvoiceService,
-    private readonly router: Router,
+    private readonly orderService: OrderService,
     private readonly snack: MatSnackBar
   ) {}
 
   private message(reason) {
     this.snack.open(
       reason && reason.message ? reason.message : reason.toString(),
-      "Ok",
+      "",
       {
         duration: 2000
       }
@@ -85,10 +83,30 @@ export class InvoiceCartState {
     this.carts.next(this.carts.value);
   }
 
+  async saveProfoma(user: UserModel): Promise<any>{
+    return this.orderService.saveOrder(
+      SecurityUtil.generateUUID(),
+      this.carts.value.map(x=>{
+        x.stock.retailPrice = x.amount;
+        x.stock.wholesalePrice = x.amount;
+        return {
+          quantity: x.quantity,
+          product: x.stock as any
+        }
+      }),
+      'profoma',
+      this.selectedCustomer.value,
+      user
+    ).then(()=>{
+      this.dispose();
+      return;
+    });
+  }
+
   dispose() {
-    this.carts.next([]);
-    this.cartTotal.next(0);
-    this.cartTotalItems.next(0);
-    this.selectedCustomer.next(null);
+    this?.carts.next([]);
+    this?.cartTotal.next(0);
+    this?.cartTotalItems.next(0);
+    this?.selectedCustomer.next(null);
   }
 }

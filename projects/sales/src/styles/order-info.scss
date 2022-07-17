@@ -1,0 +1,31 @@
+.order-header{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding-bottom: 16px;
+    align-items: center;
+}
+
+.order-header-logo{
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+}
+
+.order-header-text{
+    flex-grow: 1;
+}
+
+.hrline{
+    margin: 1em 0;
+}
+
+.otd{
+    padding: 8px
+}
+
+.oa{
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}

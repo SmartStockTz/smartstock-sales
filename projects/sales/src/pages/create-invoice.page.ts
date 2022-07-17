@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { DeviceState } from "smartstock-core";
-import { CartState } from "../states/cart.state";
 import { StockState } from "../states/stock.state";
 import { CustomerState } from "../states/customer.state";
 import { InvoiceCartState } from "../states/invoice-cart.state";

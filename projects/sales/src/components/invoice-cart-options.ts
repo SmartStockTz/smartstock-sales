@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-cash-sale-cart-options',
+  selector: 'app-invoice-cart-options',
   template: `
     <div class="cash-container">
       <div class="handler-container">
@@ -9,31 +9,31 @@ import {Component, EventEmitter, Output} from '@angular/core';
       </div>
       <mat-nav-list>
         <mat-list-item (click)="saveOrder()">
-          <p matLine>Save as order</p>
+          <p matLine>Save as profoma</p>
           <mat-icon matListIcon>save_alt</mat-icon>
         </mat-list-item>
-        <mat-list-item (click)="printOnly()">
+        <!-- <mat-list-item (click)="printOnly()">
           <p matLine>Print cart only</p>
           <mat-icon matListIcon>print</mat-icon>
         </mat-list-item>
         <mat-list-item (click)="chooseDefaultPrinter()">
           <p matLine>Set default printer</p>
           <mat-icon matListIcon>print</mat-icon>
-        </mat-list-item>
+        </mat-list-item> -->
       </mat-nav-list>
     </div>
   `,
   styleUrls: ['../styles/cash-sale.style.css']
 })
 
-export class CashSaleCartOptionsComponent {
+export class InvoiceCartOptions {
   @Output() done = new EventEmitter();
 
   constructor() {
   }
 
   saveOrder() {
-    this.done.emit('order');
+    this.done.emit('profoma');
   }
 
   printOnly() {

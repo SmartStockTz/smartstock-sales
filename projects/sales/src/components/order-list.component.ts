@@ -10,7 +10,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { CustomerModel } from "../models/customer.model";
 import { MatSort } from "@angular/material/sort";
 import { MatPaginator } from "@angular/material/paginator";
-import { DeviceState, UserService } from "smartstock-core";
+import { DeviceState, ShopModel, UserService } from "smartstock-core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -22,8 +22,10 @@ import { CartState } from "../states/cart.state";
 import { Router } from "@angular/router";
 import moment from "moment";
 
-import { OrdersItemsComponent } from "./orders-items.component";
-import { database } from "bfast";
+import { OrdersItemsComponent } from "./dialog-orders-items.component";
+import { InvoiceCartState } from "../states/invoice-cart.state";
+import { InvoiceState } from "../states/invoice.state";
+import { Dialog } from "@angular/cdk/dialog";
 
 @Component({
   selector: "app-order-list",
@@ -54,25 +56,10 @@ import { database } from "bfast";
               <b>{{ row.firstName }} {{ row.secondName }}</b>
             </p>
             <p>Mobile : {{ row.mobile ? row.mobile : row.phone }}</p>
-            <p>Email : {{ row.email }}</p>
           </td>
           <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
 
-        <ng-container matColumnDef="check">
-          <th
-            mat-header-cell
-            class="table-title-text"
-            *matHeaderCellDef
-            mat-sort-header
-          >
-            <mat-checkbox></mat-checkbox>
-          </th>
-          <td class="table-body-text" mat-cell *matCellDef="let row">
-            <mat-checkbox></mat-checkbox>
-          </td>
-          <td mat-footer-cell *matFooterCellDef></td>
-        </ng-container>
         <ng-container matColumnDef="Name">
           <th
             mat-header-cell
@@ -99,7 +86,6 @@ import { database } from "bfast";
           <td class="table-body-text" mat-cell *matCellDef="let row">
             {{ row?.shipping?.mobile }}
           </td>
-          <!--<td mat-footer-cell *matFooterCellDef>Total</td>-->
         </ng-container>
         <ng-container matColumnDef="Amount">
           <th
@@ -113,7 +99,6 @@ import { database } from "bfast";
           <td class="table-body-text" mat-cell *matCellDef="let row">
             {{ row.total | fedha | async }}
           </td>
-          <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
         </ng-container>
         <ng-container matColumnDef="Date">
           <th
@@ -127,13 +112,20 @@ import { database } from "bfast";
           <td class="table-body-text" mat-cell *matCellDef="let row">
             {{ dateT(row.date) }}
           </td>
-          <!--<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>-->
         </ng-container>
-        <!--      <ng-container matColumnDef="Status">-->
-        <!--        <th mat-header-cell class="table-title-text" *matHeaderCellDef mat-sort-header>Status</th>-->
-        <!--        <td class="table-body-text" mat-cell *matCellDef="let row"> {{row.paid === true?'PAID':''}} </td>-->
-        <!--        &lt;!&ndash;<td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>&ndash;&gt;-->
-        <!--      </ng-container>-->
+        <ng-container matColumnDef="From">
+          <th
+            mat-header-cell
+            class="table-title-text"
+            *matHeaderCellDef
+            mat-sort-header
+          >
+            Type
+          </th>
+          <td class="table-body-text" mat-cell *matCellDef="let row">
+            {{ row.channel }}
+          </td>
+        </ng-container>
         <ng-container matColumnDef="Action">
           <th
             mat-header-cell
@@ -159,7 +151,7 @@ import { database } from "bfast";
                 </mat-list-item>
                 <mat-list-item (click)="orderDetails(row)">
                   <p matLine>Details</p>
-                  <mat-icon matListIcon>receipt</mat-icon>
+                  <mat-icon matListIcon>info</mat-icon>
                 </mat-list-item>
               </mat-nav-list>
             </mat-menu>
@@ -233,7 +225,7 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
   dataSource: MatTableDataSource<OrderModel> = new MatTableDataSource<
     OrderModel
   >([]);
-  displayColumns = ["check", "Name", "Mobile", "Amount", "Date", "Action"];
+  displayColumns = ["Name", "Mobile", "Amount", "Date", "From", "Action"];
   displayColumnsMobile = ["details"];
   @Input() paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -241,13 +233,14 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     public readonly orderState: OrderState,
-    public readonly matDialog: MatDialog,
-    public readonly matBottomSheet: MatBottomSheet,
-    public readonly cartState: CartState,
-    public readonly router: Router,
-    private readonly userService: UserService,
-    public readonly deviceState: DeviceState
-  ) {}
+    private readonly dilaog: MatDialog,
+    private readonly cartState: CartState,
+    private readonly router: Router,
+    private readonly invoiceCartState: InvoiceCartState,
+    private readonly invoiceState: InvoiceState,
+    public readonly deviceState: DeviceState,
+    private readonly userServie: UserService,
+  ) { }
 
   ngOnDestroy(): void {
     this.destroyer.next("done");
@@ -287,17 +280,29 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cartState.cartOrder.next(row);
         this.router.navigateByUrl("/sale/whole").catch(console.log);
         return;
+      case "profoma":
+        this.invoiceCartState.carts.next(row.items.map(x => {
+          return {
+            amount: x.product.retailPrice,
+            quantity: x.quantity,
+            stock: x.product as any
+          }
+        }));
+        this.invoiceState.processedOrder.next(row);
+        this.invoiceCartState.totalItems();
+        this.invoiceCartState.selectedCustomer.next(row.customer);
+        this.router.navigateByUrl("/sale/invoices/create");
+        return;
     }
   }
 
   deleteOrder(row: OrderModel): void {
-    this.matDialog
-      .open(DeleteConfirmDialogComponent, {
-        data: {
-          title: "Hello!",
-          body: "Delete is permanent do you want to proceed"
-        }
-      })
+    this.dilaog.open(DeleteConfirmDialogComponent, {
+      data: {
+        title: "Hello!",
+        body: "Delete is permanent do you want to proceed"
+      }
+    })
       .afterClosed()
       .subscribe((value) => {
         if (value !== null) {
@@ -307,15 +312,20 @@ export class OrderListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   dateT(date: any) {
-    // console.log(date);
     return moment(date).format("YYYY-MM-DD HH:mm");
   }
 
-  orderDetails(row) {
-    this.matBottomSheet.open(OrdersItemsComponent, {
+  async orderDetails(row) {
+    let shop: ShopModel;
+    try {
+      shop = await this.userServie.getCurrentShop()
+    } catch { }
+    this.dilaog.open(OrdersItemsComponent, {
       closeOnNavigation: true,
+      // position: {top: '24px', bottom: '', right: '', left: ''},
       data: {
-        order: row
+        order: row,
+        shop: shop
       }
     });
   }

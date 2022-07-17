@@ -27,34 +27,6 @@ import {InvoiceCartState} from '../states/invoice-cart.state';
             Price required and must be positive number
           </mat-error>
         </div>
-<!--        <div class="input-container">-->
-<!--          <p class="input-head">New retail price</p>-->
-<!--          <input formControlName="retailPrice" type="number" class="input-body">-->
-<!--          <mat-error *ngIf="addToCartForm.get('retailPrice').invalid">-->
-<!--            Retail price required and must be positive number-->
-<!--          </mat-error>-->
-<!--        </div>-->
-<!--        <div class="input-container">-->
-<!--          <p class="input-head">New wholesale price</p>-->
-<!--          <input formControlName="wholesalePrice" type="number" class="input-body">-->
-<!--          <mat-error *ngIf="addToCartForm.get('wholesalePrice').invalid">-->
-<!--            Wholesale price required and must be positive number-->
-<!--          </mat-error>-->
-<!--        </div>-->
-
-        <!--        <div *ngIf="product.canExpire" class="input-container">-->
-        <!--          <p class="input-head">Expire date</p>-->
-        <!--          <input formControlName="expire" type="number" class="input-body">-->
-        <!--        </div>-->
-
-<!--        <mat-form-field *ngIf="product.canExpire" appearance="outline">-->
-<!--          <mat-label class="input-head">Expire date</mat-label>-->
-<!--          <input matInput formControlName="expire" [matDatepicker]="picker">-->
-<!--          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>-->
-<!--          <mat-datepicker #picker></mat-datepicker>-->
-<!--&lt;!&ndash;          <mat-error>Payment date required</mat-error>&ndash;&gt;-->
-<!--        </mat-form-field>-->
-
         <div class="input-container">
           <button color="primary" [disabled]="addToCartForm.invalid"
                   mat-flat-button

@@ -10,6 +10,7 @@ import {InvoiceState} from '../states/invoice.state';
 import {InvoiceModel} from '../models/invoice.model';
 import {InvoiceDetailsModelComponent} from './invoice-details-model.component';
 import {AddInvoicePaymentDialogComponent} from './add-invoice-payment-dialog.component';
+import { AgoPipe } from '../pipes/ago.pipe';
 
 @Component({
   selector: 'app-invoices-table',
@@ -21,7 +22,7 @@ import {AddInvoicePaymentDialogComponent} from './add-invoice-payment-dialog.com
              style="background: transparent" [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="due">
           <th class="column-head-text" mat-header-cell *matHeaderCellDef mat-sort-header>Due</th>
-          <td mat-cell *matCellDef="let row"> {{row.dueDate | ago}} </td>
+          <td mat-cell [ngStyle]="dueStyle(row)" *matCellDef="let row"> {{dueWord(row)}} </td>
         </ng-container>
         <ng-container matColumnDef="sponsor">
           <th class="column-head-text" mat-header-cell *matHeaderCellDef mat-sort-header>Sponsor</th>
@@ -94,6 +95,14 @@ export class InvoicesTableComponent implements OnInit, OnDestroy, AfterViewInit 
       }
       this.invoiceState.fetchInvoices(0);
     });
+  }
+
+  dueStyle(invoice: InvoiceModel): any{
+    return new AgoPipe().transform(invoice.dueDate).includes('ago') && invoice.amount>0?{color: 'red'}:{};
+  }
+
+  dueWord(invoice: InvoiceModel): any{
+    return invoice.amount>0?new AgoPipe().transform(invoice.dueDate):"PAID";
   }
 
   openPurchasesDetails(invoiceDetailsData: InvoiceModel): any {

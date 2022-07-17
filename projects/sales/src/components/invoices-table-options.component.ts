@@ -9,7 +9,6 @@ import {InvoiceState} from '../states/invoice.state';
       <div class="options-container">
         <button mat-button routerLink="/sale/invoices/create" class="reload-button">Create</button>
         <button mat-button class="reload-button" (click)="hotReload()">Reload</button>
-        <!--        <span class="options-table-text">Last purchased products</span>-->
         <span class="spacer"></span>
         <mat-paginator [pageSize]="invoiceState.size"
                        [length]="invoiceState.totalInvoices | async"

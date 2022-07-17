@@ -8,6 +8,8 @@ export type InvoiceItemModel = {
     supplier: string;
     unit: string;
     stockable: boolean;
+    retailPrice?: number,
+    wholesalePrice?: number,
     // saleable: boolean;
     // purchasable: boolean;
     id: string;
