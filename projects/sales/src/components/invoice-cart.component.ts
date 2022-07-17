@@ -16,6 +16,8 @@ import { Router } from "@angular/router";
 import { SaveInvoiceSheetComponent } from "./save-invoice-sheet.component";
 import { SaveInvoiceDialogComponent } from "./save-invoice-dialog.component";
 import { CustomerModel } from "../models/customer.model";
+import { DialogInvoiceCartOptions } from "./dialog-invoice-cart-options";
+import { CartState } from "../states/cart.state";
 
 @Component({
   selector: "app-invoice-cart",
@@ -59,9 +61,6 @@ import { CustomerModel } from "../models/customer.model";
               </mat-option>
             </mat-autocomplete>
           </div>
-          <!--          <button color="primary" (click)="addNewSupplier()" mat-icon-button>-->
-          <!--            <mat-icon>add_circle_outline</mat-icon>-->
-          <!--          </button>-->
         </div>
       </div>
       <div style="padding-bottom: 500px">
@@ -134,10 +133,10 @@ import { CustomerModel } from "../models/customer.model";
               >Record</span
             >
           </button>
-          <!--          <button *ngIf="(cartState.checkoutProgress | async)===false"-->
-          <!--                  (click)="openOptions()" mat-icon-button>-->
-          <!--            <mat-icon>more_vert</mat-icon>-->
-          <!--          </button>-->
+          <button *ngIf="(invoiceState.addInvoiceProgress | async) === false"
+                  (click)="openOptions()" mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -164,8 +163,8 @@ export class InvoiceCartComponent implements OnInit, OnDestroy {
     public readonly cartDrawerState: CartDrawerState,
     public readonly invoiceState: InvoiceState,
     public readonly stockState: StockState,
-    private readonly router: Router,
     private readonly dialog: MatDialog,
+    private readonly route: Router,
     public readonly sheet: MatBottomSheet
   ) {}
 
@@ -199,17 +198,6 @@ export class InvoiceCartComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getUser(): void {
-    this.userService
-      .currentUser()
-      .then((value) => {
-        this.currentUser = value;
-      })
-      .catch((_) => {
-        this.currentUser = undefined;
-      });
-  }
-
   private handleSupplierNameControl(): void {
     this.supplierFormControl.valueChanges
       .pipe(takeUntil(this.destroyer))
@@ -220,56 +208,25 @@ export class InvoiceCartComponent implements OnInit, OnDestroy {
       });
   }
 
-  checkout(): void {
+  isCustomerSelected(): boolean{
     if (
       !this.invoiceCartState.selectedCustomer.value &&
       this.supplierFormControl.value &&
       this.supplierFormControl.value !== ""
     ) {
-      // this.invoiceCartState.selectedCustomer.next({
-      //   name: this.supplierFormControl.value
-      // });
       this.supplierFormControl.setValue("");
     }
     if (!this.invoiceCartState.selectedCustomer.value) {
-      this.snack.open("Please select customer", "Ok", {
+      this.snack.open("Please select customer", "", {
         duration: 3000
       });
-      return;
+      return false;
     }
+    return true;
+  }
 
-    // this.userService.currentUser().then(user => {
-    //   return this.invoiceState.addInvoice({
-    //     batchId: SecurityUtil.generateUUID(),
-    //     sponsor: null,
-    //     id: SecurityUtil.generateUUID(),
-    //     amount: this.invoiceCartState.cartTotal.value,
-    //     channel: 'credit',
-    //     date: new Date().toISOString(),
-    //     payment: {},
-    //     items: this.invoiceCartState.carts.value,
-    //     customer: {
-    //       id: this.invoiceCartState.selectedCustomer.value.id,
-    //       displayName: this.invoiceCartState.selectedCustomer.value.displayName,
-    //       email: this.invoiceCartState.selectedCustomer.value.email,
-    //       firstName: this.invoiceCartState.selectedCustomer.value.displayName,
-    //       lastName: this.invoiceCartState.selectedCustomer.value.displayName,
-    //       mobile: this.invoiceCartState.selectedCustomer.value.phone,
-    //     },
-    //     createdAt: new Date().toISOString(),
-    //     updatedAt: new Date().toISOString(),
-    //     dueDate:
-    //   });
-    // }).then(_ => {
-    //   this.invoiceCartState.dispose();
-    //   this.router.navigateByUrl('/invoices').catch(console.log);
-    //   this.stockState.stocks.filter = '';
-    // }).catch(reason => {
-    //   this.snack.open(reason && reason.message ? reason.message : reason.toString(), 'Ok', {
-    //     duration: 3000
-    //   });
-    // });
-
+  checkout(): void {
+    if(!this.isCustomerSelected())return;
     if (this.deviceState.isSmallScreen.value === true) {
       this.sheet.open(SaveInvoiceSheetComponent, {
         closeOnNavigation: true
@@ -285,4 +242,31 @@ export class InvoiceCartComponent implements OnInit, OnDestroy {
   setSelectedSupplier(option: CustomerModel) {
     this.invoiceCartState.selectedCustomer.next(option);
   }
+
+  openOptions() {
+    if(!this.isCustomerSelected()) return;
+    this.dialog
+      .open(DialogInvoiceCartOptions, {
+        closeOnNavigation: true
+      })
+      .afterClosed()
+      .subscribe((value) => {
+        switch (value) {
+          case "profoma":
+            this.invoiceState.addInvoiceProgress.next(true);
+            this.invoiceCartState
+              .saveProfoma(this.currentUser)
+              .then((_3) => {
+                this.supplierFormControl.reset(null);
+                this.route.navigateByUrl('/sale/order');
+              })
+              .catch(console.log)
+              .finally(()=>{
+                this.invoiceState.addInvoiceProgress.next(false);
+              });
+            return;
+        }
+      });
+  }
+
 }

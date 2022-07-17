@@ -11,11 +11,12 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
       <mat-nav-list>
         <mat-list-item (click)="dialogRef.close()" routerLink="/sale/retail">
           <p matLine>Order from retail</p>
-          <mat-icon matListIcon>add</mat-icon>
         </mat-list-item>
         <mat-list-item (click)="dialogRef.close()" routerLink="/sale/whole">
           <p matLine>Order from wholesale</p>
-          <mat-icon matListIcon>add</mat-icon>
+        </mat-list-item>
+        <mat-list-item (click)="dialogRef.close()" routerLink="/sale/invoices/create">
+          <p matLine>Order from invoice</p>
         </mat-list-item>
       </mat-nav-list>
     </div>

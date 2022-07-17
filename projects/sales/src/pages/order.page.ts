@@ -49,25 +49,13 @@ import { DialogNewOrderComponent } from "../components/dialog-new-order.componen
             class="actions-container"
             *ngIf="(deviceState.isSmallScreen | async) === false"
           >
-            <button (click)="addOrder()" color="primary" mat-button>
-              <mat-icon matPrefix>add</mat-icon>
-              Add
+            <button (click)="addOrder()" class="reload-button" color="primary" mat-button>
+              Create
             </button>
-            <button (click)="hotReload()" color="primary" mat-button>
-              <mat-icon matPrefix>refresh</mat-icon>
+            <button (click)="hotReload()" class="reload-button" color="primary" mat-button>
               Load
             </button>
             <span class="actions-spacer"></span>
-            <!--            <div *ngIf="(deviceState.isSmallScreen | async)===false">-->
-            <mat-paginator
-              [ngStyle]="{
-                display:
-                  (deviceState.isSmallScreen | async) === true ? 'none' : '',
-                background: 'transparent'
-              }"
-              #c_paginator
-            ></mat-paginator>
-            <!--            </div>-->
           </div>
           <app-order-list [paginator]="c_paginator"></app-order-list>
         </div>
@@ -82,7 +70,7 @@ export class OrderPage implements OnInit, OnDestroy {
     public readonly orderState: OrderState,
     private readonly userService: UserService,
     public readonly deviceState: DeviceState
-  ) {}
+  ) { }
 
   async ngOnInit(): Promise<void> {
     this.orderState.getOrders();
@@ -106,5 +94,5 @@ export class OrderPage implements OnInit, OnDestroy {
     this.orderState.getOrdersRemote();
   }
 
-  async ngOnDestroy(): Promise<void> {}
+  async ngOnDestroy(): Promise<void> { }
 }

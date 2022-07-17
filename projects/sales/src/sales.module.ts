@@ -37,7 +37,7 @@ import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatChipsModule } from "@angular/material/chips";
 import { OrderPaymentStatusComponent } from "./components/order-payment-status.component";
 import { MatBottomSheetModule } from "@angular/material/bottom-sheet";
-import { OrdersItemsComponent } from "./components/orders-items.component";
+import { OrdersItemsComponent } from "./components/dialog-orders-items.component";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
@@ -96,6 +96,8 @@ import { InvoiceProductListComponent } from "./components/invoice-product-list.c
 import { SaveInvoiceFormComponent } from "./components/save-invoice-form.component";
 import { SaveInvoiceSheetComponent } from "./components/save-invoice-sheet.component";
 import { SaveInvoiceDialogComponent } from "./components/save-invoice-dialog.component";
+import { DialogInvoiceCartOptions } from "./components/dialog-invoice-cart-options";
+import { InvoiceCartOptions } from "./components/invoice-cart-options";
 
 const routes: Routes = [
   { path: "", component: IndexPage },
@@ -227,7 +229,9 @@ const routes: Routes = [
         RefundBodyMobileComponent,
         RefundBodyHeaderComponent,
         RefundBodyTableComponent,
-        AgoPipe
+        AgoPipe,
+        DialogInvoiceCartOptions,
+        InvoiceCartOptions
     ]
 })
 export class SalesModule {

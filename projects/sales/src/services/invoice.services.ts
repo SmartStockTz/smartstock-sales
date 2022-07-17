@@ -22,7 +22,7 @@ export class InvoiceService {
       .size(size)
       .skip(skip)
       .searchByRegex("date", searchKeyword === null ? "" : searchKeyword)
-      .orderBy("date", "desc")
+      .orderBy("createdAt", "desc")
       .find();
   }
 
