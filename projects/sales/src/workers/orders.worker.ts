@@ -1,7 +1,7 @@
-import { expose } from "comlink";
-import { ShopModel } from "smartstock-core";
-import { CartItemModel } from "../models/cart-item.model";
-import { OrderModel } from "../models/order.model";
+import { expose } from 'comlink';
+import { ShopModel } from 'smartstock-core';
+import { CartItemModel } from '../models/cart-item.model';
+import { OrderModel } from '../models/order.model';
 
 export class OrdersWorker {
   constructor() {}
@@ -14,10 +14,10 @@ export class OrdersWorker {
       .map<number>((value) => {
         let quantity;
         let price;
-        if (channel === "retail") {
+        if (channel === 'retail') {
           quantity = value.quantity;
           price = value.product.retailPrice;
-        } else if (channel === "whole") {
+        } else if (channel === 'whole') {
           quantity = value.quantity;
           price = value.product.wholesalePrice;
         } else {
