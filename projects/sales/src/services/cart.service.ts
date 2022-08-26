@@ -1,19 +1,19 @@
-import { Injectable } from "@angular/core";
-import { CartItemModel } from "../models/cart-item.model";
-import { wrap } from "comlink";
-import { CartWorker } from "../workers/cart.worker";
+import { Injectable } from '@angular/core';
+import { CartItemModel } from '../models/cart-item.model';
+import { wrap } from 'comlink';
+import { CartWorker } from '../workers/cart.worker';
 import {
   LibUserModel,
   PrintService,
   SecurityUtil,
   UserService
-} from "smartstock-core";
-import { SaleService } from "./sale.service";
-import { SalesModel } from "../models/sale.model";
-import { CustomerModel } from "../models/customer.model";
+} from 'smartstock-core';
+import { SaleService } from './sale.service';
+import { SalesModel } from '../models/sale.model';
+import { CustomerModel } from '../models/customer.model';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class CartService {
   constructor(
@@ -28,7 +28,7 @@ export class CartService {
     let nativeWorker: Worker;
     try {
       nativeWorker = new Worker(
-        new URL("../workers/cart.worker", import.meta.url)
+        new URL('../workers/cart.worker', import .meta.url)
       );
       const SW = (wrap(nativeWorker) as unknown) as any;
       const stWorker = await new SW();
@@ -95,7 +95,7 @@ export class CartService {
     );
     await this.printService.print({
       data: salesItemForPrint,
-      printer: "tm20",
+      printer: 'tm20',
       id: SecurityUtil.generateUUID(),
       qr: null
     });

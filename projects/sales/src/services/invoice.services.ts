@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { SecurityUtil, UserService } from "smartstock-core";
-import { InvoiceModel } from "../models/invoice.model";
-import { database } from "bfast";
+import { Injectable } from '@angular/core';
+import { SecurityUtil, UserService } from 'smartstock-core';
+import { InvoiceModel } from '../models/invoice.model';
+import { database } from 'bfast';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class InvoiceService {
   constructor(private readonly userService: UserService) {}
@@ -16,13 +16,13 @@ export class InvoiceService {
   ): Promise<InvoiceModel[]> {
     const activeShop = await this.userService.getCurrentShop();
     return await database(activeShop.projectId)
-      .collection("invoices")
+      .collection('invoices')
       .query()
       .cids(false)
       .size(size)
       .skip(skip)
-      .searchByRegex("date", searchKeyword === null ? "" : searchKeyword)
-      .orderBy("createdAt", "desc")
+      .searchByRegex('date', searchKeyword === null ? '' : searchKeyword)
+      .orderBy('createdAt', 'desc')
       .find();
   }
 
@@ -33,9 +33,9 @@ export class InvoiceService {
     );
     const r = await database(shop.projectId)
       .bulk()
-      .create("invoices", invoice)
+      .create('invoices', invoice)
       .update(
-        "stocks",
+        'stocks',
         stockableItems.map((item) => {
           return {
             query: {
@@ -46,7 +46,7 @@ export class InvoiceService {
                 updatedAt: new Date(),
                 [`quantity.${SecurityUtil.generateUUID()}`]: {
                   q: -Number(item.quantity),
-                  s: "invoice",
+                  s: 'invoice',
                   d: new Date().toISOString()
                 }
               }
@@ -61,9 +61,9 @@ export class InvoiceService {
   async countAll(date: string): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     return await database(shop.projectId)
-      .collection("invoices")
+      .collection('invoices')
       .query()
-      .searchByRegex("date", date)
+      .searchByRegex('date', date)
       .count(true)
       .find();
   }
@@ -74,11 +74,11 @@ export class InvoiceService {
   ): Promise<InvoiceModel> {
     const shop = await this.userService.getCurrentShop();
     return await database(shop.projectId)
-      .collection("invoices")
+      .collection('invoices')
       .query()
       .byId(id)
       .updateBuilder()
-      .set("payment", payment)
+      .set('payment', payment)
       .update();
   }
 

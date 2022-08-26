@@ -1,12 +1,12 @@
-import { Injectable } from "@angular/core";
-import { SecurityUtil, UserService } from "smartstock-core";
-import { CustomerModel } from "../models/customer.model";
-import { wrap } from "comlink";
-import { CustomerWorker } from "../workers/customer.worker";
-import { cache, database } from "bfast";
+import { Injectable } from '@angular/core';
+import { SecurityUtil, UserService } from 'smartstock-core';
+import { CustomerModel } from '../models/customer.model';
+import { wrap } from 'comlink';
+import { CustomerWorker } from '../workers/customer.worker';
+import { cache, database } from 'bfast';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class CustomerService {
   constructor(private readonly userService: UserService) {}
@@ -17,7 +17,7 @@ export class CustomerService {
     let nativeWorker: Worker;
     try {
       nativeWorker = new Worker(
-        new URL("../workers/customer.worker", import.meta.url)
+        new URL('../workers/customer.worker', import .meta.url)
       );
       const SW = (wrap(nativeWorker) as unknown) as any;
       const stWorker = await new SW();
@@ -30,7 +30,7 @@ export class CustomerService {
   }
 
   private async customersFromSyncs(shop: any): Promise<CustomerModel[]> {
-    const cCache = cache({ database: shop.projectId, collection: "customers" });
+    const cCache = cache({ database: shop.projectId, collection: 'customers' });
     return cCache.getAll().then((customers) => {
       if (Array.isArray(customers) && customers.length > 0) {
         return customers;
@@ -57,7 +57,7 @@ export class CustomerService {
 
   async getRemoteCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    const c: any[] = await database(shop.projectId).table("customers").getAll();
+    const c: any[] = await database(shop.projectId).table('customers').getAll();
     return CustomerService.withWorker((customerWorker) =>
       customerWorker.getCustomersRemote(shop, c)
     );
@@ -65,18 +65,18 @@ export class CustomerService {
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.userService.getCurrentShop();
-    customer.id = customer.phone?customer.phone: SecurityUtil.generateUUID()
+    customer.id = customer.phone ? customer.phone : SecurityUtil.generateUUID();
     customer.createdAt = new Date().toISOString();
     customer.updatedAt = new Date().toISOString();
     await database(shop.projectId)
-      .table("customers")
+      .table('customers')
       .query()
       .byId(customer.id)
       .updateBuilder()
       .upsert(true)
       .doc(customer)
       .update();
-    cache({ database: shop.projectId, collection: "customers" })
+    cache({ database: shop.projectId, collection: 'customers' })
       .set(customer.id, customer)
       .catch(console.log);
     return customer;
@@ -92,11 +92,11 @@ export class CustomerService {
   async deleteCustomer(customer: CustomerModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     await database(shop.projectId)
-      .table("customers")
+      .table('customers')
       .query()
       .byId(customer.id)
       .delete();
-    cache({ database: shop.projectId, collection: "customers" })
+    cache({ database: shop.projectId, collection: 'customers' })
       .remove(customer.id)
       .catch(console.log);
     return customer;

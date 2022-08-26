@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import { SecurityUtil, ShopModel, UserService } from "smartstock-core";
-import { OrderModel } from "../models/order.model";
-import { CustomerModel } from "../models/customer.model";
-import { OrdersWorker } from "../workers/orders.worker";
-import { wrap } from "comlink";
-import { CartItemModel } from "../models/cart-item.model";
-import { cache, database, functions } from "bfast";
+import { Injectable } from '@angular/core';
+import { SecurityUtil, ShopModel, UserService } from 'smartstock-core';
+import { OrderModel } from '../models/order.model';
+import { CustomerModel } from '../models/customer.model';
+import { OrdersWorker } from '../workers/orders.worker';
+import { wrap } from 'comlink';
+import { CartItemModel } from '../models/cart-item.model';
+import { cache, database, functions } from 'bfast';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class OrderService {
   constructor(private readonly userService: UserService) {}
@@ -19,7 +19,7 @@ export class OrderService {
     let nativeWorker: Worker;
     try {
       nativeWorker = new Worker(
-        new URL("../workers/orders.worker", import.meta.url)
+        new URL('../workers/orders.worker', import .meta.url)
       );
       const SW = (wrap(nativeWorker) as unknown) as any;
       const stWorker = await new SW();
@@ -32,7 +32,7 @@ export class OrderService {
   }
 
   private async remoteAllOrders(shop: any): Promise<OrderModel[]> {
-    return database(shop.projectId).table("orders").getAll();
+    return database(shop.projectId).table('orders').getAll();
   }
 
   async saveOrder(
@@ -43,18 +43,18 @@ export class OrderService {
     user: any
   ): Promise<any> {
     if (!selectedCustomer || !selectedCustomer?.displayName) {
-      throw { message: "Please select a customer to save the order" };
+      throw { message: 'Please select a customer to save the order' };
     }
     const shop = await this.userService.getCurrentShop();
     const order = {
       id: id ? id : SecurityUtil.generateUUID(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      channel: channel ? channel : "retail",
+      channel: channel ? channel : 'retail',
       customer: selectedCustomer,
       items: carts,
       date: new Date().toISOString(),
-      status: "PROCESSED",
+      status: 'PROCESSED',
       paid: false,
       orderRef: null,
       placedBy: {
@@ -70,8 +70,8 @@ export class OrderService {
         location: selectedCustomer?.street
       }
     };
-    await database(shop.projectId).table("orders").save(order);
-    await cache({ database: shop.projectId, collection: "orders" }).set(
+    await database(shop.projectId).table('orders').save(order);
+    await cache({ database: shop.projectId, collection: 'orders' }).set(
       order.id,
       order
     );
@@ -79,14 +79,14 @@ export class OrderService {
   }
 
   private async ordersFromSyncs(shop: ShopModel): Promise<OrderModel[]> {
-    return cache({ database: shop.projectId, collection: "orders" })
+    return cache({ database: shop.projectId, collection: 'orders' })
       .getAll()
       .then((orders) => {
         if (Array.isArray(orders) && orders.length > 0) {
           return orders;
         }
         return this.getRemoteOrders().then((rO) => {
-          cache({ database: shop.projectId, collection: "orders" })
+          cache({ database: shop.projectId, collection: 'orders' })
             .setBulk(
               rO.map((x) => x.id),
               rO
@@ -115,16 +115,16 @@ export class OrderService {
 
   async markOrderIsPaid(orderId: string): Promise<any> {
     return database()
-      .collection("orders")
+      .collection('orders')
       .query()
       .byId(orderId)
       .updateBuilder()
-      .set("paid", true)
+      .set('paid', true)
       .update();
   }
 
   async checkOrderIsPaid(order: string): Promise<any> {
-    const payments = await functions("fahamupay")
+    const payments = await functions('fahamupay')
       .request(`/functions/pay/check/${order}`)
       .get<any[]>();
     return payments
@@ -143,11 +143,11 @@ export class OrderService {
   async deleteOrder(order: OrderModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
     await database(shop.projectId)
-      .table("orders")
+      .table('orders')
       .query()
       .byId(order.id)
       .delete();
-    cache({ database: shop.projectId, collection: "orders" })
+    cache({ database: shop.projectId, collection: 'orders' })
       .remove(order.id)
       .catch(console.log);
     return order;

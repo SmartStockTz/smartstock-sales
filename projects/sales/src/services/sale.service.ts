@@ -1,21 +1,21 @@
-import { Injectable } from "@angular/core";
-import { SaleWorker } from "../workers/sale.worker";
-import { getDaasAddress, SecurityUtil, UserService } from "smartstock-core";
-import { wrap } from "comlink";
-import { StockModel } from "../models/stock.model";
-import { SalesModel } from "../models/sale.model";
-import { cache, database, functions } from "bfast";
-import { sha1 } from "crypto-hash";
-import { updateStockInLocalSyncs } from "../utils/stock.util";
-import { SocketController } from "bfast/dist/lib/controllers/socket.controller";
+import {Injectable} from '@angular/core';
+import {SaleWorker} from '../workers/sale.worker';
+import {getDaasAddress, SecurityUtil, UserService} from 'smartstock-core';
+import {wrap} from 'comlink';
+import {StockModel} from '../models/stock.model';
+import {SalesModel} from '../models/sale.model';
+import {cache, functions} from 'bfast';
+import {sha1} from 'crypto-hash';
+import {updateStockInLocalSyncs} from '../utils/stock.util';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class SaleService {
-  private changes: SocketController;
+  // private changes: SocketController;
 
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+  }
 
   private static async withWorker(
     fn: (saleWorker: SaleWorker) => Promise<any>
@@ -23,7 +23,7 @@ export class SaleService {
     let nativeWorker: Worker;
     try {
       nativeWorker = new Worker(
-        new URL("../workers/sale.worker", import.meta.url)
+        new URL('../workers/sale.worker', import .meta.url)
       );
       const SW = (wrap(nativeWorker) as unknown) as any;
       const stWorker = await new SW();
@@ -37,14 +37,14 @@ export class SaleService {
 
   async products(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    return cache({ database: shop.projectId, collection: "stocks" })
+    return cache({database: shop.projectId, collection: 'stocks'})
       .getAll()
       .then((stocks) => {
         if (Array.isArray(stocks) && stocks.length > 0) {
           return stocks;
         }
         return this.getProductsRemote().then((rP) => {
-          cache({ database: shop.projectId, collection: "stocks" })
+          cache({database: shop.projectId, collection: 'stocks'})
             .setBulk(
               rP.map((x) => x.id),
               rP
@@ -67,24 +67,25 @@ export class SaleService {
         applicationId: shop.applicationId,
         projectId: shop.projectId,
         payload: sale,
-        action: "create",
+        action: 'create',
         databaseURL: getDaasAddress(shop),
-        tree: "sales"
+        tree: 'sales'
       });
       if (sale.stock.stockable === true) {
         await cache().addSyncs({
           applicationId: shop.applicationId,
           projectId: shop.projectId,
           payload: {
-            id: sale.stock.id,
-            [`quantity.${await sha1(JSON.stringify(sale))}`]: {
+            id: `${sale.stock.id}@${SecurityUtil.generateUUID()}`,
+            product: sale.product,
+            [`quantity.${SecurityUtil.generateUUID()}`]: {
               q: -sale.quantity,
-              s: "sale",
+              s: 'sale',
               d: new Date().toISOString()
             }
           },
-          tree: "stocks",
-          action: "update",
+          tree: 'stocks',
+          action: 'update',
           databaseURL: getDaasAddress(shop)
         });
         await updateStockInLocalSyncs(sale, shop);
@@ -92,14 +93,17 @@ export class SaleService {
     }
   }
 
-  private async remoteAllProducts(): Promise<StockModel[]> {
+  shopBaseUrl = shop =>
+    `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}`;
+
+  async getAllStockRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    return database(shop.projectId).table("stocks").getAll();
+    return functions().request(`${this.shopBaseUrl(shop)}/stock/products`).get();
   }
 
   async getProductsRemote(): Promise<StockModel[]> {
     const shop = await this.userService.getCurrentShop();
-    const products = await this.remoteAllProducts();
+    const products = await this.getAllStockRemote();
     return SaleService.withWorker((saleWorker) => {
       return saleWorker.filterSaleableProducts(products, shop);
     });
@@ -114,58 +118,8 @@ export class SaleService {
   }
 
   async listeningStocksStop(): Promise<void> {
-    if (this.changes && this.changes.close) {
-      this.changes.close();
-    }
   }
 
   async listeningStocks(): Promise<void> {
-    const shop = await this.userService.getCurrentShop();
-    this.changes = functions(shop.projectId).event(
-      "/daas-changes",
-      () => {
-        console.log("connected on products changes");
-        this.changes.emit({
-          auth: {
-            masterKey: shop.masterKey
-          },
-          body: {
-            projectId: shop.projectId,
-            applicationId: shop.applicationId,
-            pipeline: [],
-            domain: "stocks"
-          }
-        });
-      },
-      () => console.log("disconnected on products changes")
-    );
-    this.changes.listener(async (response) => {
-      // console.log(response);
-      const stockCache = cache({
-        database: shop.projectId,
-        collection: "stocks"
-      });
-      if (response && response.body && response.body.change) {
-        switch (response.body.change.name) {
-          case "create":
-            const data = response.body.change.snapshot;
-            await stockCache.set(data.id, data);
-            return;
-          case "update":
-            let updateData = response.body.change.snapshot;
-            const oldData = await stockCache.get(updateData.id);
-            updateData = Object.assign(
-              typeof oldData === "object" ? oldData : {},
-              updateData
-            );
-            await stockCache.set(updateData.id, updateData);
-            return;
-          case "delete":
-            const deletedData = response.body.change.snapshot;
-            await stockCache.remove(deletedData.id);
-            return;
-        }
-      }
-    });
   }
 }

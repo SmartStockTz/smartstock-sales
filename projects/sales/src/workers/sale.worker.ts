@@ -1,5 +1,5 @@
-import { expose } from "comlink";
-import { StockModel } from "../models/stock.model";
+import { expose } from 'comlink';
+import { StockModel } from '../models/stock.model';
 
 export class SaleWorker {
   constructor() {}
