@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
-import { SecurityUtil, UserService } from 'smartstock-core';
-import { CustomerModel } from '../models/customer.model';
-import { wrap } from 'comlink';
-import { CustomerWorker } from '../workers/customer.worker';
-import { cache, database } from 'bfast';
+import {Injectable} from '@angular/core';
+import {UserService} from 'smartstock-core';
+import {CustomerModel} from '../models/customer.model';
+import {wrap} from 'comlink';
+import {CustomerWorker} from '../workers/customer.worker';
+import {cache, functions} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+  }
 
   private static async withWorker(
     fn: (customerWorker: CustomerWorker) => Promise<any>
@@ -30,7 +31,7 @@ export class CustomerService {
   }
 
   private async customersFromSyncs(shop: any): Promise<CustomerModel[]> {
-    const cCache = cache({ database: shop.projectId, collection: 'customers' });
+    const cCache = cache({database: shop.projectId, collection: 'customers'});
     return cCache.getAll().then((customers) => {
       if (Array.isArray(customers) && customers.length > 0) {
         return customers;
@@ -38,7 +39,7 @@ export class CustomerService {
       return this.getRemoteCustomers().then((rC) => {
         cCache
           .setBulk(
-            rC.map((x) => x.id),
+            rC.map((x) => x.displayName),
             rC
           )
           .catch(console.log);
@@ -57,7 +58,8 @@ export class CustomerService {
 
   async getRemoteCustomers(): Promise<CustomerModel[]> {
     const shop = await this.userService.getCurrentShop();
-    const c: any[] = await database(shop.projectId).table('customers').getAll();
+    const url = `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}/sale/customers`;
+    const c: any[] = await functions().request(url).get();
     return CustomerService.withWorker((customerWorker) =>
       customerWorker.getCustomersRemote(shop, c)
     );
@@ -65,19 +67,13 @@ export class CustomerService {
 
   async createCustomer(customer: CustomerModel): Promise<CustomerModel> {
     const shop = await this.userService.getCurrentShop();
-    customer.id = customer.phone ? customer.phone : SecurityUtil.generateUUID();
-    customer.createdAt = new Date().toISOString();
-    customer.updatedAt = new Date().toISOString();
-    await database(shop.projectId)
-      .table('customers')
-      .query()
-      .byId(customer.id)
-      .updateBuilder()
-      .upsert(true)
-      .doc(customer)
-      .update();
-    cache({ database: shop.projectId, collection: 'customers' })
-      .set(customer.id, customer)
+    const url = `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}/sale/customers`;
+    if (!customer.phone || customer.phone.trim() === '') {
+      customer.phone = '255';
+    }
+    await functions().request(url).put(customer);
+    cache({database: shop.projectId, collection: 'customers'})
+      .set(customer.displayName, customer)
       .catch(console.log);
     return customer;
   }
@@ -91,13 +87,10 @@ export class CustomerService {
 
   async deleteCustomer(customer: CustomerModel): Promise<any> {
     const shop = await this.userService.getCurrentShop();
-    await database(shop.projectId)
-      .table('customers')
-      .query()
-      .byId(customer.id)
-      .delete();
-    cache({ database: shop.projectId, collection: 'customers' })
-      .remove(customer.id)
+    const url = `https://smartstock-faas.bfast.fahamutech.com/shop/${shop.projectId}/${shop.applicationId}/sale/customers/${customer.id}`;
+    await functions().request(url).delete();
+    cache({database: shop.projectId, collection: 'customers'})
+      .remove(customer.displayName)
       .catch(console.log);
     return customer;
   }
