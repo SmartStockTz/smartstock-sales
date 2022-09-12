@@ -275,13 +275,13 @@ export class CartComponent implements OnInit, OnDestroy {
       this.customerFormControl.value &&
       this.customerFormControl.value !== ""
     ) {
-      // this.cartState.selectedCustomer.next({
-      //   displayName: this.customerFormControl.value
-      // });
-      // this.customerState
-      //   .saveCustomer(this.cartState.selectedCustomer.value)
-      //   .catch(console.log);
-      this.createCustomer();
+      this.cartState.selectedCustomer.next({
+        displayName: this.customerFormControl.value
+      });
+      this.customerState
+        .saveCustomer(this.cartState.selectedCustomer.value)
+        .catch(console.log);
+      // this.createCustomer();
       return
     }
     if (this.channel === "whole" && !this.cartState.selectedCustomer.value) {
