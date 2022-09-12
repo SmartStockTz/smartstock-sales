@@ -35,22 +35,17 @@ export class InvoiceService {
     return await database(shop.projectId)
       .bulk()
       .create('invoices', invoice)
-      .update(
+      .create(
         'stocks',
         stockableItems.map((item) => {
           return {
-            query: {
-              id: item.stock.id + '@' + SecurityUtil.generateUUID()
-            },
-            update: {
-              upsert: true,
-              $set: {
-                updatedAt: new Date(),
-                [`quantity.${SecurityUtil.generateUUID()}`]: {
-                  q: -Number(item.quantity),
-                  s: 'invoice',
-                  d: new Date().toISOString()
-                }
+            id: item.stock.id + '@' + SecurityUtil.generateUUID(),
+            product: item.stock.product,
+            quantity: {
+              [`${SecurityUtil.generateUUID()}`]: {
+                q: -Number(item.quantity),
+                s: 'invoice',
+                d: new Date().toISOString()
               }
             }
           };

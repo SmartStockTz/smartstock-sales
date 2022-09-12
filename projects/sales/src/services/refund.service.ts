@@ -57,19 +57,14 @@ export class RefundService {
           }
         }
       })
-      .update('stocks', {
-        query: {
-          id: sale.stock.id + '@' + SecurityUtil.generateUUID()
-        },
-        update: {
-          // @ts-ignore
-          upsert: true,
-          $set: {
-            [`quantity.${SecurityUtil.generateUUID()}`]: {
-              q: sale.stock.stockable === true ? value.quantity : 0,
-              s: 'refund',
-              d: new Date().toISOString()
-            }
+      .create('stocks', {
+        id: sale.stock.id + '@' + SecurityUtil.generateUUID(),
+        product: sale.product,
+        quantity: {
+          [`${SecurityUtil.generateUUID()}`]: {
+            q: sale.stock.stockable === true ? value.quantity : 0,
+            s: 'refund',
+            d: new Date().toISOString()
           }
         }
       })
