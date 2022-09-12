@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { SalesModel } from '../models/sale.model';
-import { cache, database } from 'bfast';
+import {Injectable} from '@angular/core';
+import {SalesModel} from '../models/sale.model';
+import {cache, database} from 'bfast';
 import moment from 'moment';
-import { SecurityUtil, UserService } from 'smartstock-core';
-import { sha1 } from 'crypto-hash';
+import {SecurityUtil, UserService} from 'smartstock-core';
+import {sha1} from 'crypto-hash';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,8 @@ import { sha1 } from 'crypto-hash';
 export class RefundService {
   constructor(
     private readonly userService: UserService
-  ) {}
+  ) {
+  }
 
   async getSales(date: Date): Promise<SalesModel[]> {
     const shop = await this.userService.getCurrentShop();
@@ -58,9 +59,11 @@ export class RefundService {
       })
       .update('stocks', {
         query: {
-          id: sale.stock.id
+          id: sale.stock.id + '@' + SecurityUtil.generateUUID()
         },
         update: {
+          // @ts-ignore
+          upsert: true,
           $set: {
             [`quantity.${SecurityUtil.generateUUID()}`]: {
               q: sale.stock.stockable === true ? value.quantity : 0,
@@ -92,7 +95,7 @@ export class RefundService {
       };
     }
     if (oldStock && oldStock.id) {
-      cache({ database: shop.projectId, collection: 'stocks' })
+      cache({database: shop.projectId, collection: 'stocks'})
         .set(oldStock.id, oldStock)
         .catch(console.log);
     }

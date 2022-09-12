@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
-import { SecurityUtil, UserService } from 'smartstock-core';
-import { InvoiceModel } from '../models/invoice.model';
-import { database } from 'bfast';
+import {Injectable} from '@angular/core';
+import {SecurityUtil, UserService} from 'smartstock-core';
+import {InvoiceModel} from '../models/invoice.model';
+import {database} from 'bfast';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvoiceService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+  }
 
   async fetchInvoices(
     size: number,
@@ -31,7 +32,7 @@ export class InvoiceService {
     const stockableItems = invoice.items.filter(
       (x) => x.stock.stockable === true
     );
-    const r = await database(shop.projectId)
+    return await database(shop.projectId)
       .bulk()
       .create('invoices', invoice)
       .update(
@@ -39,9 +40,10 @@ export class InvoiceService {
         stockableItems.map((item) => {
           return {
             query: {
-              id: item.stock.id
+              id: item.stock.id + '@' + SecurityUtil.generateUUID()
             },
             update: {
+              upsert: true,
               $set: {
                 updatedAt: new Date(),
                 [`quantity.${SecurityUtil.generateUUID()}`]: {
@@ -55,7 +57,6 @@ export class InvoiceService {
         })
       )
       .commit();
-    return r;
   }
 
   async countAll(date: string): Promise<any> {
