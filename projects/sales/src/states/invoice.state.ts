@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import { MessageService } from "smartstock-core";
-import { BehaviorSubject } from "rxjs";
-import { InvoiceService } from "../services/invoice.services";
-import { InvoiceModel } from "../models/invoice.model";
-import { InvoiceCartState } from "./invoice-cart.state";
-import { OrderService } from "../public-api";
-import { OrderModel } from "../models/order.model";
+import {Injectable} from '@angular/core';
+import {MessageService} from 'smartstock-core';
+import {BehaviorSubject} from 'rxjs';
+import {InvoiceService} from '../services/invoice.services';
+import {InvoiceModel} from '../models/invoice.model';
+import {InvoiceCartState} from './invoice-cart.state';
+import {OrderService} from '../public-api';
+import {OrderModel} from '../models/order.model';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class InvoiceState {
   processedOrder = new BehaviorSubject<OrderModel>(null);
@@ -26,18 +26,19 @@ export class InvoiceState {
     private readonly invoiceCartState: InvoiceCartState,
     private readonly orderService: OrderService,
     private readonly messageService: MessageService
-  ) {}
+  ) {
+  }
 
   fetchInvoices(page: number): void {
     this.fetchingInvoicesProgress.next(true);
     this.invoiceService
-      .countAll(this.filterKeyword.value ? this.filterKeyword.value : "")
+      .countAll(this.filterKeyword.value ? this.filterKeyword.value : '')
       .then((value) => {
         this.totalInvoices.next(value);
         return this.invoiceService.fetchInvoices(
           this.size,
           this.size * page,
-          this.filterKeyword.value ? this.filterKeyword.value : ""
+          this.filterKeyword.value ? this.filterKeyword.value : ''
         );
       })
       .then((value) => {
@@ -112,17 +113,12 @@ export class InvoiceState {
   async addInvoice(invoice: InvoiceModel): Promise<any> {
     this.addInvoiceProgress.next(true);
     const pO = await this.processedOrder.value;
-    if(pO && pO.id){
+    if (pO && pO.id) {
       await this.orderService.deleteOrder(pO);
       this.processedOrder.next(null);
     }
     return this.invoiceService
       .addInvoice(invoice)
-      .catch((reason) => {
-        this.messageService.showMobileInfoMessage(
-          reason.message ? reason.message : reason.toString()
-        );
-      })
       .finally(() => {
         this.addInvoiceProgress.next(false);
       });

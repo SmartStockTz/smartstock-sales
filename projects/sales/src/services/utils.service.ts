@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {StockModel} from '../models/stock.model';
+import {SecurityUtil} from 'smartstock-core';
 
 @Injectable({
   providedIn: 'root'
@@ -48,3 +49,18 @@ export class UtilsService {
     }
   }
 }
+
+const propertyOr = (property, orFn) =>
+  (data) =>
+    typeof data === 'object' && data !== null && data !== undefined && data.hasOwnProperty(property)
+      ? data[property]
+      : orFn(data);
+const compose = (...fns) =>
+  (...args) =>
+    fns.reduceRight((res, fn) => [fn.call(null, ...res)], args)[0];
+export const getProductId = compose(
+  x => x.replace(new RegExp('[^a-zA-Z0-9]', 'ig'), '_'),
+  x => x.replace(new RegExp('\\s+', 'ig'), '_'),
+  x => x.trim(),
+  propertyOr('product', (_) => SecurityUtil.generateUUID())
+);

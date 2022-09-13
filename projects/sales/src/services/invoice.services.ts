@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {SecurityUtil, UserService} from 'smartstock-core';
 import {InvoiceModel} from '../models/invoice.model';
 import {database} from 'bfast';
+import {getProductId} from './utils.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,14 +33,14 @@ export class InvoiceService {
     const stockableItems = invoice.items.filter(
       (x) => x.stock.stockable === true
     );
-    return await database(shop.projectId)
+    return database(shop.projectId)
       .bulk()
       .create('invoices', invoice)
       .create(
         'stocks',
         stockableItems.map((item) => {
           return {
-            id: item.stock.id + '@' + SecurityUtil.generateUUID(),
+            id: getProductId(item.stock) + '@' + SecurityUtil.generateUUID(),
             product: item.stock.product,
             quantity: {
               [`${SecurityUtil.generateUUID()}`]: {
@@ -106,3 +107,5 @@ export class InvoiceService {
     //   })).commit();
   }
 }
+
+

@@ -1,16 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { StockModel } from "../models/stock.model";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
-import { SecurityUtil, UserService } from "smartstock-core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
-import { StockState } from "../states/stock.state";
-import { InvoiceState } from "../states/invoice.state";
-import { InvoiceCartState } from "../states/invoice-cart.state";
-import moment from "moment";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { StockModel } from '../models/stock.model';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { SecurityUtil, UserService } from 'smartstock-core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { StockState } from '../states/stock.state';
+import { InvoiceState } from '../states/invoice.state';
+import { InvoiceCartState } from '../states/invoice-cart.state';
+import moment from 'moment';
 
 @Component({
-  selector: "app-save-invoice-form",
+  selector: 'app-save-invoice-form',
   template: `
     <div class="dialog-container">
       <div class="dialog-header">
@@ -53,7 +53,7 @@ import moment from "moment";
       </form>
     </div>
   `,
-  styleUrls: ["../styles/add-to-cart.style.scss"]
+  styleUrls: ['../styles/add-to-cart.style.scss']
 })
 export class SaveInvoiceFormComponent implements OnInit {
   invoiceHeaderForm: UntypedFormGroup;
@@ -74,21 +74,21 @@ export class SaveInvoiceFormComponent implements OnInit {
     this.invoiceHeaderForm = this.formBuilder.group({
       date: [new Date(), [Validators.required, Validators.nullValidator]],
       dueDate: [
-        moment().add(7, "days").toDate(),
+        moment().add(7, 'days').toDate(),
         [Validators.required, Validators.nullValidator]
       ]
     });
   }
 
   recordInvoice() {
-    this.done.emit("done");
+    this.done.emit('done');
     this.userService
       .currentUser()
       .then((user) => {
         return this.invoiceState.addInvoice({
           id: SecurityUtil.generateUUID(),
           dueDate: this.invoiceHeaderForm.value.dueDate,
-          date: moment(this.invoiceHeaderForm.value.date).format("YYYY-MM-DD"),
+          date: moment(this.invoiceHeaderForm.value.date).format('YYYY-MM-DD'),
           updatedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
           customer: {
@@ -103,11 +103,11 @@ export class SaveInvoiceFormComponent implements OnInit {
           payment: {},
           items: this.invoiceCartState.carts.value,
           amount: this.invoiceCartState.cartTotal.value,
-          channel: "credit",
+          channel: 'credit',
           sponsor: null,
           batchId: SecurityUtil.generateUUID(),
           generatedBy: user.username,
-          notes: "",
+          notes: '',
           refund: {
             amount: 0,
             quantity: 0
@@ -116,18 +116,19 @@ export class SaveInvoiceFormComponent implements OnInit {
             firstname: user.firstname,
             lastname: user.lastname
           },
-          status: "unpaid"
+          status: 'unpaid'
         });
       })
       .then((_) => {
         this.invoiceCartState.dispose();
-        this.router.navigateByUrl("/sale/invoices").catch(console.log);
-        this.stockState.stocks.filter = "";
+        // this.router.navigateByUrl("/sale/invoices").catch(console.log);
+        this.stockState.stocks.filter = '';
       })
       .catch((reason) => {
+        console.log(reason);
         this.snack.open(
           reason && reason.message ? reason.message : reason.toString(),
-          "Ok",
+          'Ok',
           {
             duration: 3000
           }

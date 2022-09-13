@@ -4,6 +4,7 @@ import {cache, database} from 'bfast';
 import moment from 'moment';
 import {SecurityUtil, UserService} from 'smartstock-core';
 import {sha1} from 'crypto-hash';
+import {getProductId} from './utils.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,7 @@ export class RefundService {
   ): Promise<SalesModel> {
     const shop = await this.userService.getCurrentShop();
     const user = await this.userService.currentUser();
+    console.log(getProductId(sale.stock) + '@' + SecurityUtil.generateUUID());
     // @ts-ignore
     value.user = {
       firstname: user.firstname,
@@ -58,13 +60,13 @@ export class RefundService {
         }
       })
       .create('stocks', {
-        id: sale.stock.id + '@' + SecurityUtil.generateUUID(),
+        id: getProductId(sale.stock) + '@' + SecurityUtil.generateUUID(),
         product: sale.product,
         quantity: {
           [`${SecurityUtil.generateUUID()}`]: {
             q: sale.stock.stockable === true ? value.quantity : 0,
             s: 'refund',
-            d: new Date().toISOString()
+            d: `${new Date().toISOString()}`
           }
         }
       })
